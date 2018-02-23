@@ -3,4 +3,5 @@
 ###
 Required packages:
 
+virtual-env
 django
