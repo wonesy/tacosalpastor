@@ -1,1 +1,6 @@
 # tacosalpastor
+
+###
+Required packages:
+
+django
