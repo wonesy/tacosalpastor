@@ -103,5 +103,6 @@ ENV/
 # pycharm
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/dictionaries
 
 secrets.txt
