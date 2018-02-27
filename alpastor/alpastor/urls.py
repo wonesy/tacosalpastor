@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from trombinoscope import views
+from epita import views
 
 urlpatterns = [
     path('', views.home, name='home'),
