@@ -15,7 +15,11 @@ sudo: required
 #            - libmysqlclient-dev
 before_install:
     - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
-    - sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+    - sudo apt-get purge mysql-client-core*
+    - sudo apt-get autoremove
+    - sudo apt-get autoclean
+    - sudo apt-get install mysql-client-core-5.7
+    - sudo apt-get install mysql-server
 before_script:
     - export MYSQL_DATABASE=alpastor
     - export MYSQL_USERNAME=alpastoradmin
