@@ -7,18 +7,19 @@ services:
     - mysql
 dist: trusty
 sudo: required
-env:
-    - MYSQL_DATABASE=alpastor
-    - MYSQL_USERNAME=alpastoradmin
-    - MYSQL_USER_PASS=alpastorpass
-addons:
-    apt:
-        packages:
-            - mysql-server
-            - mysql-client
-            - libmysqlclient-dev
+#addons:
+#    apt:
+#        packages:
+#            - mysql-server
+#            - mysql-client
+#            - libmysqlclient-dev
 before_install:
     - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
+    - sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+before_script:
+    - export MYSQL_DATABASE=alpastor
+    - export MYSQL_USERNAME=alpastoradmin
+    - export MYSQL_USER_PASS=alpastorpass
     - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
     - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
     - mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastor'@'localhost';"
