@@ -1,29 +1,72 @@
 from django.db import models
 
-# Create your models here.
+
 class Student(models.Model):
+    """
+    Defines the Student database table
+
+    Args:
+        first_name = student's first name (prenom)
+        last_name = student's last name (nom)
+        external_email = student's non-epita email
+        epita_email = student's auto-assigned epita email
+        phone = phone number, in string form, to allow international + symbols
+        program = student's overall program (ME, MSc)
+        specialization = student's sub specialty (Software Engineering, ISM, etc.)
+        classof = class that student joined, form of Season Year (Fall 2017, Spring 2016)
+        country = country of origin for the student
+        city = city of origin for the student
+        languages = which languages the student speaks, comma separated (English,French)
+        photo_location = path on server to the stored location of the student's photo
+    """
     first_name = models.CharField(max_length=127)
     last_name = models.CharField(max_length=127)
     external_email = models.CharField(max_length=255, unique=True)
     epita_email = models.CharField(max_length=255, unique=True)
-    phone = models.IntegerField()
+    phone = models.CharField(max_length=31)
     program = models.CharField(max_length=6)
     specialization = models.CharField(max_length=63)
     classof = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
     city = models.CharField(max_length=127)
     languages = models.CharField(max_length=127)
-    photo_location = models.CharField(max_length=511)
+    photo_location = models.CharField(max_length=511, blank=True)
+
 
 class Professor(models.Model):
+    """
+    Defines the Professor database table
+
+    Args:
+        first_name = professor's first name (prenom)
+        last_name = professor's last name (nom)
+        external_email = professor's non-epita email
+        epita_email = professor's auto-assigned epita email
+        phone = phone number, in string form, to allow international + symbols
+    """
     first_name = models.CharField(max_length=127)
     last_name = models.CharField(max_length=127)
     external_email = models.CharField(max_length=255, unique=True)
     epita_email = models.CharField(max_length=255, unique=True)
-    phone = models.IntegerField()
+    phone = models.CharField(max_length=31)
+
 
 class Course(models.Model):
+    """
+    Defines the Course database table
 
+    Args:
+        professor_id = FK to the Professor table, indicating who is teaching it
+        title = title of the course
+        description = fuller description of the course
+        semester = the semester in which the course will be taught, form Season Year (Spring 2020)
+        module = the grading module that this course falls under (Technical, Business, etc)
+        credits = the number of credits that will be offered for this course
+
+    Note:
+         columns 'title' and 'semester' must be unique as a pair, meaning you cannot have the same course title
+         during the same semester
+    """
     class Meta:
         unique_together = (('title', 'semester'),)
 
@@ -34,35 +77,84 @@ class Course(models.Model):
     module = models.CharField(max_length=63)
     credits = models.IntegerField()
 
+
 class StudentCourse(models.Model):
+    """
+    Defines the StudentCourse database table
+
+    This is a table meant to store which classes each student belongs to
+
+    Args:
+        course_id = FK to a specific course
+        student_id = FK to a specific student
+    """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
 
+
 class Grades(models.Model):
+    """
+    Defines the Grades database table
+
+    Args:
+        course_id = FK to a specific course
+        student_id = FK to a specific student
+        assignment = assignment description/title
+        points_earned = the number of points a student has earned on this assignment
+        points_possible = the number of possible points that could be earned on this assignment
+    """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     assignment = models.CharField(max_length=255)
     points_earned = models.IntegerField()
     points_possible = models.IntegerField()
 
+
 class Room(models.Model):
+    """
+    Defines the Room database table
+
+    Args:
+        building = building code that this room is in (Voltaire, Kremlin, etc.)
+        has_whiteboard = boolean, based on presence of whiteboard in room
+        has_chalkboard = boolean, based on presence of chalkboard in room
+        has_projector = boolean, based on presence of projector in room
+        size = number of people/students that the room can accommodate
+    """
     building = models.CharField(max_length=63)
     has_whiteboard = models.BooleanField()
     has_chalkboard = models.BooleanField()
     has_projector = models.BooleanField()
     size = models.IntegerField()
 
+
 class Schedule(models.Model):
+    """
+    Defines the Schedule database table
+
+    Args:
+        course_id = FK to a specific course
+        date = date that a course will take place
+        start_time = starting time for this course
+        end_time = ending time for this course
+        room_id = FK to the room where the course will be held
+    """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     date = models.DateField
     start_time = models.TimeField()
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
 
+
 class Attendance(models.Model):
+    """
+    Defines the Attendance database table
+
+    Args:
+        student_id = FK to a specific student
+        schedule_id = FK to a specific schedule instance
+        status = integer code to describe a student's status for that class (present, late, absent)
+    """
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField()
-
-
-
