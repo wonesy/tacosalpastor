@@ -18,7 +18,6 @@ addons:
             - mysql-client-5.7
 before_install:
     - sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60"
-before_script:
     - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
     - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
     - mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastor'@'localhost';"
