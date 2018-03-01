@@ -13,9 +13,7 @@ before_script:
   - export MYSQL_USER_PASSWORD=alpastorpass
   - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
   - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON alpastor.* TO 'alpastoradmin'@'localhost';"
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON test_alpastor.* TO 'alpastoradmin'@'localhost';"
-  - mysql -u root -e "ALTER USER alpastoradmin CREATEDB;"
+  - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"
   - mysql -u root -e "FLUSH PRIVILEGES;"
 script:
   - python alpastor/manage.py makemigrations
