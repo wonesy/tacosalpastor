@@ -1,22 +1,26 @@
 language: python
 python:
-    - '3.6'
+- '3.6'
 install:
-    - pip install -r requirements.txt
+- pip install -r requirements.txt
 services:
-    - mysql
+- mysql
 dist: trusty
 sudo: required
 before_script:
-    - export MYSQL_DATABASE=alpastor
-    - export MYSQL_USERNAME=alpastoradmin
-    - export MYSQL_USER_PASS=alpastorpass
-    - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
-    - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
-    - mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastoradmin'@'localhost';"
+- export MYSQL_DATABASE=alpastor
+- export MYSQL_USERNAME=alpastoradmin
+- export MYSQL_USER_PASS=alpastorpass
+- mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
+- mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
+- mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastoradmin'@'localhost';"
 script:
-    - python alpastor/manage.py test
+- python alpastor/manage.py makemigrations
+- python alpastor/managy.py migrate
+- python alpastor/manage.py test
 notifications:
   slack:
     rooms:
-      secure: cJPQov6+TyRlFuWzjGa5zG8tnwuQ4X9jKVtf5klWyN+JrNBu2YpYilf7YY1o35D9R/ILxt3C2QuDPvsILLDNtr66Tnt15vN/WkVI7O6FTCqnR0q0is8MwUPinTZ3Mbwyd0DKJh5r5NRYTkXrJkBkVw/2ZVErnwE4WvqvY4srmy8XVjlP9FRL8aap5YHQEi8L9t37C0kF4IAuN5NXjBIEOGHhyLrSUORimk+pRau1C8GBThPXujT0/lgAVlKI6j2NZtfTUsV4FYhRhItotCTUnWE9MHo/A1bCNfN7HDxcgnsnJqquvUYszvR7QG8DR/ZeDN61YQBqx6Au+VnFOnwmabh02m5O9iuMd2navTqWI4UR7a22YWf7+Ca27pdx+7ZTXd+PWWH8S5oLnI2CB8WFf75F5fmguVzki2wX5Dc8LnocpiLNOr7TH9rc5pEOu0eV5ak0m2D8fvQPTxR9QTEkKVNWC+XG4vin0QBtm4vA1zR99gJM+IKGvoUltHSaivC05cubqW6k2ylFAc+ExM/Ptcklpm9oc/zMHHfOiO54l0AUztoaQ1X6thum38mfxjMjIG7YxSSn2D/VO1lgQoNg5J51s4NSh9FQjTHI6KZZlLgU9zHVNCy1VQOJoSWDkPk1N5cYMnK4DoFBaro5AOiY0AeNZIIjLToFDO4ntIoJrbY=
+      secure: QKvC0r/XzohwueV81i/D/jadGiZdbqoDxu4+Mpz4ghvOyTp3d+rgJFDycCJI3Bmal5JWQ365/viCYfEz14i+xGzXvkRpReFPZ5VaALSBaR4jD1Rg7DO/gH04nt8fSvXCLWB+WJZ6a/f2sId8DwkK6gBpkgyirWfX0lADL6c0DY86xN+6zNGRddvngJ7s4HYNUe6VIfZTQe9lSMOIJTekoE/V6yOXoHkn+5Qjc0r6HAHqcNuG7Cp1S6pUtEmNqt+CtOW3Iy0VOQm1zvcZ/c97xewsZiPT+zmr2yVncD27hgH/4WR19+mDCEQDfcFL8AX8DIBIrPlPZZ/513Yw9qtwx5pHI3mVzzy8LsyeHxm6tHai1m3YZ9SzfGwKRon0HvxxP55Ur9DY37VK3NEfedz6HDsyPqJSWmN9sr5yVnz1rzZUzk7LrW3eMkpryeCVJE4CB0HMU8HjNqmsUiJ7Hr/zKI/DyJPBRY3ZRmfIUutJk2iVZaz+rHOsOX3Qj2QL4U4V9uhMFfHs13rUAe/fiYZjoPHX6aER91VCyeRTJlWtf4HOKqawP3135nIuaAWzSRiQf0RikefpVz9ZuchkeYDBpHlv+hvFPWX01LrUNaAGKGRuMjkRNcMZfmQXzjJsrcoj4wwqXxr0T13uoY3BHqkbmKhR7j/Kiorfqxp1mahCmx8=
+    on_success: always
+    on_failure: always
