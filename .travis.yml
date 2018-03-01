@@ -14,4 +14,5 @@ before_script:
     - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
     - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
     - mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastor'@'localhost';"
-script: true
+script:
+    - python manage.py test
