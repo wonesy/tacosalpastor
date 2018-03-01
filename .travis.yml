@@ -15,4 +15,4 @@ before_script:
     - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
     - mysql -u root -e "GRANT ALL ON alpastor.* TO 'alpastor'@'localhost';"
 script:
-    - python manage.py test
+    - python alpastor/manage.py test
