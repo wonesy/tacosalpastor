@@ -15,7 +15,7 @@ before_script:
   - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
   - mysql -u root -e "GRANT ALL PRIVILEGES ON alpastor.* TO 'alpastoradmin'@'localhost';"
   - mysql -u root -e "GRANT ALL PRIVILEGES ON test_alpastor.* TO 'alpastoradmin'@'localhost';"
-  - mysql -u root -e "ALTER USER alpastor CREATEDB;"
+  - mysql -u root -e "ALTER USER alpastoradmin CREATEDB;"
   - mysql -u root -e "FLUSH PRIVILEGES;"
 script:
   - python alpastor/manage.py makemigrations
@@ -24,6 +24,6 @@ script:
 notifications:
   slack:
     rooms:
-      secure: QKvC0r/XzohwueV81i/D/jadGiZdbqoDxu4+Mpz4ghvOyTp3d+rgJFDycCJI3Bmal5JWQ365/viCYfEz14i+xGzXvkRpReFPZ5VaALSBaR4jD1Rg7DO/gH04nt8fSvXCLWB+WJZ6a/f2sId8DwkK6gBpkgyirWfX0lADL6c0DY86xN+6zNGRddvngJ7s4HYNUe6VIfZTQe9lSMOIJTekoE/V6yOXoHkn+5Qjc0r6HAHqcNuG7Cp1S6pUtEmNqt+CtOW3Iy0VOQm1zvcZ/c97xewsZiPT+zmr2yVncD27hgH/4WR19+mDCEQDfcFL8AX8DIBIrPlPZZ/513Yw9qtwx5pHI3mVzzy8LsyeHxm6tHai1m3YZ9SzfGwKRon0HvxxP55Ur9DY37VK3NEfedz6HDsyPqJSWmN9sr5yVnz1rzZUzk7LrW3eMkpryeCVJE4CB0HMU8HjNqmsUiJ7Hr/zKI/DyJPBRY3ZRmfIUutJk2iVZaz+rHOsOX3Qj2QL4U4V9uhMFfHs13rUAe/fiYZjoPHX6aER91VCyeRTJlWtf4HOKqawP3135nIuaAWzSRiQf0RikefpVz9ZuchkeYDBpHlv+hvFPWX01LrUNaAGKGRuMjkRNcMZfmQXzjJsrcoj4wwqXxr0T13uoY3BHqkbmKhR7j/Kiorfqxp1mahCmx8=
+      secure: "QKvC0r/XzohwueV81i/D/jadGiZdbqoDxu4+Mpz4ghvOyTp3d+rgJFDycCJI3Bmal5JWQ365/viCYfEz14i+xGzXvkRpReFPZ5VaALSBaR4jD1Rg7DO/gH04nt8fSvXCLWB+WJZ6a/f2sId8DwkK6gBpkgyirWfX0lADL6c0DY86xN+6zNGRddvngJ7s4HYNUe6VIfZTQe9lSMOIJTekoE/V6yOXoHkn+5Qjc0r6HAHqcNuG7Cp1S6pUtEmNqt+CtOW3Iy0VOQm1zvcZ/c97xewsZiPT+zmr2yVncD27hgH/4WR19+mDCEQDfcFL8AX8DIBIrPlPZZ/513Yw9qtwx5pHI3mVzzy8LsyeHxm6tHai1m3YZ9SzfGwKRon0HvxxP55Ur9DY37VK3NEfedz6HDsyPqJSWmN9sr5yVnz1rzZUzk7LrW3eMkpryeCVJE4CB0HMU8HjNqmsUiJ7Hr/zKI/DyJPBRY3ZRmfIUutJk2iVZaz+rHOsOX3Qj2QL4U4V9uhMFfHs13rUAe/fiYZjoPHX6aER91VCyeRTJlWtf4HOKqawP3135nIuaAWzSRiQf0RikefpVz9ZuchkeYDBpHlv+hvFPWX01LrUNaAGKGRuMjkRNcMZfmQXzjJsrcoj4wwqXxr0T13uoY3BHqkbmKhR7j/Kiorfqxp1mahCmx8="
     on_success: always
     on_failure: always
