@@ -111,6 +111,7 @@ function read_secrets() {
 	mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
 }
 
+
 #
 #  Main
 #
