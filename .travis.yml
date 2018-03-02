@@ -1,27 +1,24 @@
 language: python
 python:
-  - '3.6'
+- '3.6'
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 services:
-  - mysql
+- mysql
 dist: trusty
 sudo: required
 before_script:
-  - export MYSQL_DATABASE=alpastor
-  - export MYSQL_USERNAME=alpastoradmin
-  - export MYSQL_USER_PASSWORD=alpastorpass
-  - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
-  - mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"
-  - mysql -u root -e "FLUSH PRIVILEGES;"
+- export MYSQL_DATABASE=alpastor
+- export MYSQL_USERNAME=alpastoradmin
+- export MYSQL_USER_PASSWORD=alpastorpass
+- mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
+- mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
+- mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"
+- mysql -u root -e "FLUSH PRIVILEGES;"
 script:
-  - python alpastor/manage.py makemigrations
-  - python alpastor/manage.py migrate
-  - python alpastor/manage.py test alpastor/ -v 2
+- python alpastor/manage.py makemigrations
+- python alpastor/manage.py migrate
+- python alpastor/manage.py test alpastor/ -v 2
 notifications:
   slack:
-    rooms:
-      secure: "r1l9qyPA+z65ckycfKK9BQG6c1mqYX45aicaXXoHI3S+LMwE2WtkGcC6UIeILcXd+i/bW+hloCo3u4y9dkXdPF05+EUgyoKngIVmZPKgYUv2xqjUX+P/sQnEPVv9REqDVHV9E6w1Jc92a+OMpkSI35X0NVKPy0AHJ2Wya1BYGhmfAO7AAonv0oVzr+2XyAHJY1/HgBH+QYbQwQcKtbWt/rIQektJxriXMCvUuE5MvyqVpib//1UV6SbaxInf27GyGnAyKBdIjWdZD0lssaOc7CH35j9o+8jZdLei8KsTWY5mW1UKW8U9mJwRTJ9m+aGAWyKEeBYPKnzQxX180kDxG2ZNO9sA3781V7FrzPuV3lj8g5NeGG+by09M9qI0UTRs72IdcBuFnq8DLlqNGdW4Alh890TbJSDkXJ2KssLWpMBTyldk6K8ROoh+j3+w16mMbE7jN5cAvQMqijxdXOeeg7cvEQM60BYHCD1UZw2R4JxNoZE8+62lAc0SEmZgwB2FL1862icR3oOwlw05p3pvCUltwwZY+0F5VH5DqX8Qh2geUfSv0hnSej28I7Bwaf8mpG2Q+XNVa6sY43vcUeqfV8Lhwkwc3m2KviPJdlUe5pGWiii7hq8IxOcRlwFHcBZhtm3IkteNTaLgQlV0JbCfCcg2XKP5EO+RZkiNvznxfG8="
-    on_success: always
-    on_failure: always
+    secure: "lC1e1k+joqmuEug4tleLEoH813zzZVLBnCkXe3EuEpmiOGvRXsl0ot6ANT0OXCqftCzYuSp76ikUGAkCfhcysj5afMMsQvW+AKPGkRp/bRKNu9JvYM81u3uehcF4KuC5j24+/xrloI9oi7S1xZUJkt20izuFewjVEyAeu+l0itN/nIItX8atUeblHyfvojYDtTFwARtuFr+6B1J8whlCluas0hB9B5X1PJF33Mgw6PAo+KmC4K4MSXvHKmt/HdiOPSobgI3axEhhyqyZAckq/F80N/SVyh9z6mBzg4vjG2iLO0moYEsLcLEk00Sp9qekgQVa/ACW/oIMAY5GNnoBh8iXV03lv/RptvB7+pKR5/xg0wniOCMTiA/1eM9/WqputqmKxiOltckm8CMf7uRs8iEps0VrRAl1dFsln6hzz8AEAR/IkQNC+Rzs7XHGDU3KrWTy0KBhCXKmf3k5ezjr7IJknq8uhFan+vlfFbJYUou2ThRuqf81iojBupYatFJqG/JF4tuhYI6CUR5Ldo0OaxB2Q0zseEVkc2OyUWuo5qcWCyEu+ALWkFk6mj5mJKzqtgktkAVVbYtuhm7/vpSd1OULdBkd17XaJQ6sURno3a4L20Dcm0aLqBgIcHL6uIZr6X26u/QemxJb+YDS2D3olYujzxxsJrjT5bHG8sQfUIM="
