@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 
 class Student(models.Model):
@@ -140,7 +141,7 @@ class Schedule(models.Model):
         room_id = FK to the room where the course will be held
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date = models.DateField
+    date = models.DateField(auto_now_add=True, blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)

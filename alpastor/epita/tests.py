@@ -4,19 +4,15 @@ from epita.models import Student
 from epita.models import Course
 from epita.models import StudentCourse
 from epita.models import Professor
-
+from epita.models import Room
+from epita.models import Schedule
+from epita.models import Attendance
+import datetime
 
 '''
 Model Tests
 
 Below are our tests for the database objects, making sure that tables fit together properly
-
-professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE)
-    title = models.CharField(max_length=127)
-    description = models.TextField(max_length=1000)
-    semester = models.CharField(max_length=31)
-    module = models.CharField(max_length=63)
-    credits = models.IntegerField()
     
 '''
 class StudentCourseTest(TestCase):
@@ -55,6 +51,18 @@ class StudentCourseTest(TestCase):
         # Give s2 just the second course
         StudentCourse.objects.create(student_id=s2, course_id=c1)
 
+        room = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
+                                   has_whiteboard=True, size=100)
+
+        # Create 20 instances of a class schedule for c0
+        for i in range(0,20):
+            Schedule.objects.create(course_id=c0, date=datetime.date.today()+datetime.timedelta(days=i),
+                                    start_time="10:00", end_time="11:00", room_id=room)
+
+        for i in range(0,10):
+            Schedule.objects.create(course_id=c1, date=datetime.date.today()+datetime.timedelta(days=i),
+                                    start_time="10:00", end_time="11:00", room_id=room)
+
     def test_course_count(self):
         s0_courses = StudentCourse.objects.filter(student_id__first_name__exact="fn0").count()
         s1_courses = StudentCourse.objects.filter(student_id__first_name__exact="fn1").count()
@@ -65,4 +73,8 @@ class StudentCourseTest(TestCase):
         self.assertEqual(s2_courses, 1)
 
     def test_attendance_by_course(self):
-        self.assertEqual(0,1)
+        c0_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 0").count()
+        c1_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 1").count()
+
+        self.assertEqual(c0_schedules, 20)
+        self.assertEqual(c1_schedules, 10)
