@@ -63,3 +63,6 @@ class StudentCourseTest(TestCase):
         self.assertEqual(s0_courses, 2)
         self.assertEqual(s1_courses, 1)
         self.assertEqual(s2_courses, 1)
+
+    def test_attendance_by_course(self):
+        self.assertEqual(0,1)
