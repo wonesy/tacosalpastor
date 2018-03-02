@@ -73,7 +73,8 @@ function install_django()
 
     source venv/bin/activate
 
-    pip install django 
+    pip install django
+    pip install mysqlclient
 }
 
 function create_mysql_admin() {

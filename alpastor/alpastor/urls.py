@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import path
 from epita import views
 
+# add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
+    path('people/', views.people, name='people'),
     path('admin/', admin.site.urls),
 ]

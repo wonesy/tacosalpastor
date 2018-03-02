@@ -9,6 +9,11 @@ def home(request):
     return render(request, 'base_generic.html')
 
 def people(request):
-    activeStudents = Student.object.all()
 
-    return HttpResponse()
+    people_dict = {}
+
+    activeStudents = Student.objects.all()
+
+    people_dict['students'] = activeStudents
+
+    return render(request, 'people.html', people_dict)

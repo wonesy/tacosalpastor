@@ -1,0 +1,24 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div id="people_container">
+        {%  for student in students %}
+            <div class="row">
+                <div class="col">
+                    <p>IMAGE GOES HERE</p>
+                    flag.jpg
+                </div>
+                <div class="col">
+                    {{ student.first_name }} {{ student.last_name }} <br>
+                    Joined: {{ student.classof }} <br>
+                    {{ student.program }}: {{ student.specialization }} <br>
+                </div>
+                <div class="col">
+                    {{ student.external_email }} <br>
+                    {{ student.epita_email }} <br>
+                    {{ student.phone }} <br>
+                </div>
+            </div>
+        {%  endfor %}
+    </div>
+{% endblock %}
