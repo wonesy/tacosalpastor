@@ -105,4 +105,4 @@ ENV/
 .idea/tasks.xml
 .idea/dictionaries
 
-secrets.txt
+secrets.env
