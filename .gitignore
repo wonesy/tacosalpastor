@@ -101,8 +101,6 @@ ENV/
 .mypy_cache/
 
 # pycharm
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
+alpastor/.idea/*
 
 secrets.env
