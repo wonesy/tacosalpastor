@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkgman='unkown'
+pkgman='unknown'
 admincmd='unknown'
 secrets="secrets.env"
 
@@ -116,8 +116,21 @@ function read_secrets() {
 #
 #  Main
 #
-identify_package_manager
-read_secrets
-install_python3
-install_django
-install_mysql
+
+functions_list=(identify_package_manager read_secrets install_python3 install_django install_mysql)
+
+echo -e "'y' to execute function or any other key to skip.\n"
+
+for i in ${functions_list[@]}; do
+  read -p "Install $i?" answer
+  if [[ $answer == "y" ]]; then
+    echo -e "\n##################################################"
+    echo "Installing $i"
+    echo -e "##################################################\n"
+    $i
+  else
+    echo -e "\n##################################################"
+    echo "Skipping $i"
+    echo -e "##################################################\n"
+  fi
+done
