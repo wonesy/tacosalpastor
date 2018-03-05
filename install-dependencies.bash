@@ -25,7 +25,6 @@ function is_installed()
 # This function will check the operating system and assign the correct
 # package manager to install system-wide packages
 #
-
 function identify_package_manager()
 {
     case $OSTYPE in
@@ -77,8 +76,8 @@ function install_django()
     pip install mysqlclient
 }
 
-function create_mysql_admin() {
-	
+function create_mysql_admin()
+{	
 	sudo mysql -uroot -p${mysql_root_pw} -e  "CREATE DATABASE ${mysql_db};"
 	sudo mysql -uroot -p${mysql_root_pw} -e  "CREATE USER ${mysql_username}@localhost IDENTIFIED BY '${mysql_user_pw}';"
 	sudo mysql -uroot -p${mysql_root_pw} -e  "GRANT ALL PRIVILEGES ON ${mysql_db}.* TO '${mysql_username}'@'localhost';"
@@ -100,7 +99,8 @@ function install_mysql()
     fi
 }
 
-function read_secrets() {
+function read_secrets()
+{
 	if [[ ! -f "$secrets" ]]; then
 		echo "Please download from GoogleDrive/AlPastor/Documentation/secrets.env"
 		exit 1
@@ -112,25 +112,25 @@ function read_secrets() {
 	mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
 }
 
-
 #
-#  Main
+# Main
 #
-
 functions_list=(identify_package_manager read_secrets install_python3 install_django install_mysql)
 
 echo -e "'y' to execute function or any other key to skip.\n"
-
+#
+# Allows you to skip individual functions
+#
 for i in ${functions_list[@]}; do
-  read -p "Install $i?" answer
+  read -p "Install $i? " answer
   if [[ $answer == "y" ]]; then
     echo -e "\n##################################################"
-    echo "Installing $i"
+    echo "Installing $i..."
     echo -e "##################################################\n"
     $i
   else
     echo -e "\n##################################################"
-    echo "Skipping $i"
+    echo "Skipping $i..."
     echo -e "##################################################\n"
   fi
 done
