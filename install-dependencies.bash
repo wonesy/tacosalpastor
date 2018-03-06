@@ -78,38 +78,53 @@ function install_django()
 
 function create_mysql_admin()
 {	
-	sudo mysql -uroot -p${mysql_root_pw} -e  "CREATE DATABASE ${mysql_db};"
-	sudo mysql -uroot -p${mysql_root_pw} -e  "CREATE USER ${mysql_username}@localhost IDENTIFIED BY '${mysql_user_pw}';"
-	sudo mysql -uroot -p${mysql_root_pw} -e  "GRANT ALL PRIVILEGES ON ${mysql_db}.* TO '${mysql_username}'@'localhost';"
-	sudo mysql -uroot -p${mysql_root_pw} -e  "FLUSH PRIVILEGES;"
+	$admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE DATABASE ${mysql_db};"
+	$admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE USER ${mysql_username}@localhost IDENTIFIED BY '${mysql_user_pw}';"
+	$admincmd mysql -uroot -p${mysql_root_pw} -e  "GRANT ALL PRIVILEGES ON ${mysql_db}.* TO '${mysql_username}'@'localhost';"
+	$admincmd mysql -uroot -p${mysql_root_pw} -e  "FLUSH PRIVILEGES;"
 }
 
 function install_mysql()
 {
-    is_installed=$(dpkg --get-selections | grep mysql | grep installed)
-    if [[ -z "$is_installed" ]]; then
-        export DEBIAN_FRONTEND="noninteractive"
-        sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_pw}"
-        sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_pw}"
-        sudo apt-get update > /dev/null
-        sudo apt-get install -y  mysql-server libmysqlclient-dev > /dev/null
-
-        create_mysql_admin
-        unset DEBIAN_FRONTEND
+    if [[ $pkgman == "apt-get" ]]; then
+        is_installed=$(dpkg --get-selections | grep mysql | grep installed)
+        if [[ -z "$is_installed" ]]; then
+            export DEBIAN_FRONTEND="noninteractive"
+            sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_pw}"
+            sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_pw}"
+            sudo apt-get update > /dev/null
+            sudo apt-get install -y  mysql-server libmysqlclient-dev > /dev/null
+            create_mysql_admin
+            unset DEBIAN_FRONTEND
+        else
+            echo MySQL already installed.
+        fi
+    elif [[ $pkgman == "brew" ]]; then
+        is_installed=$(type -a mysql)
+        echo $is_installed
+        if [[ -z "$is_installed" ]]; then
+            $pkgman install mysql
+            mysql.server start
+            create_mysql_admin
+        else
+            echo MySQL already installed.
+        fi
+    else
+        echo Please install MySQL manually.
     fi
 }
 
 function read_secrets()
 {
-	if [[ ! -f "$secrets" ]]; then
-		echo "Please download from GoogleDrive/AlPastor/Documentation/secrets.env"
-		exit 1
-	fi
+	  if [[ ! -f "$secrets" ]]; then
+        echo "Please download from GoogleDrive/AlPastor/Documentation/secrets.env"
+		    exit 1
+	  fi
 
-	mysql_root_pw=$(cat "$secrets" | grep -i "mysql_root_password" | cut -d= -f2)
-	mysql_username=$(cat "$secrets" | grep -i "mysql_username" | cut -d= -f2)
-	mysql_user_pw=$(cat "$secrets" | grep -i "mysql_user_password" | cut -d= -f2)
-	mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
+	  mysql_root_pw=$(cat "$secrets" | grep -i "mysql_root_password" | cut -d= -f2)
+	  mysql_username=$(cat "$secrets" | grep -i "mysql_username" | cut -d= -f2)
+	  mysql_user_pw=$(cat "$secrets" | grep -i "mysql_user_password" | cut -d= -f2)
+	  mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
 }
 
 #
@@ -122,15 +137,15 @@ echo -e "'y' to execute function or any other key to skip.\n"
 # Allows you to skip individual functions
 #
 for i in ${functions_list[@]}; do
-  read -p "Install $i? " answer
-  if [[ $answer == "y" ]]; then
-    echo -e "\n##################################################"
-    echo "Installing $i..."
-    echo -e "##################################################\n"
-    $i
-  else
-    echo -e "\n##################################################"
-    echo "Skipping $i..."
-    echo -e "##################################################\n"
-  fi
+    read -p "Install $i? " answer
+    if [[ $answer == "y" ]]; then
+        echo -e "\n##################################################"
+        echo "Installing $i..."
+        echo -e "##################################################\n"
+        $i
+    else
+        echo -e "\n##################################################"
+        echo "Skipping $i..."
+        echo -e "##################################################\n"
+    fi
 done
