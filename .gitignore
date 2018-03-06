@@ -101,7 +101,6 @@ ENV/
 .mypy_cache/
 
 # pycharm
-alpastor/.idea/*
-.idea/*
+.idea/dictionary
 
 secrets.env
