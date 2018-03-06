@@ -78,10 +78,10 @@ function install_django()
 
 function create_mysql_admin()
 {	
-	$admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE DATABASE ${mysql_db};"
-	$admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE USER ${mysql_username}@localhost IDENTIFIED BY '${mysql_user_pw}';"
-	$admincmd mysql -uroot -p${mysql_root_pw} -e  "GRANT ALL PRIVILEGES ON ${mysql_db}.* TO '${mysql_username}'@'localhost';"
-	$admincmd mysql -uroot -p${mysql_root_pw} -e  "FLUSH PRIVILEGES;"
+    $admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE DATABASE ${mysql_db};"
+    $admincmd mysql -uroot -p${mysql_root_pw} -e  "CREATE USER ${mysql_username}@localhost IDENTIFIED BY '${mysql_user_pw}';"
+    $admincmd mysql -uroot -p${mysql_root_pw} -e  "GRANT ALL PRIVILEGES ON ${mysql_db}.* TO '${mysql_username}'@'localhost';"
+    $admincmd mysql -uroot -p${mysql_root_pw} -e  "FLUSH PRIVILEGES;"
 }
 
 function install_mysql()
@@ -101,13 +101,14 @@ function install_mysql()
         fi
     elif [[ $pkgman == "brew" ]]; then
         is_installed=$(type -a mysql)
-        echo $is_installed
         if [[ -z "$is_installed" ]]; then
             $pkgman install mysql
             mysql.server start
+            sleep 7
             create_mysql_admin
         else
             echo MySQL already installed.
+            echo $is_installed
         fi
     else
         echo Please install MySQL manually.
@@ -116,15 +117,15 @@ function install_mysql()
 
 function read_secrets()
 {
-	  if [[ ! -f "$secrets" ]]; then
+    if [[ ! -f "$secrets" ]]; then
         echo "Please download from GoogleDrive/AlPastor/Documentation/secrets.env"
-		    exit 1
+        exit 1
 	  fi
 
-	  mysql_root_pw=$(cat "$secrets" | grep -i "mysql_root_password" | cut -d= -f2)
-	  mysql_username=$(cat "$secrets" | grep -i "mysql_username" | cut -d= -f2)
-	  mysql_user_pw=$(cat "$secrets" | grep -i "mysql_user_password" | cut -d= -f2)
-	  mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
+    mysql_root_pw=$(cat "$secrets" | grep -i "mysql_root_password" | cut -d= -f2)
+    mysql_username=$(cat "$secrets" | grep -i "mysql_username" | cut -d= -f2)
+    mysql_user_pw=$(cat "$secrets" | grep -i "mysql_user_password" | cut -d= -f2)
+    mysql_db=$(cat "$secrets" | grep -i "mysql_database" | cut -d= -f2)
 }
 
 #
