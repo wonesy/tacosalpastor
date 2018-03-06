@@ -1,0 +1,24 @@
+.people-img {
+    width: 100px;
+    height: 100px;
+}
+
+/* resize images */
+.people-img img {
+    width: 100%;
+    height: auto;
+}
+
+.people-flag {
+    width: 80px;
+    height: 80px;
+}
+
+/* resize images */
+.people-flag img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

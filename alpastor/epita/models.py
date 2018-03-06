@@ -29,6 +29,7 @@ class Student(models.Model):
     specialization = models.CharField(max_length=63)
     classof = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
+    country_code = models.CharField(max_length=2)
     city = models.CharField(max_length=127)
     languages = models.CharField(max_length=127)
     photo_location = models.CharField(max_length=511, blank=True)

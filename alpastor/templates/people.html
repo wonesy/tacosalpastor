@@ -1,24 +1,45 @@
 {% extends 'base_generic.html' %}
 
+{% load static %}
+
 {% block content %}
-    <div id="people_container">
-        {%  for student in students %}
-            <div class="row">
-                <div class="col">
-                    <p>IMAGE GOES HERE</p>
-                    flag.jpg
-                </div>
-                <div class="col">
-                    {{ student.first_name }} {{ student.last_name }} <br>
-                    Joined: {{ student.classof }} <br>
-                    {{ student.program }}: {{ student.specialization }} <br>
-                </div>
-                <div class="col">
-                    {{ student.external_email }} <br>
-                    {{ student.epita_email }} <br>
-                    {{ student.phone }} <br>
-                </div>
-            </div>
-        {%  endfor %}
-    </div>
+    <table class="table text-center">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Contact</th>>
+                <th>Program</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%  for student in students %}
+            <tr>
+                <td>
+                    <div class="people-img">
+                        <!-- Show student image, if exists, otherwise show default image -->
+                        {%  if student.photo_location != "mia" %}
+                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                <img class="center-block" src="{% static image_static %}" alt={{ student.first_name }}>
+                            {% endwith %}
+                        {% else %}
+                            <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco" class="people-img">
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    {{ student.first_name }} {{ student.last_name }}<br>
+                    {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                        <img src="{% static image_static %}" alt={{ student.first_name }}>
+                    {% endwith %}
+                </td>
+                <td>{{ student.country }}</td>
+                <td>{{ student.epita_email }}<br>{{ student.external_email }}<br>{{ student.phone }}</td>
+                <td>{{ student.program }}: {{ student.specialization }} [{{ student.classof }}]</td>
+            </tr>
+            {%  endfor %}
+        </tbody>
+    </table>
+
 {% endblock %}
