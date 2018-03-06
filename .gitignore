@@ -102,5 +102,6 @@ ENV/
 
 # pycharm
 alpastor/.idea/*
+.idea/*
 
 secrets.env
