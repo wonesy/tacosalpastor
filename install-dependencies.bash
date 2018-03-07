@@ -55,7 +55,13 @@ function install_python3()
         install_cmd="$admincmd $pkgman install python3"
 
         if [[ "$OSTYPE" == "linux"* ]]; then
-            install_cmd="${install_cmd}.6 python3-dev"
+
+            release=$(lsb_release -a | grep -i release)
+            if [[ "$release" == *"16.04"* ]]; then
+                sudo add-apt-repository ppa:deadsnakes/ppa
+                sudo apt-get update
+            fi
+            install_cmd="${install_cmd}.6 python3.6-dev"
         fi
 
         eval "$update_cmd"
@@ -65,10 +71,13 @@ function install_python3()
 
 function install_django()
 {
-    wget https://bootstrap.pypa.io/get-pip.py > /dev/null
-    python3.6 get-pip.py > /dev/null
-    pip3.6 install virtualenv
+    wget https://bootstrap.pypa.io/get-pip.py
+    python3.6 get-pip.py
+    sudo -H pip3.6 install virtualenv
     rm -f get-pip.py
+
+    virtualenv -p python3.6 venv
+    sudo chown -R ${USER}:${USER} venv
 
     source venv/bin/activate
 
