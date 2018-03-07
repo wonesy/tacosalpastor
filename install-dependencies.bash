@@ -72,13 +72,14 @@ function install_python3()
 function install_django()
 {
     wget https://bootstrap.pypa.io/get-pip.py
-    python3.6 get-pip.py
+    sudo python3.6 get-pip.py
     sudo -H pip3.6 install virtualenv
     rm -f get-pip.py
 
     virtualenv -p python3.6 venv
     sudo chown -R ${USER}:${USER} venv
-
+    
+    sudo apt-get install -y libmysqlclient-dev
     source venv/bin/activate
 
     pip install django
