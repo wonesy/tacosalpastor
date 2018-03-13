@@ -7,6 +7,6 @@ for i in $(cat secrets.env); do
   fi
 done
 
-$(source venv/bin/activate)
+source venv/bin/activate
 
 echo "Environment activated"
