@@ -34,6 +34,9 @@ class Student(models.Model):
     languages = models.CharField(max_length=127)
     photo_location = models.CharField(max_length=511, blank=True)
 
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
 
 class Professor(models.Model):
     """
@@ -51,6 +54,9 @@ class Professor(models.Model):
     external_email = models.CharField(max_length=255, unique=True)
     epita_email = models.CharField(max_length=255, unique=True)
     phone = models.CharField(max_length=31)
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class Course(models.Model):
@@ -79,6 +85,9 @@ class Course(models.Model):
     module = models.CharField(max_length=63)
     credits = models.IntegerField()
 
+    def __str__(self):
+        return " {} by {} ".format(self.title, self.professor_id)
+
 
 class StudentCourse(models.Model):
     """
@@ -92,6 +101,9 @@ class StudentCourse(models.Model):
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}".format(self.course_id)
 
 
 class Grades(models.Model):
@@ -129,6 +141,9 @@ class Room(models.Model):
     has_projector = models.BooleanField()
     size = models.IntegerField()
 
+    def __str__(self):
+        return "{}".format(self.building)
+
 
 class Schedule(models.Model):
     """
@@ -147,6 +162,9 @@ class Schedule(models.Model):
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return " {} from {} - {} ".format(self.course_id, self.start_time, self.end_time)
+
 
 class Attendance(models.Model):
     """
@@ -160,3 +178,6 @@ class Attendance(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField()
+
+    def __str__(self):
+        return "{}, status: {}, {}".format(str(self.student_id), str(self.status), str(self.schedule_id))

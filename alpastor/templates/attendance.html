@@ -4,6 +4,16 @@
 
 {% block content %}
 
-        # to be added
-
+        <table class="table text-center">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>Course ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <td>{{ course.course_id }}</td>
+                {% endfor %}
+            </tbody>
+        </table>
 {% endblock %}
