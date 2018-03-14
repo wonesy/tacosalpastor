@@ -8,6 +8,9 @@ from .models import Professor
 def home(request):
     return render(request, 'base_generic.html')
 
+def attendance(request):
+    return render(request, 'attendance.html')
+
 def people(request):
 
     people_dict = {}

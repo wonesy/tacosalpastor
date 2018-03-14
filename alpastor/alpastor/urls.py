@@ -20,6 +20,7 @@ from epita import views
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
+    path('attendance/', views.attendance, name='attendance'),
     path('people/', views.people, name='people'),
     path('admin/', admin.site.urls),
 ]
