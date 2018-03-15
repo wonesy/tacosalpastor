@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from .models import Student
 from .models import Professor
 from .models import StudentCourse
+from .models import Course
+from .models import Attendance
+from .models import Schedule
 
 
 # Create your views here.
@@ -14,7 +17,7 @@ def attendance(request):
 
     course_dict = {}
 
-    active_courses = StudentCourse.objects.all()
+    active_courses = Schedule.objects.all()
 
     course_dict['courses'] = active_courses
 
