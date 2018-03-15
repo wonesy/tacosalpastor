@@ -9,22 +9,24 @@ from .models import StudentCourse
 def home(request):
     return render(request, 'base_generic.html')
 
+
 def attendance(request):
 
     course_dict = {}
 
-    activeCourses = StudentCourse.objects.all()
+    active_courses = StudentCourse.objects.all()
 
-    course_dict['courses'] = activeCourses
+    course_dict['courses'] = active_courses
 
     return render(request, 'attendance.html', course_dict)
+
 
 def people(request):
 
     people_dict = {}
 
-    activeStudents = Student.objects.all()
+    active_students = Student.objects.all()
 
-    people_dict['students'] = activeStudents
+    people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
