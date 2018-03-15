@@ -5,12 +5,12 @@
 
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Verdana', sans-serif;
     background: #fafafa;
 }
 
 p {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Verdana', sans-serif;
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
@@ -56,9 +56,10 @@ a, a:hover, a:focus {
 #sidebar {
     min-width: 250px;
     max-width: 250px;
-    background: #7386D5;
+    background: #2e353d;
     color: #fff;
     transition: all 0.3s;
+    overflow-y: hidden;
 }
 
 #sidebar.active {
@@ -67,12 +68,11 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
+    background: #2e353d;
 }
 
 #sidebar ul.components {
     padding: 20px 0;
-    border-bottom: 0px solid #47748b;
 }
 
 #sidebar ul p {
@@ -86,13 +86,14 @@ a, a:hover, a:focus {
     display: block;
 }
 #sidebar ul li a:hover {
-    color: #7386D5;
-    background: #fff;
+    border-left: 3px solid #6f42c1;
+    color: #fff;
+    background: #4f5b69;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
     color: #fff;
-    background: #6d7fcc;
+    background: #4f5b69;
 }
 
 
@@ -129,6 +130,20 @@ ul.CTAs a {
     display: block;
     border-radius: 5px;
     margin-bottom: 5px;
+}
+
+a.download {
+    background: #fff;
+    color: #7386D5;
+}
+
+a.article, a.article:hover {
+    background: #6d7fcc !important;
+    color: #fff !important;
+}
+
+.pastor-nav-icon {
+    margin-right: 10px;
 }
 
 /* ---------------------------------------------------

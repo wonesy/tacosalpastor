@@ -3,71 +3,57 @@
 {% load static %}
 
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-        <title>EPITA International Portal</title>
-        <!-- Bootstrap CSS CDN -->
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
-        <link rel="stylesheet" href="{% static 'css/epita.css' %}">
-    </head>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" id="bootstrap-css">
+    <link href="{% static 'vendor/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+</head>
+
     <body>
-
         <div class="wrapper">
             <!-- Sidebar Holder -->
             <nav id="sidebar">
                 <div class="sidebar-header">
-                    <h3>USER IMAGE WILL GO HERE</h3>
+                    <h3>EPITA Intl</h3>
                 </div>
 
                 <ul class="list-unstyled components">
                     <li class="active">
-                        <a href="#">Account</a>
-                        <!-- TODO THIS IS AN EXAMPLE THAT WE MAY DELETE LATER
-                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Home</a>
-                        <ul class="collapse list-unstyled" id="homeSubmenu">
-                            <li><a href="#">Home 1</a></li>
-                            <li><a href="#">Home 2</a></li>
-                            <li><a href="#">Home 3</a></li>
-                        </ul>
-                        -->
+                        <a href="/">
+                            <i class="fa fa-tachometer-alt pastor-nav-icon"></i>Dashboard
+                        </a>
                     </li>
                     <li>
-                        <a href="/attendance/">Attendance</a>
+                        <a href="/people">
+                            <i class="fa fa-address-book pastor-nav-icon"></i>People
+                        </a>
                     </li>
                     <li>
-                        <a href="/people/">People</a>
-                    </li>
-                    <li>
-                        <a href="#">Grades</a>
-                    </li>
-                    <li>
-                        <a href="#">PRI</a>
-                    </li>
-                    <li>
-                        <a href="#">Survey 360</a>
+                        <a href="/attendance">
+                            <i class="fa fa-pencil-alt pastor-nav-icon"></i>Portfolio
+                        </a>
                     </li>
                 </ul>
             </nav>
 
             <!-- Page Content Holder -->
             <div id="content">
+                <div class="navbar-header">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                        <i class="glyphicon glyphicon-align-left"></i>
+                        <span>Toggle Sidebar</span>
+                    </button>
+                </div>
                 {% block content %}
                 {% endblock %}
             </div>
         </div>
-
-
-
-
-
-        <!-- jQuery CDN -->
-         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-         <!-- Bootstrap Js CDN -->
-         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
          <script type="text/javascript">
              $(document).ready(function () {
