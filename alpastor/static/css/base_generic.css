@@ -5,12 +5,12 @@
 
 
 body {
-    font-family: 'Verdana', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: #fafafa;
 }
 
 p {
-    font-family: 'Verdana', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
@@ -56,10 +56,10 @@ a, a:hover, a:focus {
 #sidebar {
     min-width: 250px;
     max-width: 250px;
-    background: #2e353d;
+    /*background: #7386D5;*/
+    background: #1e1e1e;
     color: #fff;
     transition: all 0.3s;
-    overflow-y: hidden;
 }
 
 #sidebar.active {
@@ -68,7 +68,7 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #2e353d;
+    background: #222222;
 }
 
 #sidebar ul.components {
@@ -86,16 +86,34 @@ a, a:hover, a:focus {
     display: block;
 }
 #sidebar ul li a:hover {
-    border-left: 3px solid #6f42c1;
-    color: #fff;
-    background: #4f5b69;
+    color: #7386D5;
+    background: #fff;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
     color: #fff;
-    background: #4f5b69;
+    /*background: #6d7fcc;*/
+    background: #222222;
 }
 
+.base-generic-lmargin {
+    margin-left: 10px;
+}
+
+.hover-left-brdr:hover {
+    border-left: 3px solid #d19b3d;
+    background-color: #4f5b69;
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    -ms-transition: all 1s ease;
+    transition: all 1s ease;
+}
+
+.fill-width {
+    width: 100%;
+    float: left;
+}
 
 a[data-toggle="collapse"] {
     position: relative;
@@ -113,38 +131,6 @@ a[aria-expanded="true"]::before {
     content: '\e260';
 }
 
-
-ul ul a {
-    font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #6d7fcc;
-}
-
-ul.CTAs {
-    padding: 20px;
-}
-
-ul.CTAs a {
-    text-align: center;
-    font-size: 0.9em !important;
-    display: block;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-a.download {
-    background: #fff;
-    color: #7386D5;
-}
-
-a.article, a.article:hover {
-    background: #6d7fcc !important;
-    color: #fff !important;
-}
-
-.pastor-nav-icon {
-    margin-right: 10px;
-}
 
 /* ---------------------------------------------------
     CONTENT STYLE
