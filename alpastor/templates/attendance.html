@@ -3,7 +3,20 @@
 {% load static %}
 
 {% block content %}
-
-        # to be added
-
+        <table class="table text-center">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td>
+                        <button type="button" class="btn btn-primary">{{ course.course_id }} {{ course.start_time}} - {{ course.end_time}} </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 {% endblock %}

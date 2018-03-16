@@ -2,21 +2,34 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Student
 from .models import Professor
+from .models import StudentCourse
+from .models import Course
+from .models import Attendance
+from .models import Schedule
 
 
 # Create your views here.
 def home(request):
     return render(request, 'base_generic.html')
 
+
 def attendance(request):
-    return render(request, 'attendance.html')
+
+    course_dict = {}
+
+    active_courses = Schedule.objects.all()
+
+    course_dict['courses'] = active_courses
+
+    return render(request, 'attendance.html', course_dict)
+
 
 def people(request):
 
     people_dict = {}
 
-    activeStudents = Student.objects.all()
+    active_students = Student.objects.all()
 
-    people_dict['students'] = activeStudents
+    people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)

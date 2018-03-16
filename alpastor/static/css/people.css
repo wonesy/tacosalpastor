@@ -1,0 +1,35 @@
+.people-block {
+    background: #bee5eb;
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 250px;
+    max-height: 250px;
+    margin: 10px;
+    padding: 5px;
+    float: left;
+    text-align: center;
+}
+
+.people-top {
+    min-height: 100px;
+}
+
+.people-bot {
+    padding-top: 10px;
+}
+
+.people-img {
+    float: left;
+    /*min-width: 100px;*/
+    max-width: 100px;
+    min-height: 100px;
+    /*max-height: 100px;*/
+}
+
+.people-img img {
+    width: 100%;
+    height: auto;
+}
+
+.people-names {
+}
