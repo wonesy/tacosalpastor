@@ -1,0 +1,23 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+        <table class="table text-center">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>Student List</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in attendance_list %}
+                    <tr>
+                        <td>
+{#                        <button onclick="call_counter(attendance/<course_id>/)" type="button" class="btn btn-primary">{{ student.course_id }} {{ student.start_time}} - {{ student.end_time}} </button>#}
+                        <a class="btn btn-primary" href="{% url 'schedule'%}">{{ student.student_id }} - {{ student.status}}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}

@@ -1,11 +1,7 @@
 from django.shortcuts import render
+from django.views.generic import ListView
 from django.http import HttpResponse
-from .models import Student
-from .models import Professor
-from .models import StudentCourse
-from .models import Course
-from .models import Attendance
-from .models import Schedule
+from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
 
 
 # Create your views here.
@@ -13,15 +9,12 @@ def home(request):
     return render(request, 'base_generic.html')
 
 
-def attendance(request):
+class ScheduleList(ListView):
+    model = Schedule
 
-    course_dict = {}
 
-    active_courses = Schedule.objects.all()
-
-    course_dict['courses'] = active_courses
-
-    return render(request, 'attendance.html', course_dict)
+class AttendanceList(ListView):
+    model = Attendance
 
 
 def people(request):
