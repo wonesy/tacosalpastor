@@ -34,6 +34,13 @@ class Student(models.Model):
     languages = models.CharField(max_length=127)
     photo_location = models.CharField(max_length=511, blank=True)
 
+    def __repr__(self):
+        return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
+               "specialization={}, classof={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               ")".format(self.first_name, self.last_name, self.external_email, self.epita_email, self.phone,
+                          self.program, self.specialization, self.classof, self.country, self.country_code, self.city,
+                          self.languages, self.photo_location)
+
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
 
@@ -54,6 +61,10 @@ class Professor(models.Model):
     external_email = models.CharField(max_length=255, unique=True)
     epita_email = models.CharField(max_length=255, unique=True)
     phone = models.CharField(max_length=31)
+
+    def __repr__(self):
+        return "Professor(first_name={}, last_name={}, external_email={}, epita_email={}, phone={})".format(
+            self.first_name, self.last_name, self.external_email, self.epita_email, self.phone)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -85,6 +96,10 @@ class Course(models.Model):
     module = models.CharField(max_length=63)
     credits = models.IntegerField()
 
+    def __repr__(self):
+        return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
+            self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
+
     def __str__(self):
         return " {} by {} ".format(self.title, self.professor_id)
 
@@ -101,6 +116,9 @@ class StudentCourse(models.Model):
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+    def __repr__(self):
+        return "StudentCourse(course_id={}, student_id={})".format(self.course_id, self.student_id)
 
     def __str__(self):
         return "{}".format(self.course_id)
@@ -123,6 +141,13 @@ class Grades(models.Model):
     points_earned = models.IntegerField()
     points_possible = models.IntegerField()
 
+    def __repr__(self):
+        return "Grades(course_id={}, student_id={}, assignment={}, points_earned={}, points_possible={})".format(
+            self.course_id, self.student_id, self.assignment, self.points_earned, self.points_possible)
+
+    def __str__(self):
+        return "{} Scored {} out of {}".format(self.assignment, self.points_earned, self.points_possible)
+
 
 class Room(models.Model):
     """
@@ -140,6 +165,10 @@ class Room(models.Model):
     has_chalkboard = models.BooleanField()
     has_projector = models.BooleanField()
     size = models.IntegerField()
+
+    def __repr__(self):
+        return "Room(building={}, has_whiteboard={}, has_chalkboard={}, has_projector={}, size={})".format(
+            self.building, self.has_whiteboard, self.has_chalkboard, self.has_projector, self.size)
 
     def __str__(self):
         return "{}".format(self.building)
@@ -162,6 +191,10 @@ class Schedule(models.Model):
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
 
+    def __repr__(self):
+        return "Schedule(course_id={}, date={}, start_time={}, end_time={}, room_id={})".format(self.course_id,
+            self.date, self.start_time, self.end_time, self.room_id)
+
     def __str__(self):
         return " {} from {} - {} ".format(self.course_id, self.start_time, self.end_time)
 
@@ -178,6 +211,10 @@ class Attendance(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField()
+
+    def __repr__(self):
+        return "Attendance(student_id={}, schedule_id={}, status={})".format(self.student_id,
+            self.schedule_id, self.status)
 
     def __str__(self):
         return "{}, status: {}, {}".format(str(self.student_id), str(self.status), str(self.schedule_id))
