@@ -1,0 +1,81 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EPITA International Login</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:700,600' rel='stylesheet' type='text/css'>
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+</head>
+
+
+<div class="wrapper">
+    <div class="box">
+        <form id="loginform" method="post" action="#" class="login-form" onsubmit="validate_email(this);">
+            <div class="form-box">
+                <h1>Login</h1>
+
+                <input title="epita_email" type="email" name="email" value="yourname@epita.fr" onFocus="field_focus(this, 'yourname@epita.fr');"
+                       onblur="field_blur(this, 'yourname@epita.fr');" class="email" />
+
+                <input title="password" type="password" name="pw" value="password" onFocus="field_focus(this, 'password');"
+                       onblur="field_blur(this, 'password');" class="email" />
+
+                <input type="submit" href="#" class="btn"></input> <!-- End Btn -->
+            </div>
+        </form>
+
+        <form id="newpassform" method="post" action="/" class="new-pass-form">
+            <div class="form-box">
+                <h1>Request New Password</h1>
+                <p>For forgotten passwords or first time sign-on</p>
+
+                <input title="epita_email" type="email" name="email" value="yourname@epita.fr" onFocus="field_focus(this, 'yourname@epita.fr');"
+                       onblur="field_blur(this, 'yourname@epita.fr');" class="email" />
+
+                <a href="#"><div class="btn">Send Link</div></a> <!-- End Btn -->
+            </div> <!-- End Box -->
+        </form>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
+</div>
+
+</body>
+
+<script type="text/javascript">
+    function field_focus(field, val) {
+        if (field.value == val) {
+          field.value = '';
+        }
+    }
+
+    function field_blur(field, email) {
+        if (field.value == '') {
+            field.value = email;
+        }
+    }
+
+    function validate_email(myform) {
+        console.print("hello")
+        var re = new RegExp('@epita\.fr$');
+        console.print(re)
+        var email = myform["email"].value;
+        console.print(email)
+
+        return re.test(email);
+    }
+
+    //Fade in dashboard box
+    $(document).ready(function() {
+        $('.box').hide().fadeIn(1000);
+    });
+
+    //Stop click event
+    $('a').click(function(event) {
+        event.preventDefault();
+    });
+</script>
+
+</html>

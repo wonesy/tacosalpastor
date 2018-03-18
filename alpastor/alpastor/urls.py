@@ -24,5 +24,6 @@ urlpatterns = [
     path('schedule/', ScheduleList.as_view(), name='schedule'),
     path('attendance/', AttendanceList.as_view(), name='attendance'),
     path('people/', views.people, name='people'),
+    path('login/', views.login, name='login'),
     path('admin/', admin.site.urls),
 ]

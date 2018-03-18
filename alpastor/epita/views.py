@@ -26,3 +26,6 @@ def people(request):
     people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
+
+def login(request):
+    return render(request, 'login.html')
