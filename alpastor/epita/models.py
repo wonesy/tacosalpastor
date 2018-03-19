@@ -101,7 +101,7 @@ class Course(models.Model):
             self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
 
     def __str__(self):
-        return " {} by {} ".format(self.title, self.professor_id)
+        return "{}".format(self.title)
 
 
 class StudentCourse(models.Model):
@@ -196,7 +196,7 @@ class Schedule(models.Model):
             self.date, self.start_time, self.end_time, self.room_id)
 
     def __str__(self):
-        return " {} from {} - {} ".format(self.course_id, self.start_time, self.end_time)
+        return "{}".format(self.course_id)
 
 
 class Attendance(models.Model):

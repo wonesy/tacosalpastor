@@ -21,8 +21,8 @@ from epita.views import AttendanceList, ScheduleList
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
-    path('schedule/', ScheduleList.as_view(), name='schedule'),
-    path('attendance/', AttendanceList.as_view(), name='attendance'),
+    path('attendance/', ScheduleList.as_view(), name='schedule'),
+    path('attendance/student-list/', AttendanceList.as_view(), name='attendance'),
     path('people/', views.people, name='people'),
     path('admin/', admin.site.urls),
 ]

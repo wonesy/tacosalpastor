@@ -13,7 +13,6 @@
                 {% for course in schedule_list %}
                     <tr>
                         <td>
-{#                        <button onclick="call_counter(http://127.0.0.1:8000/attendance/<course_id>/)" type="button" class="btn btn-primary">{{ course.course_id }} {{ course.start_time}} - {{ course.end_time}} </button>#}
                         <a class="btn btn-primary" href="{% url 'attendance'%}">{{ course.course_id }} {{ course.start_time}} - {{ course.end_time}}</a>
                         </td>
                     </tr>

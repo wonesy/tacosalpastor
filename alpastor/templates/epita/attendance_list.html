@@ -12,10 +12,12 @@
             <tbody>
                 {% for student in attendance_list %}
                     <tr>
-                        <td>
-{#                        <button onclick="call_counter(attendance/<course_id>/)" type="button" class="btn btn-primary">{{ student.course_id }} {{ student.start_time}} - {{ student.end_time}} </button>#}
-                        <a class="btn btn-primary" href="{% url 'schedule'%}">{{ student.student_id }} - {{ student.status}}</a>
-                        </td>
+                        {%  if student.schedule_id.course_id.title == "Java Programming" %}
+                            <h2>{{ student.schedule_id.course_id.title }}</h2>
+                            <td>
+                            <a class="btn btn-primary" href="{% url 'schedule'%}">{{ student.student_id }}</a>
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
