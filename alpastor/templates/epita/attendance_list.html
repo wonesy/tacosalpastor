@@ -15,7 +15,7 @@
                         {%  if student.schedule_id.course_id.title == "Java Programming" %}
                             <h2>{{ student.schedule_id.course_id.title }}</h2>
                             <td>
-                            <a class="btn btn-primary" href="{% url 'schedule'%}">{{ student.student_id }}</a>
+                            <a class="btn btn-primary" href="#">{{ student.student_id }}</a>
                             </td>
                         {% endif %}
                     </tr>
