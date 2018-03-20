@@ -22,7 +22,7 @@ from epita.views import AttendanceList, ScheduleList
 urlpatterns = [
     path('', views.home, name='home'),
     path('attendance/', ScheduleList.as_view(), name='schedule'),
-    path('attendance/<course_id>/', AttendanceList.as_view(), name='attendance'),
+    path('attendance/<semester>/<course_id>/', AttendanceList.as_view(), name='attendance'),
     path('people/', views.people, name='people'),
     path('admin/', admin.site.urls),
 ]
