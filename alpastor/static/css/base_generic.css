@@ -54,8 +54,8 @@ a, a:hover, a:focus {
 }
 
 #sidebar {
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 200px;
+    max-width: 200px;
     /*background: #7386D5;*/
     background: #1e1e1e;
     color: #fff;
@@ -113,6 +113,12 @@ a, a:hover, a:focus {
 .fill-width {
     width: 100%;
     float: left;
+}
+
+.nav-avatar {
+    border-radius: 50%;
+    width:100%;
+    height: auto;
 }
 
 a[data-toggle="collapse"] {

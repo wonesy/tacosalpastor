@@ -1,22 +1,22 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
 from django.views.generic import ListView
 from django.http import HttpResponse
 from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
 
 
-# Create your views here.
+@login_required()
 def home(request):
     return render(request, 'base_generic.html')
-
 
 class ScheduleList(ListView):
     model = Schedule
 
-
 class AttendanceList(ListView):
     model = Attendance
 
-
+@login_required()
 def people(request):
 
     people_dict = {}
