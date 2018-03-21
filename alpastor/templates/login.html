@@ -10,32 +10,45 @@
     <link href="{% static 'css/login.css' %}" rel="stylesheet">
 </head>
 
+<body>
 
 <div class="wrapper">
     <div class="box">
-        <form id="loginform" method="post" action="#" class="login-form" onsubmit="validate_email(this);">
+        <form id="loginform" method="post" class="login-form" novalidate>
+            {% csrf_token %}
             <div class="form-box">
                 <h1>Login</h1>
 
-                <input title="epita_email" type="email" name="email" value="yourname@epita.fr" onFocus="field_focus(this, 'yourname@epita.fr');"
-                       onblur="field_blur(this, 'yourname@epita.fr');" class="email" />
+                {% if form.errors %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <strong style="color: red">{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-                <input title="password" type="password" name="pw" value="password" onFocus="field_focus(this, 'password');"
-                       onblur="field_blur(this, 'password');" class="email" />
+                {% for field in form.visible_fields %}
+                    <!--{{ field.label_tag }}<br>-->
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
 
-                <input type="submit" href="#" class="btn"></input> <!-- End Btn -->
+                <button type="submit" class="btn" value="Send Link">Login</button>
             </div>
         </form>
 
-        <form id="newpassform" method="post" action="/" class="new-pass-form">
+        <form id="newpassform" method="post" class="new-pass-form">
+            {% csrf_token %}
             <div class="form-box">
-                <h1>Request New Password</h1>
+                <h1>New Password</h1>
                 <p>For forgotten passwords or first time sign-on</p>
 
                 <input title="epita_email" type="email" name="email" value="yourname@epita.fr" onFocus="field_focus(this, 'yourname@epita.fr');"
                        onblur="field_blur(this, 'yourname@epita.fr');" class="email" />
 
-                <a href="#"><div class="btn">Send Link</div></a> <!-- End Btn -->
+                <button type="submit" class="btn" value="Send Link">Send Link</button>
             </div> <!-- End Box -->
         </form>
     </div>
@@ -47,7 +60,7 @@
 <script type="text/javascript">
     function field_focus(field, val) {
         if (field.value == val) {
-          field.value = '';
+            field.value = '';
         }
     }
 
@@ -55,16 +68,6 @@
         if (field.value == '') {
             field.value = email;
         }
-    }
-
-    function validate_email(myform) {
-        console.print("hello")
-        var re = new RegExp('@epita\.fr$');
-        console.print(re)
-        var email = myform["email"].value;
-        console.print(email)
-
-        return re.test(email);
     }
 
     //Fade in dashboard box
