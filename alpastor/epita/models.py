@@ -6,6 +6,17 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def create_user_student_or_prof(sender, instance, created, **kwargs):
+    """
+    Automatically creates a record of student/professor, depending on is_staff bool
+
+    This is a signal-function, meaning it gets fired on the 'post_save' signal
+
+    :param sender:      User model instance (from accounts/models.py)
+    :param instance:    The instance of the created User
+    :param created:     Boolean indicating whether User was successfully created
+    :param kwargs:      Additional keyword args
+    :return:            None
+    """
     if created:
         if not instance.is_staff:
             Student.objects.create(user=instance)
@@ -15,6 +26,15 @@ def create_user_student_or_prof(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_student(sender, instance, **kwargs):
+    """
+    Automatically saves/stores a record of student/professor, depending on is_staff bool
+
+    This is a signal-function, meaning it gets fired on the 'post_save' signal
+    :param sender:      User model instance (from accounts/models.py)
+    :param instance:    The instance of the created User
+    :param kwargs:      Additional keyword args
+    :return:            None
+    """
     if not instance.is_staff:
         instance.student.save()
     elif not instance.is_superuser:
