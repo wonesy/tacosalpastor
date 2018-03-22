@@ -26,5 +26,6 @@ urlpatterns = [
     path('attendance/<semester>/<course_id>/', AttendanceList.as_view(), name='attendance'),
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
+    path('quizbuilder/', views.QuizBuilderView.as_view(), name='quizbuilder'),
     path('admin/', admin.site.urls),
 ]
