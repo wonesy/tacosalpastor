@@ -9,7 +9,7 @@
                 <div class="people-top">
                     <div class="people-img">
                         <!-- Show student image, if exists, otherwise show default image -->
-                        {%  if student.photo_location != "mia" %}
+                        {%  if student.photo_location != "" %}
                             {% with 'image/portraits/'|add:student.photo_location as image_static %}
                                 <img class="center-block" src="{% static image_static %}" alt={{ student.first_name }}>
                             {% endwith %}
@@ -19,7 +19,7 @@
                     </div>
 
                     <div class="people-names">
-                        {{ student.first_name }} {{ student.last_name }} <br>
+                        {{ student.user.get_full_name }} <br>
                         {{ student.country }} <br>
                         {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
                             <img src="{% static image_static %}" alt={{ student.first_name }}>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="people-bot">
                     <div class="people-info">
-                        {{ student.epita_email }}<br>{{ student.external_email }}<br>{{ student.phone }}<br>
+                        {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
                         {{ student.program }}: {{ student.specialization }}<br>[{{ student.classof }}]
                     </div>
                 </div>

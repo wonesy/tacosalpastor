@@ -15,12 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from accounts import views as accounts_views
 from epita import views
+from epita.views import AttendanceList, ScheduleList
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
-    path('attendance/', views.attendance, name='attendance'),
+    path('attendance/', ScheduleList.as_view(), name='schedule'),
+    path('attendance/<semester>/<course_id>/', AttendanceList.as_view(), name='attendance'),
     path('people/', views.people, name='people'),
+    path('login/', accounts_views.login, name='login'),
     path('admin/', admin.site.urls),
 ]

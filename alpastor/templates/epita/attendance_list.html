@@ -1,0 +1,25 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+        <table class="table text-center">
+            <thead class="thead-inverse">
+                <tr>
+                    <th>Student List</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in attendance_list %}
+                    <tr>
+                        {%  if student.schedule_id.course_id.title == "Java Programming" %}
+                            <h2>{{ student.schedule_id.course_id.title }}</h2>
+                            <td>
+                            <a class="btn btn-primary" href="#">{{ student.student_id }}</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}
