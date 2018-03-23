@@ -3,9 +3,18 @@
 {% load static %}
 
 {% block content %}
+    <form>
+        <input id="searcher" type="text" placeholder="Search">
+
+    </form>
+
+    ME<input type="checkbox" id="ME" align="right">
+
     <div class="row">
             {%  for student in students %}
-            <div class="col-sm-12 col-md-4 col-lg-3 people-block">
+                <div class="secondDiv">
+
+            <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv">
                 <div class="people-top">
                     <div class="people-img">
                         <!-- Show student image, if exists, otherwise show default image -->
@@ -19,6 +28,7 @@
                     </div>
 
                     <div class="people-names">
+                    <input hidden value="{{ student.user.get_full_name }}">
                         {{ student.user.get_full_name }} <br>
                         {{ student.country }} <br>
                         {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
@@ -33,7 +43,24 @@
                     </div>
                 </div>
             </div>
-
+            </div>
             {% endfor %}
     </div>
+
+        <script>
+        $("#searcher").on("keyup click input", function () {
+            var val = $(this).val();
+            if (val.length) {
+                $(".secondDiv .entryDiv").hide().filter(function () {
+                    return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
+                }).show();
+            }
+            else {
+                $(".secondDiv .entryDiv").show();
+            }
+        });
+
+
+
+    </script>
 {% endblock %}
