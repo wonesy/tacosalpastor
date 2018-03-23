@@ -6,17 +6,19 @@
         <table class="table text-center">
             <thead class="thead-inverse">
                 <tr>
-                    <th>Active Courses</th>
+                    <th>Course Times</th>
                 </tr>
             </thead>
             <tbody>
-                {% for course in schedule_list %}
-                    <tr>
-                        <td>
-                        <a class="btn btn-primary" href="/attendance/{{ course.course_id.semester }}/{{ course.course_id.title }}/">{{ course.course_id }} {{ course.start_time}} - {{ course.end_time}}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    {% for schedule in schedule_list %}
+                        {% if schedule.course_id.title == 'Java Programming' %}
+                            <td>
+                                <a class="btn btn-primary" href="{% url 'attendance_list' %}">{{ schedule.start_time }} - {{ schedule.end_time }} {{ schedule.room_id }}</a>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
             </tbody>
         </table>
 {% endblock %}
