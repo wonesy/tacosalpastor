@@ -24,7 +24,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('attendance/', CourseList.as_view(), name='course_list'),
     path('attendance/schedule/', ScheduleList.as_view(), name='schedule_list'),
-    path('attendance/schedule/students/', AttendanceDetail.as_view(), name='attendance_list'),
+    # path('attendance/schedule/students/', AttendanceDetail.as_view(), name='attendance_list'),
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
     path('admin/', admin.site.urls),

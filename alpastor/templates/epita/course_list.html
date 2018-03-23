@@ -13,7 +13,7 @@
                 {% for course in object_list %}
                     <tr>
                         <td>
-                            <a class="btn btn-primary" href="{% url 'schedule_list' %}">{{ course.title }}</a>
+                            <a class="btn btn-primary" href="/attendance/schedule?course_id={{ course.id }}">{{ course.title }}</a>
                         </td>
                     </tr>
                 {% endfor %}
