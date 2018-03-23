@@ -10,16 +10,15 @@
                 </tr>
             </thead>
             <tbody>
-                {% for student in attendance_list %}
-                    <tr>
-                        {%  if student.schedule_id.course_id.title == "Java Programming" %}
-                            <h2>{{ student.schedule_id.course_id.title }}</h2>
+                <tr>
+                    {% for student in attendance_list %}
+                        {% if student.schedule_id.course_id.title == "Java Programming" %}
                             <td>
-                            <a class="btn btn-primary" href="#">{{ student.student_id }}</a>
+                                <a class="btn btn-primary" href="#">{{ student.student_id.user }}</a>
                             </td>
                         {% endif %}
-                    </tr>
-                {% endfor %}
+                    {% endfor %}
+                </tr>
             </tbody>
         </table>
 {% endblock %}
