@@ -6,12 +6,12 @@
         <table class="table text-center">
             <thead class="thead-inverse">
                 <tr>
-                    <th>Student List</th>
+                    <th>{{ course_time.schedule_id.course_id.title }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    {% for student in attendance_list %}
+                    {% for student in times %}
                         <td>
                             <a class="btn btn-primary" href="#">{{ student.student_id.user }}</a>
                         </td>

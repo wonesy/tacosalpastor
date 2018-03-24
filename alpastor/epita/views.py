@@ -14,15 +14,8 @@ def home(request):
 class CourseList(ListView):
     model = Course
 
-    def post(self, request):
-        course_objects = Course.objects.all()
-        return render(request, {'course_objects': course_objects})
-
-    # def get(self):
-    #     return render()
 
 class ScheduleList(ListView):
-    model = Schedule
 
     def get(self, request):
         specific_course = request.GET.get('course_id','')
@@ -31,11 +24,13 @@ class ScheduleList(ListView):
         return render(request, 'epita/schedule_list.html', {'schedule_list': schedules, 'course': specific_course})
 
 
-class AttendanceDetail(ListView):
-    model = Attendance
+class AttendanceList(ListView):
 
-    # def get(self, request):
-    #     students_in_course = request.GET.get('')
+    def get(self, request):
+        course_time = request.GET.get('schedule_id','')
+        times = Attendance.objects.filter(schedule_id=course_time)
+        course_time = Attendance.objects.get(id=course_time)
+        return render(request, 'epita/attendance_list.html', {'times': times, 'course_time': course_time})
 
 
 @login_required()
