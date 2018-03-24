@@ -23,9 +23,9 @@
                     </td>
                     <td>{{ student.student_id.user }}</td>
                     <td>
-                        <input type="checkbox"> Present</input><br>
-                        <input type="checkbox"> Absent</input><br>
-                        <input type="checkbox"> Excused</input>
+                        <input type="radio" name={{ student.student_id}}+"status" value="1"> Present<br>
+                        <input type="radio" name={{ student.student_id}}+"status" value="2"> Absent<br>
+                        <input type="radio" name={{ student.student_id}}+"status" value="3"> Excused</input>
                         <div class="form-group">
                             <label>Upload Documentation</label>
                             <input type="file" class="form-control-file">
