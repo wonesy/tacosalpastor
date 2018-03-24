@@ -3,20 +3,36 @@
 {% load static %}
 
 {% block content %}
-        <table class="table text-center">
-            <thead class="thead-inverse">
+    <table class="table">
+        <thead>
+            <th>Photo</th>
+            <th>Student Name</th>
+            <th>Status</th>
+        </thead>
+        <tbody>
+            {% for student in times %}
                 <tr>
-                    <th>{{ course_time.schedule_id.course_id.title }}</th>
+                    <td>
+                        {% if student.student_id.photo_location != '' %}
+                            {% with 'image/portraits/'|add:student.student_id.photo_location as image_static %}
+                                <img src="{% static image_static %}" alt={{ student.student_id.user }}>
+                            {% endwith %}
+                        {% else %}
+                            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Taco" class="people-img">
+                        {% endif %}
+                    </td>
+                    <td>{{ student.student_id.user }}</td>
+                    <td>
+                        <input type="checkbox"> Present</input><br>
+                        <input type="checkbox"> Absent</input><br>
+                        <input type="checkbox"> Excused</input>
+                        <div class="form-group">
+                            <label>Upload Documentation</label>
+                            <input type="file" class="form-control-file">
+                        </div>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for student in times %}
-                        <td>
-                            <a class="btn btn-primary" href="#">{{ student.student_id.user }}</a>
-                        </td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
