@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
 from epita import views
-from epita.views import AttendanceList, ScheduleList
+from epita.views import CourseList, ScheduleList, AttendanceList
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
-    path('attendance/', ScheduleList.as_view(), name='schedule'),
-    path('attendance/<semester>/<course_id>/', AttendanceList.as_view(), name='attendance'),
+    path('attendance/', CourseList.as_view(), name='course_list'),
+    path('attendance/schedule/', ScheduleList.as_view(), name='schedule_list'),
+    path('attendance/schedule/students/', AttendanceList.as_view(), name='attendance_list'),
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
     path('quizbuilder/', views.QuizBuilderView.as_view(), name='quizbuilder'),

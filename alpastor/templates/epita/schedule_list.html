@@ -3,20 +3,18 @@
 {% load static %}
 
 {% block content %}
-        <table class="table text-center">
-            <thead class="thead-inverse">
-                <tr>
-                    <th>Active Courses</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for course in schedule_list %}
-                    <tr>
-                        <td>
-                        <a class="btn btn-primary" href="/attendance/{{ course.course_id.semester }}/{{ course.course_id.title }}/">{{ course.course_id }} {{ course.start_time}} - {{ course.end_time}}</a>
-                        </td>
-                    </tr>
+    <table class="table text-center">
+        <thead>
+            <h2>Course Times for {{ course.title }}</h2>
+        </thead>
+        <tbody>
+            <tr>
+                {% for schedule in schedule_list %}
+                    <th>
+                        <a class="btn btn-primary" href="/attendance/schedule/students?schedule_id={{ schedule.id }}">{{ schedule.start_time }} - {{ schedule.end_time }} {{ schedule.room_id }}</a>
+                    </th>
                 {% endfor %}
-            </tbody>
-        </table>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}
