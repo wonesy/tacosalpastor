@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
 
 
-@login_required()
 def home(request):
     return render(request, 'base_generic.html')
 
@@ -33,7 +32,6 @@ class AttendanceList(ListView):
         return render(request, 'epita/attendance_list.html', {'times': times, 'course_time': course_time})
 
 
-@login_required()
 def people(request):
 
     people_dict = {}
