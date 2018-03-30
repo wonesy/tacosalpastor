@@ -48,51 +48,81 @@ class StudentCourseTest(TestCase):
 
         Professor.objects.filter(user__email="epitaprof@epita.fr").update(phone="0987654321")
 
-        p = Professor.objects.filter(user__email="epitaprof@epita.fr")[0]
-        s0 = Student.objects.filter(user__email="epita0@epita.fr")[0]
-        s1 = Student.objects.filter(user__email="epita1@epita.fr")[0]
-        s2 = Student.objects.filter(user__email="epita2@epita.fr")[0]
+        professor1 = Professor.objects.filter(user__email="epitaprof@epita.fr")[0]
+        student0 = Student.objects.filter(user__email="epita0@epita.fr")[0]
+        student1 = Student.objects.filter(user__email="epita1@epita.fr")[0]
+        student2 = Student.objects.filter(user__email="epita2@epita.fr")[0]
 
-        c0 = Course.objects.create(professor_id=p, title="Sample Course 0", description="Sample Description",
+        course0 = Course.objects.create(professor_id=professor1, title="Sample Course 0", description="Sample Description",
                                    semester="Spring 2018", module="Advanced Technology", credits=3)
 
-        c1 = Course.objects.create(professor_id=p, title="Sample Course 1", description="Sample Description",
+        course1 = Course.objects.create(professor_id=professor1, title="Sample Course 1", description="Sample Description",
                                    semester="Spring 2018", module="Advanced Technology", credits=3)
 
-        # Give s0 both courses
-        StudentCourse.objects.create(student_id=s0, course_id=c0)
-        StudentCourse.objects.create(student_id=s0, course_id=c1)
+        course2 = Course.objects.create(professor_id=professor1, title="Sample Course 2", description="Sample Description",
+                                   semester="Spring 2018", module="Java", credits=3)
 
-        # Give s1 just the first course
-        StudentCourse.objects.create(student_id=s1, course_id=c0)
+        room0 = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
+                                    has_whiteboard=False, size=50)
 
-        # Give s2 just the second course
-        StudentCourse.objects.create(student_id=s2, course_id=c1)
+        room1 = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
+                                   has_whiteboard=True, size=20)
 
-        room = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
-                                   has_whiteboard=True, size=100)
 
-        # Create 20 instances of a class schedule for c0
+        # Give student0 both courses
+        StudentCourse.objects.create(student_id=student0, course_id=course0)
+        StudentCourse.objects.create(student_id=student0, course_id=course1)
+
+        # Give student1 just the first course
+        StudentCourse.objects.create(student_id=student1, course_id=course0)
+
+        # Give student2 just the second course
+        StudentCourse.objects.create(student_id=student2, course_id=course1)
+
+
+        # Create 20 instances of a class schedule for course0
         for i in range(0,20):
-            Schedule.objects.create(course_id=c0, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00", end_time="11:00", room_id=room)
+            Schedule.objects.create(course_id=course0, date=datetime.date.today()+datetime.timedelta(days=i),
+                                    start_time="10:00", end_time="11:00", room_id=room0)
 
+        # Create 10 instances of a class schedule for course1
         for i in range(0,10):
-            Schedule.objects.create(course_id=c1, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00", end_time="11:00", room_id=room)
+            Schedule.objects.create(course_id=course1, date=datetime.date.today()+datetime.timedelta(days=i),
+                                    start_time="10:00", end_time="11:00", room_id=room1)
+
+        schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00:00",
+                                            end_time="13:00:00", room_id=room0)
+
+        schedule1 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="14:00:00",
+                                            end_time="16:00:00", room_id=room1)
+
+        schedule2 = Schedule.objects.create(course_id=course2, date=datetime.date.today(), start_time="18:30:00",
+                                            end_time="20:30:00", room_id=room1)
+
+        Attendance.objects.create(student_id=student0, schedule_id=schedule0, status=1)
+        Attendance.objects.create(student_id=student1, schedule_id=schedule1, status=2)
+        for i in range(20):
+            Attendance.objects.create(student_id=student2, schedule_id=schedule2, status=3)
 
     def test_models_course_count(self):
-        s0_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn0").count()
-        s1_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn1").count()
-        s2_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn2").count()
+        student0_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn0").count()
+        student1_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn1").count()
+        student2_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn2").count()
 
-        self.assertEqual(s0_courses, 2)
-        self.assertEqual(s1_courses, 1)
-        self.assertEqual(s2_courses, 1)
+        self.assertEqual(student0_courses, 2)
+        self.assertEqual(student1_courses, 1)
+        self.assertEqual(student2_courses, 1)
 
-    def test_models_attendance_by_course(self):
-        c0_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 0").count()
-        c1_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 1").count()
+    def test_models_schedule_by_course(self):
+        course0_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 0").count()
+        course1_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 1").count()
 
-        self.assertEqual(c0_schedules, 20)
-        self.assertEqual(c1_schedules, 10)
+        self.assertEqual(course0_schedules, 20)
+        self.assertEqual(course1_schedules, 12)
+
+    def test_models_attendance_by_schedule(self):
+        schedule0_attendance = Attendance.objects.filter(schedule_id__course_id__title__exact="Sample Course 1").count()
+        schedule1_attendance = Attendance.objects.filter(schedule_id__course_id__title__exact="Sample Course 2").count()
+
+        self.assertEqual(schedule0_attendance, 2)
+        self.assertEqual(schedule1_attendance, 20)
