@@ -79,21 +79,21 @@ class AttendanceTest(TestCase):
         # Create 20 instances of a class schedule for course0
         for i in range(0,20):
             Schedule.objects.create(course_id=course0, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00:00", end_time="11:00:00", room_id=room0)
+                                    start_time="10:00", end_time="11:00", room_id=room0)
 
         # Create 10 instances of a class schedule for course1
         for i in range(0,10):
             Schedule.objects.create(course_id=course1, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00:00", end_time="11:00:00", room_id=room1)
+                                    start_time="10:00", end_time="11:00", room_id=room1)
 
-        schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00:00",
-                                            end_time="13:00:00", room_id=room0)
+        schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00",
+                                            end_time="13:00", room_id=room0)
 
-        schedule1 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="14:00:00",
-                                            end_time="16:00:00", room_id=room1)
+        schedule1 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="14:00",
+                                            end_time="16:00", room_id=room1)
 
-        schedule2 = Schedule.objects.create(course_id=course2, date=datetime.date.today(), start_time="18:30:00",
-                                            end_time="20:30:00", room_id=room1)
+        schedule2 = Schedule.objects.create(course_id=course2, date=datetime.date.today(), start_time="18:30",
+                                            end_time="20:30", room_id=room1)
 
         Attendance.objects.create(student_id=student0, schedule_id=schedule0, status=1)
         Attendance.objects.create(student_id=student1, schedule_id=schedule1, status=2)
@@ -122,12 +122,19 @@ class AttendanceTest(TestCase):
         self.assertEqual(schedule1_attendance, 20)
 
     def test_course_view_status_code_and_template(self):
-        self.response = self.client.get(reverse('course_list'))
+        url = reverse('course_list')
+        self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
 
+    def test_schedule_view_status_code_and_template(self):
+        url = reverse('schedule_list') + '?course_id=1'
+        self.response = self.client.get(url)
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
+
     def test_attendance_view_status_code_and_template(self):
         url = reverse('attendance_list') + '?schedule_id=1'
-        self.response = self.client.get(url, follow=True)
+        self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
