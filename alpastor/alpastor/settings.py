@@ -137,3 +137,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
 
 TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"
+
+# Media files (uploaded files)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

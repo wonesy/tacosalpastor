@@ -6,6 +6,8 @@ from django.views.generic import ListView, DetailView, View
 from django.views.generic import ListView
 from django.http import HttpResponse
 from .models import Student, Course, Attendance, Schedule
+from .forms import AttendanceForm
+
 
 
 def home(request):
@@ -25,11 +27,22 @@ class ScheduleList(ListView):
 
 
 class AttendanceList(ListView):
+    template_name = 'epita/attendance_list.html'
 
     def get(self, request):
+        form = AttendanceForm()
         course_time = request.GET.get('schedule_id')
         times = Attendance.objects.filter(schedule_id=course_time)
-        return render(request, 'epita/attendance_list.html', {'times': times})
+        return render(request, self.template_name, {'times': times, 'form':form})
+
+    def post(self, request):
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            file = form.cleaned_data['post']
+
+        args = {'form': form, 'file':file}
+        return render(request, self.template_name, args)
 
 
 def people(request):
