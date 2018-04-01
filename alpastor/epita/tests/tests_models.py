@@ -15,7 +15,7 @@ Below are our tests for the database objects, making sure that tables fit togeth
 class AttendanceTest(TestCase):
     def setUp(self):
 
-        User.objects.create(first_name="fn0", last_name="ln0", external_email="external0@gmail.com", password="abc",
+        User.objects.create(first_name="first0", last_name="last0", external_email="external0@gmail.com", password="abc",
                             email="epita0@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
@@ -23,7 +23,7 @@ class AttendanceTest(TestCase):
                                                                      classof="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
-        User.objects.create(first_name="fn1", last_name="ln1", external_email="external1@gmail.com", password="abc",
+        User.objects.create(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
                             email="epita1@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program="ME",
@@ -31,7 +31,7 @@ class AttendanceTest(TestCase):
                                                                      classof="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
 
-        User.objects.create(first_name="fn2", last_name="ln2", external_email="external2@gmail.com", password="abc",
+        User.objects.create(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
                             email="epita2@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program="ME",
@@ -102,9 +102,9 @@ class AttendanceTest(TestCase):
             Attendance.objects.create(student_id=student2, schedule_id=schedule2, status=3)
 
     def test_models_course_count(self):
-        student0_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn0").count()
-        student1_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn1").count()
-        student2_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn2").count()
+        student0_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="first0").count()
+        student1_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="first1").count()
+        student2_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="first2").count()
         self.assertEqual(student0_courses, 2)
         self.assertEqual(student1_courses, 1)
         self.assertEqual(student2_courses, 1)
@@ -128,13 +128,21 @@ class AttendanceTest(TestCase):
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
 
     def test_schedule_view_status_code_and_template(self):
-        url = reverse('schedule_list') + '?course_id=1'
-        self.response = self.client.get(url)
+        url = reverse('schedule_list')
+        self.response = self.client.get(url, {'course_id':1})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
 
     def test_attendance_view_status_code_and_template(self):
-        url = reverse('attendance_list') + '?schedule_id=1'
-        self.response = self.client.get(url)
+        url = reverse('attendance_list')
+        self.response = self.client.get(url, {'schedule_id':1})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
+
+    def test_schedule_view_contains_courses(self):
+        # print(Schedule.objects.all())
+        self.assertIsNot(self, Schedule.objects.all(), [])
+
+    def test_attendance_view_contains_students(self):
+        self.assertIsNotNone(Attendance.objects.get(id=1))
+

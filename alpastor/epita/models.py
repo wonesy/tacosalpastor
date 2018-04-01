@@ -234,14 +234,18 @@ class Attendance(models.Model):
         student_id = FK to a specific student
         schedule_id = FK to a specific schedule instance
         status = integer code to describe a student's status for that class (present, late, absent)
+        file_upload = file for excused absence
+        upload_time = timestamp of file upload
     """
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField()
+    file_upload = models.FileField(null=True, blank=True)
+    upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):
-        return "Attendance(student_id={}, schedule_id={}, status={})".format(self.student_id,
-            self.schedule_id, self.status)
+        return "Attendance(student_id={}, schedule_id={}, status={}, file_upload={}, upload_time={})".format(self.student_id,
+            self.schedule_id, self.status, self.file_upload, self.upload_time)
 
     def __str__(self):
-        return "{}, status: {}, {}".format(str(self.student_id), str(self.status), str(self.schedule_id))
+        return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status), str(self.schedule_id), self.file_upload, self.upload_time)

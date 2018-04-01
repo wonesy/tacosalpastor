@@ -18,6 +18,9 @@ from django.urls import path
 from accounts import views as accounts_views
 from epita import views
 from epita.views import CourseList, ScheduleList, AttendanceList
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
@@ -29,3 +32,7 @@ urlpatterns = [
     path('login/', accounts_views.login, name='login'),
     path('admin/', admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

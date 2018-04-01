@@ -23,15 +23,16 @@
                     </td>
                     <td>{{ student.student_id.user }}</td>
                     <td>
-                        <form id="rGroup1">
-                        <input type="radio" id="r1" name="status" value="1" onclick="disableButton()"> Present<br>
-                        <input type="radio" id="r1" name="status" value="2" onclick="disableButton()" checked="checked"> Absent<br>
-                        <input type="radio" id="r1" name="status" value="3" onclick="disableButton()" > Excused</input>
-                        </form>
-                        <div class="form-group">
+                        <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">
+                            <input type="radio" id="r1" name="status" value="1" onclick="disableButton()"> Present<br>
+                            <input type="radio" id="r1" name="status" value="2" onclick="disableButton()" checked="checked"> Absent<br>
+                            <input type="radio" id="r1" name="status" value="3" onclick="disableButton()" > Excused</input><br>
+                            {% csrf_token %}
                             <label>Upload Documentation</label>
-                            <input id="uploadForm" type="file" class="form-control-file" disabled="true">
-                        </div>
+                            {{ form.as_p }}
+{#                            <input id="uploadForm" type="file" class="form-control-file" name="myfile" disabled="true">#}
+                            <button type="submit">Upload</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
