@@ -1,10 +1,11 @@
 import re
-import pytz
 
 from django.db import models
 from django.utils.translation import ugettext as _
 from epita.models import Course
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+import decimal
 
 """
 General Quiz Section
@@ -14,7 +15,7 @@ class Quiz(models.Model):
     """
     Defines an overall Quiz
 
-    Fieldsz:
+    Fields
         title
         description
         utl
@@ -67,7 +68,7 @@ class Quiz(models.Model):
 
         self.url = ''.join(letter for letter in self.url if letter.isalnum() or letter == '-')
 
-        if self.status is not self.READY and self.open:
+        if (self.status is not self.READY) and self.open:
             self.open = False
 
         super(Quiz, self).save(force_insert, force_update, *args, **kwargs)
@@ -85,6 +86,7 @@ class Question(models.Model):
     figure = models.ImageField(blank=True, null=True, upload_to="image/quiz", verbose_name=_("Figure"))
     explanation = models.CharField(max_length=1023, verbose_name=_("Explanation"), blank=True,
                                    help_text="Explanation of correct answer to be shown after user submits response")
+    essay = models.BooleanField(default=False, verbose_name=_("Open-Ended Essay Question"))
 
 
 """
@@ -98,10 +100,57 @@ class MultipleChoiceQuestion(Question):
 
     randomize = models.BooleanField(default=False, verbose_name=_("Randomize Options"), help_text="randomize the option order")
 
+
+    def clean(self):
+        super(MultipleChoiceQuestion, self).clean()
+
+        if self.essay:
+            raise ValidationError(_("Cannot be multiple-choice and essay"))
+
     def check_if_correct(self, guess):
         opt = MultipleChoiceOption.objects.get(id=guess)
 
         return opt.is_correct
+
+class CheckboxQuestion(MultipleChoiceQuestion):
+    multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))
+    partial_credit = models.BooleanField(default=False, verbose_name=_("Partial Credit"),
+                                         help_text="Allow partial credit for correctly chosen answers, but where not all correct answers were chosen")
+    total_correct_answers = models.IntegerField(blank=False, verbose_name=_("Total Correct Answers"), help_text="total number of correct answers")
+    incorrect_choice_points_lost = models.DecimalField(max_digits=4, decimal_places=2, default=1, verbose_name=_("Incorrect Choice Points Lost"),
+                                                       help_text="the number of points lost for an incorrect choice")
+    missed_choice_points_lost = models.DecimalField(max_digits=4, decimal_places=2, default=0, verbose_name=_("Missed Choice Points Lost"),
+                                                    help_text="the number of points lost for a correct choice that's missed")
+    allow_negative_score = models.BooleanField(default=False, verbose_name=_("Allow Negative Scores"), help_text="allow negative scores")
+
+    def clean(self):
+        super(CheckboxQuestion, self).clean()
+
+        if MultipleChoiceOption.objects.get(question=self) < self.total_correct_answers:
+            raise ValidationError
+
+    def get_score(self, guesses):
+        correct_answers_submitted = 0
+        score = 0
+
+        correct_answers = MultipleChoiceOption.objects.filter(question=self, is_correct=True)
+
+        # Calculate the number of correct guesses, and subtract incorrect choice points
+        for guess in guesses:
+            if guess in correct_answers:
+                correct_answers_submitted+=1
+                score += 1
+            else:
+                score -= self.incorrect_choice_points_lost
+
+        # Calculate the number of missed correct answers, and subtract points accordingly
+        correct_answers_difference = self.total_correct_answers - correct_answers_submitted
+        score -= (correct_answers_difference * self.missed_choice_points_lost)
+
+        if score < 0 and not self.allow_negative_score:
+            score = 0
+
+        return score
 
 class MultipleChoiceOption(models.Model):
 
@@ -116,6 +165,31 @@ class MultipleChoiceOption(models.Model):
         verbose_name = _("Option")
         verbose_name_plural = _("Options")
 
+"""
 
+Numeric Scale Question
 
+[1] [2] [3] [4] [5]
 
+"""
+class NumericScaleQuestion(Question):
+    min = models.IntegerField(verbose_name=_("Minimum Scale Value"), blank=False)
+    max = models.IntegerField(verbose_name=_("Maximum Scale Value"), blank=False)
+    step = models.IntegerField(verbose_name=_("Step Value"), default=1)
+    correct_value = models.IntegerField(verbose_name=_("Correct Value"), blank=True, null=True)
+
+    def clean(self):
+        super(NumericScaleQuestion, self).clean()
+
+        if self.essay:
+            raise ValidationError(_("Cannot be both numeric-scale and essay"))
+
+        # Reverse the order of min/max if step is negative
+        if self.step < 0:
+            tmp = self.min
+            self.min = self.max
+            self.max = tmp
+            self.step *= -1
+
+        if self.min >= self.max:
+            raise ValidationError(_("Min cannot be greater-than or equal to max"))
