@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-
 from django.views.generic import ListView, DetailView, View
-from django.views.generic import ListView
 from django.http import HttpResponse
 from .models import Student, Course, Attendance, Schedule
 from .forms import AttendanceForm
