@@ -52,17 +52,3 @@ def people(request):
     people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
-
-#@login_required()
-class QuizBuilderView(View):
-    template_name = "quiz_builder.html"
-    model = Course
-
-    def post(self, request):
-        pass
-
-    def get(self, request):
-        return render(request, "quiz_builder.html")
-
-    def get_queryset(self):
-        return Course.objects.all()

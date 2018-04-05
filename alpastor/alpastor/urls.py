@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
+from quiz import views as quiz_views
 from epita import views
 from epita.views import CourseList, ScheduleList, AttendanceList
 from django.conf import settings
@@ -30,7 +31,7 @@ urlpatterns = [
     path('attendance/schedule/students/', AttendanceList.as_view(), name='attendance_list'),
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
-    path('quizbuilder/', views.QuizBuilderView.as_view(), name='quizbuilder'),
+    path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
     path('admin/', admin.site.urls),
 ]
 

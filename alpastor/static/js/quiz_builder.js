@@ -1,5 +1,10 @@
-$(document).ready(function(){
-    $(".quiz-opt").click(function(self){
-        $(".collapse").collapse('hide');
-    });
-});
+var idList = [];
+var totalQuestions = 0;
+
+function getNewID() {
+
+}
+
+function deleteQuestion() {
+
+}
