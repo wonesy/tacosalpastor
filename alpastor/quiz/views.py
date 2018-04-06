@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from epita.models import Course
 from django.views import View
-from .forms import MultipleChoiceForm
+from .forms import MultipleChoiceForm, MultipleChoiceOptionForm
 
 # Create your views here.
 #@login_required()
@@ -14,9 +14,14 @@ class QuizBuilderView(View):
 
     def get(self, request):
         mcform = MultipleChoiceForm()
-        print("Here")
-        print(mcform)
-        return render(request, self.template_name, {'mcform': mcform})
+        mcoptform = MultipleChoiceOptionForm()
+
+        dict = {
+            'mcform': mcform,
+            'mcoptform': mcoptform
+        }
+
+        return render(request, self.template_name, dict)
 
     def get_queryset(self):
         return Course.objects.all()

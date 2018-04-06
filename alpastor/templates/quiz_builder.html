@@ -60,7 +60,6 @@
             wrapperDiv.classList.add('question-wrapper');
 
             var cardDiv = document.createElement('div');
-
             cardDiv.classList.add('card');
             cardDiv.classList.add('question');
 
@@ -71,17 +70,44 @@
 
             var optionCanvas = document.createElement('div');
             optionCanvas.classList.add('card-body');
+            optionCanvas.classList.add('opt-canvas');
+            var optionCanvasId = getNewID();
+            optionCanvas.setAttribute('id', optionCanvasId);
 
             wrapperDiv.appendChild(cardDiv);
             cardDiv.appendChild(optionCanvas);
 
+            var newQuestionButtonDiv = document.createElement('button');
+            newQuestionButtonDiv.classList.add('new-question-btn');
+            newQuestionButtonDiv.classList.add('btn');
+            newQuestionButtonDiv.classList.add('fa');
+            newQuestionButtonDiv.classList.add('fa-plus');
+
+            var buttonOnClick = "addMultipleChoiceOption(" + optionCanvasId + ");";
+            newQuestionButtonDiv.setAttribute('onclick', buttonOnClick);
+
+            cardDiv.appendChild(newQuestionButtonDiv);
             questionCanvas.appendChild(wrapperDiv);
 
             console.log(questionCanvas);
         }
 
-        function addCheckboxOption() {
+        function addMultipleChoiceOption(optCanvasId) {
+            optCanvas = document.getElementById(optCanvasId);
 
+            var newOption = document.createElement('div');
+            newOption.classList.add('mc-opt');
+
+            var contentDiv = document.createElement('div');
+            contentDiv.classList.add('mc-opt-content');
+            contentDiv.classList.add('input-group');
+
+            contentDiv.innerHTML += '{{ mcoptform.content }}';
+            contentDiv.innerHTML += '{{ mcoptform.is_correct }}';
+            contentDiv.innerHTML += '{{ mcoptform.is_correct.help_text }}';
+
+            newOption.appendChild(contentDiv);
+            optCanvas.appendChild(newOption);
         }
     </script>
 {% endblock %}
