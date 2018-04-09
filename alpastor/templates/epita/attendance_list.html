@@ -10,27 +10,21 @@
             <th>Status</th>
         </thead>
         <tbody>
-            {% for student in times %}
+            {% for form in form_list %}
                 <tr>
                     <td>
-                        {% if student.student_id.photo_location != '' %}
-                            {% with 'image/portraits/'|add:student.student_id.photo_location as image_static %}
-                                <img src="{% static image_static %}" alt={{ student.student_id.user }}>
-                            {% endwith %}
-                        {% else %}
-                            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Taco" class="people-img">
-                        {% endif %}
+{#                        {% if student.student_id.photo_location != '' %}#}
+{#                            {% with 'image/portraits/'|add:student.student_id.photo_location as image_static %}#}
+{#                                <img src="{% static image_static %}" alt={{ student.student_id.user }}>#}
+{#                            {% endwith %}#}
+{#                        {% else %}#}
+{#                            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Taco" class="people-img">#}
+{#                        {% endif %}#}
                     </td>
-                    <td>{{ student.student_id.user }}</td>
                     <td>
                         <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">
-                            <input type="radio" id="r1" name="status" value="1" onclick="disableButton()"> Present<br>
-                            <input type="radio" id="r1" name="status" value="2" onclick="disableButton()" checked="checked"> Absent<br>
-                            <input type="radio" id="r1" name="status" value="3" onclick="disableButton()" > Excused</input><br>
                             {% csrf_token %}
-                            <label>Upload Documentation</label>
-                            {{ form.as_p }}
-{#                            <input id="uploadForm" type="file" class="form-control-file" name="myfile" disabled="true">#}
+                            {{ form }}
                             <button type="submit">Upload</button>
                         </form>
                     </td>

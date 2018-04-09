@@ -213,7 +213,7 @@ class Schedule(models.Model):
         room_id = FK to the room where the course will be held
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True, blank=True)
+    date = models.DateField(blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -223,7 +223,7 @@ class Schedule(models.Model):
             self.date, self.start_time, self.end_time, self.room_id)
 
     def __str__(self):
-        return "{}".format(self.course_id)
+        return "{} {}".format(self.course_id, self.date)
 
 
 class Attendance(models.Model):
@@ -233,13 +233,23 @@ class Attendance(models.Model):
     Args:
         student_id = FK to a specific student
         schedule_id = FK to a specific schedule instance
-        status = integer code to describe a student's status for that class (present, late, absent)
+        status = integer code to describe a student's status for that class (present, absent, excused)
         file_upload = file for excused absence
         upload_time = timestamp of file upload
     """
+    PRESENT = 1
+    ABSENT = 2
+    EXCUSED = 3
+
+    ATTENDANCE_CHOICES = [
+        (PRESENT, 'Present'),
+        (ABSENT, 'Absent'),
+        (EXCUSED, 'Excused'),
+    ]
+
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
-    status = models.IntegerField()
+    status = models.IntegerField(choices=ATTENDANCE_CHOICES, default=ABSENT)
     file_upload = models.FileField(null=True, blank=True)
     upload_time = models.DateTimeField(null=True, blank=True)
 
