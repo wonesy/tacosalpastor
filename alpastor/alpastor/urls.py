@@ -32,6 +32,7 @@ urlpatterns = [
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
     path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
+    path('quizbuilder/savenewquiz/', quiz_views.saveNewQuiz, name='savenewquiz'),
     path('admin/', admin.site.urls),
 ]
 

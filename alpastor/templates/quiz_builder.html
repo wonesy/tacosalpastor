@@ -28,6 +28,12 @@
                 </button>
             </div>
 
+            <form id="quizBuilderForm" onsubmit="buildQuizJSON();" action="savenewquiz/" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="json_quiz" name="json_quiz" value="">
+                <input type="submit" value="Submit" />
+            </form>
+
         </div>
     </div>
 
@@ -83,6 +89,7 @@
             newQuestionButtonDiv.classList.add('btn');
             newQuestionButtonDiv.classList.add('fa');
             newQuestionButtonDiv.classList.add('fa-plus');
+            newQuestionButtonDiv.type = "button";
 
             var buttonOnClick = "addMultipleChoiceOption(" + optionCanvasId + ");";
             newQuestionButtonDiv.setAttribute('onclick', buttonOnClick);
@@ -109,6 +116,7 @@
             trashButton.classList.add('btn-block');
             trashButton.classList.add('h-100');
             trashButton.classList.add('w-100');
+            trashButton.type = "button";
 
             trashButton.onclick = function() {deleteMCOption(optCanvas, optWrapper)};
 
@@ -133,36 +141,17 @@
             isCorrectSidebar.classList.add('col-sm');
             isCorrectSidebar.classList.add('mc-opt-correct-sidebar');
 
-            {#var checkboxLabel = document.createElement('label');#}
-            {#checkboxLabel.classList.add('mc-opt-label');#}
-            {#checkboxLabel.classList.add('btn');#}
-            {#checkboxLabel.classList.add('btn');#}
-            {#checkboxLabel.classList.add('btn-block');#}
-            {#checkboxLabel.classList.add('h-100');#}
-            {#checkboxLabel.classList.add('w-100');#}
-
-            {#checkboxLabel.innerHTML += '{{ mcoptform.is_correct }}';#}
-            {##}
-            {#var checkmarkIcon = document.createElement('i');#}
-            {#checkmarkIcon.classList.add('fa');#}
-            {#checkmarkIcon.classList.add('fa-lg');#}
-            {#checkmarkIcon.classList.add('fa-check-circle');#}
-            {#checkmarkIcon.classList.add('h-100');#}
-            {#checkmarkIcon.classList.add('active');#}
-            {##}
-            {#checkboxLabel.appendChild(checkmarkIcon);#}
-            {##}
-            {#checkboxLabel.onclick = function() {isCorrectToggle(checkboxLabel)};#}
-            {##}
-            {#isCorrectSidebar.appendChild(checkboxLabel);#}
-
             /* Adding checkmark button and icons */
             var checkmarkButton = document.createElement('button');
             checkmarkButton.classList.add('btn');
             checkmarkButton.classList.add('btn-block');
             checkmarkButton.classList.add('h-100');
             checkmarkButton.classList.add('w-100');
-            checkmarkButton.innerHTML += '{{ mcoptform.is_correct }}';
+            checkmarkButton.innerHTML += '{{ mcoptform.is_correct.as_hidden }}';
+            checkmarkButton.innerHTML += '{{ mcoptform.is_correct_hidden }}';
+
+            checkmarkButton.type = "button";
+
 
             checkmarkButton.onclick = function() {isCorrectToggle(checkmarkButton)};
 
