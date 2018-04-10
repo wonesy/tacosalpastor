@@ -8,7 +8,7 @@ services:
 dist: trusty
 sudo: required
 before_script:
-- ./travis_setup.py 
+- ./travis_setup.bash 
 script:
 - python alpastor/manage.py makemigrations
 - python alpastor/manage.py migrate
