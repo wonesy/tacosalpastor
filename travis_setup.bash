@@ -24,6 +24,7 @@ if [[ ${rc} != 0 ]]; then
     echo "Flushing privileges failed"
 fi
 
+sudo mysql -e "show databases;"
 
 # Migrations nonsense
 
