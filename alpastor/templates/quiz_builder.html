@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal
     <div class="modal fade" id="newQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -51,6 +51,7 @@
             </div>
         </div>
     </div>
+    -->
 
     <script type="application/javascript">
         function addMultipleChoiceQuestion() {
@@ -102,22 +103,85 @@
             deleteSidebar.classList.add('col-sm');
             deleteSidebar.classList.add('mc-opt-delete-sidebar');
 
+            /* Adding trash button and icons */
             var trashButton = document.createElement('button');
-            trashButton.classList.add('b')
+            trashButton.classList.add('btn');
+            trashButton.classList.add('btn-block');
+            trashButton.classList.add('h-100');
+            trashButton.classList.add('w-100');
 
+            trashButton.onclick = function() {deleteMCOption(optCanvas, optWrapper)};
+
+            var trashIcon = document.createElement('i');
+            trashIcon.classList.add('fa');
+            trashIcon.classList.add('fa-lg');
+            trashIcon.classList.add('fa-trash-alt');
+
+            trashButton.appendChild(trashIcon);
+            deleteSidebar.appendChild(trashButton);
+
+            /* Main MC question content */
             var optContent = document.createElement('div');
             optContent.classList.add('mc-opt-content');
             optContent.classList.add('col');
-            optContent.classList.add('col-lg-auto');
 
             optContent.innerHTML += '{{ mcoptform.content }}';
 
+            /* Right-most sidebar for whether question is correct */
+            var isCorrectSidebar = document.createElement('div');
+            isCorrectSidebar.classList.add('col');
+            isCorrectSidebar.classList.add('col-sm');
+            isCorrectSidebar.classList.add('mc-opt-correct-sidebar');
+
+            {#var checkboxLabel = document.createElement('label');#}
+            {#checkboxLabel.classList.add('mc-opt-label');#}
+            {#checkboxLabel.classList.add('btn');#}
+            {#checkboxLabel.classList.add('btn');#}
+            {#checkboxLabel.classList.add('btn-block');#}
+            {#checkboxLabel.classList.add('h-100');#}
+            {#checkboxLabel.classList.add('w-100');#}
+
+            {#checkboxLabel.innerHTML += '{{ mcoptform.is_correct }}';#}
+            {##}
+            {#var checkmarkIcon = document.createElement('i');#}
+            {#checkmarkIcon.classList.add('fa');#}
+            {#checkmarkIcon.classList.add('fa-lg');#}
+            {#checkmarkIcon.classList.add('fa-check-circle');#}
+            {#checkmarkIcon.classList.add('h-100');#}
+            {#checkmarkIcon.classList.add('active');#}
+            {##}
+            {#checkboxLabel.appendChild(checkmarkIcon);#}
+            {##}
+            {#checkboxLabel.onclick = function() {isCorrectToggle(checkboxLabel)};#}
+            {##}
+            {#isCorrectSidebar.appendChild(checkboxLabel);#}
+
+            /* Adding checkmark button and icons */
+            var checkmarkButton = document.createElement('button');
+            checkmarkButton.classList.add('btn');
+            checkmarkButton.classList.add('btn-block');
+            checkmarkButton.classList.add('h-100');
+            checkmarkButton.classList.add('w-100');
+            checkmarkButton.innerHTML += '{{ mcoptform.is_correct }}';
+
+            checkmarkButton.onclick = function() {isCorrectToggle(checkmarkButton)};
+
+            var checkmarkIcon = document.createElement('i');
+            checkmarkIcon.classList.add('fa');
+            checkmarkIcon.classList.add('fa-lg');
+            checkmarkIcon.classList.add('fa-check-circle');
+            isCorrectSidebar.appendChild(checkmarkIcon);
+
+            checkmarkButton.appendChild(checkmarkIcon);
+            isCorrectSidebar.appendChild(checkmarkButton);
+
+            /* Add everything to HTML */
             optWrapper.appendChild(deleteSidebar);
             optWrapper.appendChild(optContent);
+            optWrapper.appendChild(isCorrectSidebar);
 
             optCanvas.appendChild(optWrapper);
-
-            console.log(optCanvas);
         }
+
     </script>
 {% endblock %}

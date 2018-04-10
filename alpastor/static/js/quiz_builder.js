@@ -8,6 +8,18 @@ function getNewID() {
     return newID;
 }
 
-function deleteQuestion() {
+function deleteMCOption(canvas, option) {
+    canvas.removeChild(option);
+}
 
+function isCorrectToggle(element, checkbox) {
+    var checkbox = element.querySelector("#id_is_correct")
+    console.log(checkbox);
+    if (element.classList.contains('active')) {
+        element.classList.remove('active');
+        checkbox.checked = false;
+    } else {
+        element.classList.add('active');
+        checkbox.checked = true;
+    }
 }
