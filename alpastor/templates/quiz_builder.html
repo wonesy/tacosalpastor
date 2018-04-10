@@ -88,26 +88,36 @@
 
             cardDiv.appendChild(newQuestionButtonDiv);
             questionCanvas.appendChild(wrapperDiv);
-
-            console.log(questionCanvas);
         }
 
         function addMultipleChoiceOption(optCanvasId) {
             optCanvas = document.getElementById(optCanvasId);
 
-            var newOption = document.createElement('div');
-            newOption.classList.add('mc-opt');
+            var optWrapper = document.createElement('div');
+            optWrapper.classList.add('row');
+            optWrapper.classList.add('mc-opt-wrapper');
 
-            var contentDiv = document.createElement('div');
-            contentDiv.classList.add('mc-opt-content');
-            contentDiv.classList.add('input-group');
+            var deleteSidebar = document.createElement('div');
+            deleteSidebar.classList.add('col');
+            deleteSidebar.classList.add('col-sm');
+            deleteSidebar.classList.add('mc-opt-delete-sidebar');
 
-            contentDiv.innerHTML += '{{ mcoptform.content }}';
-            contentDiv.innerHTML += '{{ mcoptform.is_correct }}';
-            contentDiv.innerHTML += '{{ mcoptform.is_correct.help_text }}';
+            var trashButton = document.createElement('button');
+            trashButton.classList.add('b')
 
-            newOption.appendChild(contentDiv);
-            optCanvas.appendChild(newOption);
+            var optContent = document.createElement('div');
+            optContent.classList.add('mc-opt-content');
+            optContent.classList.add('col');
+            optContent.classList.add('col-lg-auto');
+
+            optContent.innerHTML += '{{ mcoptform.content }}';
+
+            optWrapper.appendChild(deleteSidebar);
+            optWrapper.appendChild(optContent);
+
+            optCanvas.appendChild(optWrapper);
+
+            console.log(optCanvas);
         }
     </script>
 {% endblock %}

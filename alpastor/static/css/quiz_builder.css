@@ -41,34 +41,30 @@
     height: 50px;
     border-radius: 25px;
     color: #fff;
+    background: #5a6268;
 }
 
-.mc-opt {
-    padding-left: 50px;
-    width: 100%;
-    overflow: hidden;
-    border-bottom-left-radius: 10px;
-    border-top-left-radius: 10px;
-    background: #17a2b8;
-    margin-bottom: 10px;
-    border: #17a2b8 1px solid;
-}
-
-.mc-opt #id_content {
+/* --- */
+.mc-opt-wrapper {
     width: 100%;
     overflow: hidden;
 }
 
-.mc-opt #id_is_correct {
-    margin-right: 5px;
-    margin-top: 5px;
+.mc-opt-delete-sidebar {
+    height: 10px;
+    background: red;
+    max-width: 50px;
+    min-width: 50px;
 }
 
 .mc-opt-content {
+    background: blueviolet;
     padding: 5px;
-    background: white;
-    overflow: hidden;
+}
+
+.mc-opt-content input {
     width: 100%;
-    float: left;
-    text-align: left;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
