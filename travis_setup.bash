@@ -4,10 +4,10 @@ export MYSQL_DATABASE=alpastor
 export MYSQL_USERNAME=alpastoradmin
 export MYSQL_USER_PASSWORD=alpastorpass
 
-mysql -u root -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
-mysql -u root -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"
-mysql -u root -e "FLUSH PRIVILEGES;"
+sudo mysql -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
+sudo mysql -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"
+sudo mysql -e "FLUSH PRIVILEGES;"
 
 # Migrations nonsense
 
