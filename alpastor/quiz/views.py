@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion
 from epita.models import Course
 from django.views import View
 from .forms import MultipleChoiceForm, MultipleChoiceOptionForm
@@ -27,9 +28,27 @@ class QuizBuilderView(View):
     def get_queryset(self):
         return Course.objects.all()
 
-def saveNewQuiz(request):
-    if request.method != "POST":
+class SaveNewQuiz(View):
+    def get(self, request):
         return redirect('quizbuilder')
 
-    print(request.POST)
-    return redirect('quizbuilder')
+    def post(self, request):
+        quiz_payload = json.loads(request.POST['json_quiz'])
+
+        if self.processQuizJSON(quiz_payload):
+            return redirect('quizbuilder')
+
+        # TODO redirect to quiz list that dodo is working on
+        return redirect('quizbuilder')
+
+    def processQuizJSON(self, quiz_json):
+        quiz_title = quiz_json['title']
+
+        if quiz_title == "":
+            print("[FAIL] quiz must have a title")
+            return 1
+
+        for question in quiz_json['questions']:
+            print(question)
+
+        return 0

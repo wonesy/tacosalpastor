@@ -24,7 +24,7 @@ function mapAllQuestions() {
         "questions": []
     };
 
-    quizMap['title'] = document.getElementById('#quizTitle').value;
+    quizMap['title'] = document.getElementById('quizTitle').value;
 
     /* Loop through all question elements */
     var questionElems = document.getElementsByClassName('question');
