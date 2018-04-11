@@ -11,10 +11,8 @@ def home(request):
 
 
 class CourseList(ListView):
-    print('model:\n')
     model = Course
-    for i in Course.objects.all():
-        print(i)
+
 
 
 class ScheduleList(ListView):
