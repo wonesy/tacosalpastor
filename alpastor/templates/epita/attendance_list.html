@@ -13,9 +13,9 @@
             {% for form in form_list %}
                 <tr>
                     <td>
-{#                        {% if student.student_id.photo_location != '' %}#}
-{#                            {% with 'image/portraits/'|add:student.student_id.photo_location as image_static %}#}
-{#                                <img src="{% static image_static %}" alt={{ student.student_id.user }}>#}
+{#                        {% if form.student_id.photo_location != '' %}#}
+{#                            {% with 'image/portraits/'|add:form.student_id.photo_location as image_static %}#}
+{#                                <img src="{% static image_static %}" alt={{ form.student_id.user }}>#}
 {#                            {% endwith %}#}
 {#                        {% else %}#}
 {#                            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Taco" class="people-img">#}
@@ -24,8 +24,8 @@
                     <td>
                         <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {{ form }}
-                            <button type="submit">Upload</button>
+                            {{ form.as_p }}
+                            <input type="submit">
                         </form>
                     </td>
                 </tr>
