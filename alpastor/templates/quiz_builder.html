@@ -75,6 +75,10 @@
                 cardDiv.innerHTML += '{{ field }}';
             {% endfor %}
 
+            {% for field in mcform.hidden_fields %}
+                cardDiv.innerHTML += '{{ field }}';
+            {% endfor %}
+
             var optionCanvas = document.createElement('div');
             optionCanvas.classList.add('card-body');
             optionCanvas.classList.add('opt-canvas');

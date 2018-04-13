@@ -36,12 +36,14 @@ function mapAllQuestions() {
         var questionContent = curQuestion.querySelector("#id_content").value;
         var questionExplanation = curQuestion.querySelector("#id_explanation").value;
         var questionRandomize = curQuestion.querySelector("#id_randomize").checked;
+        var questionType = curQuestion.querySelector('#id_type').value;
 
         /* Assign collected information to the quiz map */
         var question = _getNewQuestionMap();
         question['content'] = questionContent;
         question['explanation'] = questionExplanation;
         question['randomize'] = questionRandomize;
+        question['type'] = questionType;
 
         /* Loop through all possible options for each question */
         // TODO [if type is multiple-choice]

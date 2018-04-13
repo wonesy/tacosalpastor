@@ -4,6 +4,10 @@ from epita.models import Course
 from django.views import View
 from .forms import MultipleChoiceForm, MultipleChoiceOptionForm
 import json
+import enum
+
+class QuizErrors(enum.Enum):
+    NOTITLE = 1
 
 # Create your views here.
 #@login_required()
@@ -41,14 +45,44 @@ class SaveNewQuiz(View):
         # TODO redirect to quiz list that dodo is working on
         return redirect('quizbuilder')
 
+
     def processQuizJSON(self, quiz_json):
         quiz_title = quiz_json['title']
 
         if quiz_title == "":
             print("[FAIL] quiz must have a title")
-            return 1
+            return QuizErrors.NOTITLE
 
+        # Create the new quiz object in the database
+        quiz = Quiz.objects.create(title=quiz_title)
+
+        # Process every question for this quiz
         for question in quiz_json['questions']:
-            print(question)
+            self.processQuestionJSON(quiz, question)
 
         return 0
+
+    def processQuestionJSON(self, quiz, question_json):
+
+        question_type = question_json['type']
+        question_content = question_json['content']
+        question_explanation = question_json['explanation']
+        question_randomize = question_json['randomize']
+
+        # Create new question database instance
+        if question_type == str(Question.MULTIPLE_CHOICE):
+            question = MultipleChoiceQuestion.objects.create(type=question_type,
+                                                             content=question_content,
+                                                             explanation=question_explanation,
+                                                             randomize=question_randomize)
+
+            # Process every option for this question
+            for option in question_json['options']:
+                self.processOptionJSON(question, option)
+
+
+    def processOptionJSON(self, question, option_json):
+        opt_content = option_json['content']
+        opt_is_correct = option_json['is_correct']
+
+        opt = MultipleChoiceOption.objects.create(question=question, content=opt_content, is_correct=opt_is_correct)

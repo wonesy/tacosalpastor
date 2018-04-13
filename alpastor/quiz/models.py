@@ -81,12 +81,25 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
+    ESSAY = 0
+    MULTIPLE_CHOICE = 1
+    CHECKBOX = 2
+    NUMERIC_SCALE = 3
+    QUESTION_TYPES = (
+        (ESSAY, "Essay Question"),
+        (MULTIPLE_CHOICE, "Multiple Choice Question"),
+        (CHECKBOX, "Checkbox Question"),
+        (NUMERIC_SCALE, "Numeric Scale Question")
+    )
     quiz = models.ManyToManyField(Quiz, verbose_name=_('Quiz'), blank=True)
     content = models.CharField(max_length=1023, verbose_name=_("Question Content"), help_text="the actual question being asked")
     figure = models.ImageField(blank=True, null=True, upload_to="image/quiz", verbose_name=_("Figure"))
     explanation = models.CharField(max_length=1023, verbose_name=_("Explanation"), blank=True,
                                    help_text="Explanation of correct answer to be shown after user submits response")
-    essay = models.BooleanField(default=False, verbose_name=_("Open-Ended Essay Question"))
+    type = models.IntegerField(null=False, verbose_name=_("Question Type"), choices=QUESTION_TYPES, default=ESSAY)
+
+    def _str__(self):
+        return "[{}] {}".format(self.quiz.id, self.content)
 
 
 """
@@ -100,11 +113,10 @@ class MultipleChoiceQuestion(Question):
 
     randomize = models.BooleanField(default=False, verbose_name=_("Randomize Options"), help_text="randomize the option order")
 
-
     def clean(self):
         super(MultipleChoiceQuestion, self).clean()
 
-        if self.essay:
+        if self.type == Question.ESSAY:
             raise ValidationError(_("Cannot be multiple-choice and essay"))
 
     def check_if_correct(self, guess):
@@ -181,7 +193,7 @@ class NumericScaleQuestion(Question):
     def clean(self):
         super(NumericScaleQuestion, self).clean()
 
-        if self.essay:
+        if self.type == Question.ESSAY:
             raise ValidationError(_("Cannot be both numeric-scale and essay"))
 
         # Reverse the order of min/max if step is negative
