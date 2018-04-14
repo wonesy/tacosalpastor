@@ -9,7 +9,8 @@ class MultipleChoiceTest(TestCase):
         self.quiz2 = Quiz.objects.create(title="EPITA test multiple-choice quiz")
 
         self.mcquestion = MultipleChoiceQuestion.objects.create(content="Do you capitalize the first letter of a job title?",
-                                                                explanation="Absolutely not, you must be dumb")
+                                                                explanation="Absolutely not, you must be dumb",
+                                                                type=Question.MULTIPLE_CHOICE)
         self.mcquestion.quiz.add(self.quiz1)
         self.mcquestion.quiz.add(self.quiz2)
 
@@ -61,25 +62,25 @@ class MultipleChoiceTest(TestCase):
 class NumericScaleTest(TestCase):
     def setUp(self):
         self.quiz = Quiz.objects.create(title="Numeric Quiz Example")
-        self.numeric_question = NumericScaleQuestion.objects.create(content="Rate me", min=1, max=10, step=1)
+        self.numeric_question = NumericScaleQuestion.objects.create(content="Rate me", min=1, max=10, step=1, type=Question.NUMERIC_SCALE)
         self.numeric_question.quiz.add(self.quiz)
 
     def test_numericscale_quiz_exists(self):
         self.assertTrue(NumericScaleQuestion.objects.exists())
 
     def test_numericscale_negative_step(self):
-        negative_question = NumericScaleQuestion.objects.create(content="Negative Numeric", min=100, max=10, step=-1)
+        negative_question = NumericScaleQuestion.objects.create(content="Negative Numeric", min=100, max=10, step=-1, type=Question.NUMERIC_SCALE)
         negative_question.clean()
         self.assertEqual(negative_question.min, 10)
         self.assertEqual(negative_question.max, 100)
         self.assertEqual(negative_question.step, 1)
 
     def test_numericscale_range_error(self):
-        self.assertRaises(ValidationError, lambda: NumericScaleQuestion.objects.create(content="Invalid", min=1, max=1).clean())
+        self.assertRaises(ValidationError, lambda: NumericScaleQuestion.objects.create(content="Invalid", min=1, max=1, type=Question.NUMERIC_SCALE).clean())
 
 class CheckboxTest(TestCase):
     def setUp(self):
-        self.question = CheckboxQuestion.objects.create(content="Which are members of wu-tang", total_correct_answers=2)
+        self.question = CheckboxQuestion.objects.create(content="Which are members of wu-tang", total_correct_answers=2, type=Question.CHECKBOX)
         self.opt1 = MultipleChoiceOption.objects.create(question=self.question, content="Method Man", is_correct=True)
         self.opt2 = MultipleChoiceOption.objects.create(question=self.question, content="Jay Z", is_correct=False)
         self.opt3 = MultipleChoiceOption.objects.create(question=self.question, content="Nas", is_correct=False)
@@ -111,7 +112,7 @@ class CheckboxTest(TestCase):
         self.assertEqual(0, self.question.get_score(submission))
 
     def test_checkbox_correct_negative_score(self):
-        neg_question = CheckboxQuestion.objects.create(content="Which are colors", total_correct_answers=2, allow_negative_score=True)
+        neg_question = CheckboxQuestion.objects.create(content="Which are colors", total_correct_answers=2, allow_negative_score=True, type=Question.CHECKBOX)
         negopt1 = MultipleChoiceOption.objects.create(question=neg_question, content="Blue", is_correct=True)
         negopt2 = MultipleChoiceOption.objects.create(question=neg_question, content="Joe", is_correct=False)
         negopt3 = MultipleChoiceOption.objects.create(question=neg_question, content="5", is_correct=False)
@@ -139,7 +140,8 @@ class CheckboxTest(TestCase):
 
     def test_checkbox_correct_decimal_scores(self):
         neg_question = CheckboxQuestion.objects.create(content="Which are colors", total_correct_answers=2,
-                                                       allow_negative_score=True, incorrect_choice_points_lost=0.5, missed_choice_points_lost=0.25)
+                                                       allow_negative_score=True, incorrect_choice_points_lost=0.5, missed_choice_points_lost=0.25,
+                                                       type=Question.CHECKBOX)
         negopt1 = MultipleChoiceOption.objects.create(question=neg_question, content="Blue", is_correct=True)
         negopt2 = MultipleChoiceOption.objects.create(question=neg_question, content="Joe", is_correct=False)
         negopt3 = MultipleChoiceOption.objects.create(question=neg_question, content="5", is_correct=False)
