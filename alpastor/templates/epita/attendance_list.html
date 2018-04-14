@@ -5,36 +5,37 @@
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th>Photo</th>
-            <th>Student Name</th>
-            <th>Status</th>
+            <th class="text-center">Photo</th>
+            <th class="text-center">Student Name</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Supporting Documents</th>
+            <link href="{% static 'css/attendance.css' %}" rel="stylesheet">
         </thead>
         <tbody>
-            {% for student in times %}
-                <tr>
-                    <td>
-                        {% if student.student_id.photo_location != '' %}
-                            {% with 'image/portraits/'|add:student.student_id.photo_location as image_static %}
-                                <img src="{% static image_static %}" alt={{ student.student_id.user }}>
-                            {% endwith %}
-                        {% else %}
-                            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Taco" class="people-img">
-                        {% endif %}
-                    </td>
-                    <td>{{ student.student_id.user }}</td>
-                    <td>
-                        <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">
-                            <input type="radio" id="r1" name="status" value="1" onclick="disableButton()"> Present<br>
-                            <input type="radio" id="r1" name="status" value="2" onclick="disableButton()" checked="checked"> Absent<br>
-                            <input type="radio" id="r1" name="status" value="3" onclick="disableButton()" > Excused</input><br>
-                            {% csrf_token %}
-                            <label>Upload Documentation</label>
-                            {{ form.as_p }}
-{#                            <input id="uploadForm" type="file" class="form-control-file" name="myfile" disabled="true">#}
-                            <button type="submit">Upload</button>
-                        </form>
-                    </td>
-                </tr>
+            {% for form in form_list %}
+                <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <tr>
+                        <td>
+                            {% if form.student_id.photo_location != None %}
+                                {% with 'image/portraits/'|add:form.student_id.photo_location as image_static %}
+                                    <img src="{% static image_static %}" alt={{ form.student_id.user }}>
+                                {% endwith %}
+                            {% else %}
+                                <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar" class="people-img">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ form.student_id }}
+                        </td>
+                        <td>
+                            {{ form.status }}
+                        </td>
+                        <td>
+                            {{ form.file_upload }}
+                            <input type="submit">
+                        </td>
+                    </tr>
+                </form>
             {% endfor %}
         </tbody>
     </table>
