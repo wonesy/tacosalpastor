@@ -12,9 +12,22 @@ class MultipleChoiceForm(forms.ModelForm):
     class Meta:
         model = MultipleChoiceQuestion
         fields = ['content', 'explanation','randomize']
+        widgets = {
+            'content': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'explanation': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }
 
 
 class MultipleChoiceOptionForm(forms.ModelForm):
     class Meta:
         model = MultipleChoiceOption
         fields = ['content', 'is_correct']
+        widgets = {
+            'content': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }

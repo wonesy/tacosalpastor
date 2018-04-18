@@ -99,7 +99,7 @@ class Question(models.Model):
     type = models.IntegerField(null=False, verbose_name=_("Question Type"), choices=QUESTION_TYPES, default=ESSAY)
 
     def _str__(self):
-        return "[{}] {}".format(self.quiz.id, self.content)
+        return "{}".format(self.content)
 
 
 """
@@ -123,6 +123,9 @@ class MultipleChoiceQuestion(Question):
         opt = MultipleChoiceOption.objects.get(id=guess)
 
         return opt.is_correct
+
+    def __str__(self):
+        return "{}".format(self.content)
 
 class CheckboxQuestion(MultipleChoiceQuestion):
     multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))

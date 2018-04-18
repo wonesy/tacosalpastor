@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion
 from epita.models import Course
 from django.views import View
-from .forms import MultipleChoiceForm, MultipleChoiceOptionForm
+from quiz.forms import MultipleChoiceForm, MultipleChoiceOptionForm
+from quiz.serializers import QuestionSerializer
+from rest_framework import generics
 import json
 import enum
 
@@ -85,4 +87,24 @@ class SaveNewQuiz(View):
         opt_content = option_json['content']
         opt_is_correct = option_json['is_correct']
 
-        opt = MultipleChoiceOption.objects.create(question=question, content=opt_content, is_correct=opt_is_correct)
+class AddExistingQuestionView(generics.ListCreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        content_filter = self.request.query_params.get('content', None)
+        type_filter = self.request.query_params.get('type', None)
+
+        if content_filter == None:
+            return None
+
+        queryset = Question.objects.filter(content__icontains=content_filter)
+
+        if type_filter != None:
+            queryset.filter(type__exact=type_filter)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        """ Save the POST data """
+        serializer.save()

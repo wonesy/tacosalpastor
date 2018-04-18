@@ -1,3 +1,36 @@
+/*
+* Extend JavaScript String object with printf() like functionality
+* "{0} is dead, but {1} is alive!".format("This", "that");
+*/
+String.prototype.format = function() {
+    var formatted = this;
+    for(arg in arguments) {
+        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+    }
+    return formatted;
+};
+
+function getQuestionTypeString(num) {
+    var string = "None";
+    switch (num) {
+        case 0:
+            string = "Essay";
+            break;
+        case 1:
+            string = "MC";
+            break;
+        case 2:
+            string = "Checkbox";
+            break;
+        case 3:
+            string = "Numeric";
+            break;
+        default:
+            string = "ERROR";
+    }
+
+    return string;
+}
 
 function _getNewQuestionMap() {
     return {
@@ -93,4 +126,47 @@ function isCorrectToggle(element, checkbox) {
 
 function buildQuizJSON() {
     document.getElementById('json_quiz').value = JSON.stringify(mapAllQuestions());
+}
+
+/*
+    Function:       refreshBlankQuestionRadio
+
+    Description:    This is executed whenever the "existing questions" canvas is focused and marks the "blank questions"
+                    as None/empty
+ */
+function refreshBlankQuestionRadio() {
+    $('input[name=blank-question-opt][value=\'None\']').prop("checked",true);
+}
+
+
+var resultsRowTemplate =
+    "<div class='col-sm-1'>{0}</div>" +
+    "<div class='col-sm-11'>{1}</div>";
+
+function getExistingQuestionQueryset() {
+    var baseUrl = window.location.origin + window.location.pathname + "existingquestion";
+
+    var searchElem = document.getElementById("searchExistingQuestion");         // the search bar
+    var resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
+
+    resultsCanvas.innerHTML = "";
+
+    if (searchElem.value == "") {
+        return;
+    }
+
+    // construct full web API URI
+    fullAPIURL = baseUrl + "?content=" + searchElem.value;
+
+    // execute the web API call and handle data accordingly
+    $.getJSON(fullAPIURL, null, function(data) {
+        for (var i = 0; i < data.length; i++) {
+            resultsCanvas.innerHTML += resultsRowTemplate.format(getQuestionTypeString(data[i]['type']), data[i]['content']);
+            console.log(data[i]);
+        }
+    });
+}
+
+function addNewQuestion() {
+
 }

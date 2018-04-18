@@ -117,3 +117,38 @@
     color: #2ecc71;
 }
 
+/******************************************************/
+/************          MODAL           ****************/
+/******************************************************/
+
+.modal-body {
+    margin: 10px;
+}
+
+.modal-content {
+    min-width: 750px;
+}
+
+.blank-questions-wrapper {
+    background: #2CC06B;
+    float: left;
+}
+
+.existing-questions-wrapper {
+    width: 100%;
+    overflow: hidden;
+    background: #5b80b2;
+}
+
+.search-question-wrapper .search {
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown {
+    min-width: 155px;
+}
+
+.existing-questions-results {
+    overflow-y: visible;
+}

@@ -23,7 +23,7 @@
             </div>
 
             <div style="text-align: center">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newQuestionModal" onclick="addMultipleChoiceQuestion();">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newQuestionModal" onclick="getExistingQuestionQueryset();">
                     Add Question
                 </button>
             </div>
@@ -37,29 +37,72 @@
         </div>
     </div>
 
-    <!-- Modal
+    <!-- Modal -->
     <div class="modal fade" id="newQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Question</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    ...
+                <div class="modal-body row">
+                    <div class="blank-questions-wrapper col-md-4">
+                        <h3>Add Blank Question</h3>
+                        <form id="blank-question-form">
+                            <input type="radio" name="blank-question-opt" value="None" checked> None<br>
+                            <input type="radio" name="blank-question-opt" value="Essay" > Essay<br>
+                            <input type="radio" name="blank-question-opt" value="Multiple Choice"> Multiple Choice<br>
+                            <input type="radio" name="blank-question-opt" value="Checkbox (multiple correct answers)"> Checkbox<br>
+                            <input type="radio" name="blank-question-opt" value="Numeric Scale (i.e 1-10)"> Numeric Scale<br>
+                        </form>
+                    </div>
+                    <div class="existing-questions-wrapper col-md-8" tabindex="-1">
+                        <div class="row search-question-wrapper">
+                            <div class="search col-sm-8">
+                                <input id="searchExistingQuestion" type="text" class="form-control" placeholder="Search question">
+                            </div>
+                            <div class="search col-sm-4">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Question Type
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#">Any</a>
+                                        <a class="dropdown-item" href="#">Essay</a>
+                                        <a class="dropdown-item" href="#">Multiple Choice</a>
+                                        <a class="dropdown-item" href="#">Checkbox</a>
+                                        <a class="dropdown-item" href="#">Numeric Scale</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row existing-questions-results">
+                            <div class="col-sm-1">Type</div>
+                            <div class="col-sm-11">Content</div>
+                            <div id="existingQuestionsResults" class="row">
+                                <!-- Add results via javascript function -->
+                            </div>
+
+                        </div>
+                        <button type="button" onclick="getExistingQuestionQueryset();">Update Results</button>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Add</button>
+
                 </div>
             </div>
         </div>
     </div>
-    -->
 
     <script type="application/javascript">
+
+        $(".existing-questions-wrapper").focus(function () {
+            refreshBlankQuestionRadio();
+        });
+
         function addMultipleChoiceQuestion() {
             var questionCanvas = document.getElementById('question-canvas');
 
