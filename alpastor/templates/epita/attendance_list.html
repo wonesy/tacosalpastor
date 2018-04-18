@@ -25,7 +25,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            {{ form.student_id }}
+                            {{ form.instance.student_id }}
+                            {{ form.student_id.as_hidden }}
+                            {{ form.schedule_id.as_hidden }}
+                            <input name="id" value="{{ form.instance.id }}" type="hidden">
                         </td>
                         <td>
                             {{ form.status }}
