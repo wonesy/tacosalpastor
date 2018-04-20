@@ -1,0 +1,21 @@
+{% extends 'base_generic.html'%}
+
+{% load static %}
+{% block content %}
+    <table class="table text-center">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Active Courses</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in class_list %}
+                <tr>
+                    <th>
+                        <a class="btn btn-primary" href="#">{{ course }}</a>
+                    </th>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

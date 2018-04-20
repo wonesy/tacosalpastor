@@ -9,6 +9,9 @@ from .forms import AttendanceForm
 def home(request):
     return render(request, 'base_generic.html')
 
+################################################
+# Professor View for attendance module         #
+################################################
 
 class CourseList(ListView):
     model = Course
@@ -44,6 +47,32 @@ class AttendanceList(ListView):
             file = form.cleaned_data['file_upload']
         args = {'form': form, 'file':file}
         return render(request, self.template_name, args)
+
+
+################################################
+# Student View for attendance module           #
+################################################
+
+class CourseStudentView(ListView):
+    template_name = 'epita/course_list_student.html'
+    student_num = 4
+
+    def get(self, request):
+        student_instance = self.student_num
+        user_courses = Attendance.objects.filter(student_id__user_id=student_instance)
+        class_list = []
+        for course in user_courses:
+            class_list.append(course.schedule_id.course_id.title)
+        args = {'student_instance' : student_instance ,'class_list' : class_list}
+        return render(request, self.template_name, args)
+
+
+class ScheduleStudentView(ListView):
+    pass
+
+
+class AttendanceStudentView(ListView):
+    pass
 
 
 def people(request):
