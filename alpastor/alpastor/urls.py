@@ -28,14 +28,14 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     # Professor/superuser view Attendance
-    path('attendance/', CourseList.as_view(), name='course_list'),
-    path('attendance/schedule/', ScheduleList.as_view(), name='schedule_list'),
-    path('attendance/schedule/students/', AttendanceList.as_view(), name='attendance_list'),
+    path('attendance-professor/', CourseList.as_view(), name='course_list'),
+    path('attendance-professor/course/', ScheduleList.as_view(), name='schedule_list'),
+    path('attendance-professor/course/schedule/', AttendanceList.as_view(), name='attendance_list'),
 
     # Student view Attendance
     path('attendance-student/', CourseStudentView.as_view(), name='course_list_student'),
-    path('attendance-student/schedule/', ScheduleStudentView.as_view(), name='schedule_list_student'),
-    path('attendance-student/schedule/course/', AttendanceStudentView.as_view(), name='attendance_student'),
+    path('attendance-student/course/', ScheduleStudentView.as_view(), name='schedule_list_student'),
+    path('attendance-student/course/schedule/', AttendanceStudentView.as_view(), name='attendance_student'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),

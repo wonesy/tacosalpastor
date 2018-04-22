@@ -13,7 +13,7 @@
             {% for course in user_courses %}
                 <tr>
                     <th>
-                        <a class="btn btn-primary" href="/attendance-student/schedule?course_id={{ course.id }}">{{ course.schedule_id.course_id.title }}</a>
+                        <a class="btn btn-primary" href="/attendance-student/course?course_name={{ course }}">{{ course }}</a>
                     </th>
                 </tr>
             {% endfor %}

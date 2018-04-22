@@ -13,7 +13,7 @@
             <tr>
                 {% for schedule in schedule_list %}
                     <th>
-                        <a class="btn btn-primary" href="/attendance/schedule/students?schedule_id={{ schedule.id }}">{{ schedule.date }}<br>{{ schedule.start_time }} - {{ schedule.end_time }} {{ schedule.room_id }}</a>
+                        <a class="btn btn-primary" href="/attendance-professor/course/schedule?schedule_id={{ schedule.id }}">{{ schedule.date }}<br>{{ schedule.start_time }} - {{ schedule.end_time }} {{ schedule.room_id }}</a>
                     </th>
                 {% endfor %}
             </tr>

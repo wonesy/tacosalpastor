@@ -20,7 +20,7 @@ class CourseList(ListView):
 class ScheduleList(ListView):
 
     def get(self, request):
-        specific_course = request.GET.get('course_id','')
+        specific_course = request.GET.get('course_id', '')
         schedules = Schedule.objects.filter(course_id=specific_course)
         return render(request, 'epita/schedule_list.html', {'schedule_list': schedules})
 
@@ -31,7 +31,7 @@ class AttendanceList(ListView):
 
     def get(self, request):
         course_num = request.GET.get('schedule_id','')
-        attendance_objects = Attendance.objects.filter(schedule_id=course_num)
+        attendance_objects = Attendance.objects.filter(schedule_id=course_num).order_by('student_id__user__first_name')
         form_list = []
         for i in attendance_objects:
             form = self.form_class(instance=i)
@@ -39,7 +39,7 @@ class AttendanceList(ListView):
         return render(request, self.template_name, {'form_list': form_list})
 
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
         form = self.form_class(request.POST, request.FILES, instance=instance)
         if form.is_valid():
@@ -59,7 +59,8 @@ class CourseStudentView(ListView):
 
     def get(self, request):
         student_instance = self.student_num
-        user_courses = Attendance.objects.filter(student_id__user_id=student_instance)
+        user_courses = Attendance.objects.filter(student_id__user_id=student_instance).order_by('schedule_id__course_id__title')
+        user_courses = user_courses.values_list('schedule_id__course_id__title', flat=True).distinct()
         return render(request, self.template_name, {'user_courses' : user_courses})
 
 
@@ -67,9 +68,8 @@ class ScheduleStudentView(ListView):
     template_name = 'epita/schedule_list_student.html'
 
     def get(self, request):
-        course_instance = request.GET.get('course_id', '')
-        selected = Attendance.objects.get(id=course_instance)
-        schedule_list = Schedule.objects.filter(course_id=selected.schedule_id.course_id)
+        course_instance = request.GET.get('course_name', '')
+        schedule_list = Schedule.objects.filter(course_id__title=course_instance)
         return render(request, self.template_name, {'schedule_list' : schedule_list})
 
 
