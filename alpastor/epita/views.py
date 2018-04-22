@@ -74,7 +74,25 @@ class ScheduleStudentView(ListView):
 
 
 class AttendanceStudentView(ListView):
-    pass
+    template_name = 'epita/attendance_student'
+    student_num = 4
+    form_class = AttendanceForm
+
+    def get(self, request, *args, **kwargs):
+        schedule_instance = request.GET.get('schedule_id', '')
+        student_instance = self.student_num
+        attendance_instance = Attendance.objects.filter(student_id__user_id=student_instance).filter(schedule_id=schedule_instance)
+        form = self.form_class(instance=attendance_instance[0])
+        return render(request, self.template_name, {'form' : form})
+
+    def post(self, request):
+        instance = get_object_or_404(Attendance, pk=request.POST['id'])
+        form = self.form_class(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            file = form.cleaned_data['file_upload']
+        args = {'form' : form, 'file' : file}
+        return render(request, self.template_name, args)
 
 
 def people(request):

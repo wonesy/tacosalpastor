@@ -18,7 +18,7 @@ from django.urls import path
 from accounts import views as accounts_views
 from quiz import views as quiz_views
 from epita import views
-from epita.views import CourseList, ScheduleList, AttendanceList, CourseStudentView, ScheduleStudentView
+from epita.views import CourseList, ScheduleList, AttendanceList, CourseStudentView, ScheduleStudentView, AttendanceStudentView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -35,6 +35,7 @@ urlpatterns = [
     # Student view Attendance
     path('attendance-student/', CourseStudentView.as_view(), name='course_list_student'),
     path('attendance-student/schedule/', ScheduleStudentView.as_view(), name='schedule_list_student'),
+    path('attendance-student/schedule/course/', AttendanceStudentView.as_view(), name='attendance_student'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
