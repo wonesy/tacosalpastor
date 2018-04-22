@@ -60,15 +60,17 @@ class CourseStudentView(ListView):
     def get(self, request):
         student_instance = self.student_num
         user_courses = Attendance.objects.filter(student_id__user_id=student_instance)
-        class_list = []
-        for course in user_courses:
-            class_list.append(course.schedule_id.course_id.title)
-        args = {'student_instance' : student_instance ,'class_list' : class_list}
-        return render(request, self.template_name, args)
+        return render(request, self.template_name, {'user_courses' : user_courses})
 
 
 class ScheduleStudentView(ListView):
-    pass
+    template_name = 'epita/schedule_list_student.html'
+
+    def get(self, request):
+        course_instance = request.GET.get('course_id', '')
+        selected = Attendance.objects.get(id=course_instance)
+        schedule_list = Schedule.objects.filter(course_id=selected.schedule_id.course_id)
+        return render(request, self.template_name, {'schedule_list' : schedule_list})
 
 
 class AttendanceStudentView(ListView):
