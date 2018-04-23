@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.views.generic import ListView
 from .models import Student, Course, Attendance, Schedule
 from .forms import AttendanceForm
@@ -14,7 +15,13 @@ def home(request):
 ################################################
 
 class CourseList(ListView):
-    model = Course
+    template_name = 'epita/course_list.html'
+
+    def get(self, request):
+        professor_instance = str(request.user)
+        first, last = professor_instance.split(' ')
+        course_list = Course.objects.filter(professor_id__user__last_name=last)
+        return render(request, self.template_name, {'course_list' : course_list})
 
 
 class ScheduleList(ListView):
@@ -38,7 +45,6 @@ class AttendanceList(ListView):
             form_list.append(form)
         return render(request, self.template_name, {'form_list': form_list})
 
-
     def post(self, request):
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
         form = self.form_class(request.POST, request.FILES, instance=instance)
@@ -55,10 +61,9 @@ class AttendanceList(ListView):
 
 class CourseStudentView(ListView):
     template_name = 'epita/course_list_student.html'
-    student_num = 4
 
     def get(self, request):
-        student_instance = self.student_num
+        student_instance = request.user
         user_courses = Attendance.objects.filter(student_id__user_id=student_instance).order_by('schedule_id__course_id__title')
         user_courses = user_courses.values_list('schedule_id__course_id__title', flat=True).distinct()
         return render(request, self.template_name, {'user_courses' : user_courses})
@@ -75,12 +80,11 @@ class ScheduleStudentView(ListView):
 
 class AttendanceStudentView(ListView):
     template_name = 'epita/attendance_student'
-    student_num = 4
     form_class = AttendanceForm
 
     def get(self, request, *args, **kwargs):
         schedule_instance = request.GET.get('schedule_id', '')
-        student_instance = self.student_num
+        student_instance = request.user
         attendance_instance = Attendance.objects.filter(student_id__user_id=student_instance).filter(schedule_id=schedule_instance)
         form = self.form_class(instance=attendance_instance[0])
         return render(request, self.template_name, {'form' : form})

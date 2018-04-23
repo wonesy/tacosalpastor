@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <table class="table">
+    <table class="table student-form">
         <thead>
             <th class="text-center">{{ form.instance.schedule_id }}</th>
             <link href="{% static 'css/attendance_student.css' %}" rel="stylesheet">
@@ -21,6 +21,7 @@
                             <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar"
                                  class="people-img">
                         {% endif %}
+                        <p>{{ user }}</p>
                     </td>
                 </tr>
                 <tr>
