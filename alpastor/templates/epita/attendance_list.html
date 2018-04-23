@@ -12,29 +12,29 @@
             <link href="{% static 'css/attendance.css' %}" rel="stylesheet">
         </thead>
         <tbody>
-            {% for form in form_list %}
+            {% for form_item in form %}
                 <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
                     <tr>
                         <td>
-                            {% if form.student_id.photo_location != None %}
-                                {% with 'image/portraits/'|add:form.student_id.photo_location as image_static %}
-                                    <img src="{% static image_static %}" alt={{ form.student_id.user }}>
+                            {% if form_item.student_id.photo_location != None %}
+                                {% with 'image/portraits/'|add:form_item.student_id.photo_location as image_static %}
+                                    <img src="{% static image_static %}" alt={{ form_item.student_id.user }}>
                                 {% endwith %}
                             {% else %}
                                 <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar" class="people-img">
                             {% endif %}
                         </td>
                         <td>
-                            {{ form.instance.student_id }}
-                            {{ form.student_id.as_hidden }}
-                            {{ form.schedule_id.as_hidden }}
-                            <input name="id" value="{{ form.instance.id }}" type="hidden">
+                            {{ form_item.instance.student_id }}
+                            {{ form_item.student_id.as_hidden }}
+                            {{ form_item.schedule_id.as_hidden }}
+                            <input name="id" value="{{ form_item.instance.id }}" type="hidden">
                         </td>
                         <td>
-                            {{ form.status }}
+                            {{ form_item.status }}
                         </td>
                         <td>
-                            {{ form.file_upload }}
+                            {{ form_item.file_upload }}
                             <input type="submit">
                         </td>
                     </tr>

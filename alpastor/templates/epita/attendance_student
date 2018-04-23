@@ -12,7 +12,7 @@
             <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
                 <tr>
                     <td>
-                        <p>User</p>
+                        <p>{{ user }}</p>
                         {% if form.student_id.photo_location != None %}
                             {% with 'image/portraits/'|add:form.student_id.photo_location as image_static %}
                                 <img src="{% static image_static %}" alt={{ form.student_id.user }}>
@@ -21,7 +21,6 @@
                             <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar"
                                  class="people-img">
                         {% endif %}
-                        <p>{{ user }}</p>
                     </td>
                 </tr>
                 <tr>

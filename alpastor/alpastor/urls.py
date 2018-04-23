@@ -18,7 +18,7 @@ from django.urls import path
 from accounts import views as accounts_views
 from quiz import views as quiz_views
 from epita import views
-from epita.views import CourseList, ScheduleList, AttendanceList, CourseStudentView, ScheduleStudentView, AttendanceStudentView
+from epita.views import CourseView, ScheduleView, AttendanceView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,14 +28,12 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     # Professor/superuser view Attendance
-    path('attendance-professor/', CourseList.as_view(), name='course_list'),
-    path('attendance-professor/course/', ScheduleList.as_view(), name='schedule_list'),
-    path('attendance-professor/course/schedule/', AttendanceList.as_view(), name='attendance_list'),
+    path('attendance/', CourseView.as_view(), name='course_list'),
+    path('attendance/course/', ScheduleView.as_view(), name='schedule_list'),
+    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_list'),
 
     # Student view Attendance
-    path('attendance-student/', CourseStudentView.as_view(), name='course_list_student'),
-    path('attendance-student/course/', ScheduleStudentView.as_view(), name='schedule_list_student'),
-    path('attendance-student/course/schedule/', AttendanceStudentView.as_view(), name='attendance_student'),
+    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_student'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
