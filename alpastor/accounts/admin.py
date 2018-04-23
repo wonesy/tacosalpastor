@@ -1,5 +1,28 @@
 from django.contrib import admin
 from accounts.models import User
+from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
+from django.contrib.auth.admin import UserAdmin
 
-# Register your models here.
-admin.site.register(User)
+
+class CustomUserAdmin(UserAdmin):
+    form = CustomUserChangeForm
+    add_form = CustomUserCreationForm
+
+    list_display = ('email', 'password', 'first_name', 'last_name', 'external_email')
+    fieldsets = ((None, {'fields':
+                             ('email', 'password', 'last_name', 'first_name',),
+                         }
+                  ),
+                 )
+    readonly_fields = ('date_joined',)
+    ordering = ('email',)
+    exclude = ('username',)
+    add_fieldsets = (
+        (None, {
+            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'external_email',)}
+         ),
+    )
+    search_fields = ('email',)
+    filter_horizontal = ()
+
+admin.site.register(User, CustomUserAdmin)

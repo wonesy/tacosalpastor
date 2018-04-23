@@ -41,6 +41,7 @@ class SuccessfulLoginTests(TestCase):
             'username': 'testuser@epita.fr',
             'password': 'abcdef123456'
         }
+
         self.response = self.client.post(self.url, self.data)
         self.home_url = reverse('home')
 
