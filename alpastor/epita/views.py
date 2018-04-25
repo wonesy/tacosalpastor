@@ -10,7 +10,7 @@ from .forms import AttendanceForm
 def home(request):
     return render(request, 'base_generic.html')
 
-
+# @login_required
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
 
@@ -18,20 +18,17 @@ class CourseView(ListView):
         user_instance = request.user
 
         if user_instance.is_superuser:
-            print("Entered Superuser block")
-            course_list = Course.objects.all()
+            course_list = Attendance.objects.all()
 
         elif user_instance.is_staff:
-            print("Entered Professor block")
             course_list = Attendance.objects.filter(schedule_id__course_id__professor_id__user_id=user_instance)
 
         else:
-            print("Entered Student block")
             course_list = Attendance.objects.filter(student_id__user_id=user_instance)
 
         course_list = course_list.order_by('schedule_id__course_id__title')
         course_list = course_list.values_list('schedule_id__course_id__title', flat=True).distinct()
-        return render(request, self.template_name, {'course_list' : course_list})
+        return render(request, self.template_name, {'course_list': course_list})
 
 
 class ScheduleView(ListView):
@@ -40,8 +37,7 @@ class ScheduleView(ListView):
     def get(self, request):
         course_instance = request.GET.get('course_name', '')
         schedule_list = Schedule.objects.filter(course_id__title=course_instance)
-        return render(request, self.template_name, {'schedule_list' : schedule_list})
-
+        return render(request, self.template_name, {'schedule_list': schedule_list})
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
@@ -66,7 +62,7 @@ class AttendanceView(ListView):
                 schedule_id=schedule_instance)
             form = self.form_class(instance=attendance_instance[0])
 
-        return render(request, self.template_name, {'form' : form})
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
@@ -74,7 +70,7 @@ class AttendanceView(ListView):
         if form.is_valid():
             form.save()
             file = form.cleaned_data['file_upload']
-        args = {'form': form, 'file':file}
+        args = {'form': form, 'file': file}
         return render(request, self.template_name, args)
 
 
