@@ -1,36 +1,16 @@
-/*
-* Extend JavaScript String object with printf() like functionality
-* "{0} is dead, but {1} is alive!".format("This", "that");
-*/
-String.prototype.format = function() {
-    var formatted = this;
-    for(arg in arguments) {
-        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
-    }
-    return formatted;
+var questionTypesI2A = {
+    0: "Essay",
+    1: "M.C.",
+    2: "C.B.",
+    3: "N.S."
 };
 
-function getQuestionTypeString(num) {
-    var string = "None";
-    switch (num) {
-        case 0:
-            string = "Essay";
-            break;
-        case 1:
-            string = "MC";
-            break;
-        case 2:
-            string = "Checkbox";
-            break;
-        case 3:
-            string = "Numeric";
-            break;
-        default:
-            string = "ERROR";
-    }
-
-    return string;
-}
+var questionTypesA2I = {
+    "Essay": 0,
+    "M.C.": 1,
+    "Checkbox": 2,
+    "Numeric": 3
+};
 
 function _getNewQuestionMap() {
     return {
@@ -140,33 +120,40 @@ function refreshBlankQuestionRadio() {
 
 
 var resultsRowTemplate =
-    "<div class='col-sm-1'>{0}</div>" +
-    "<div class='col-sm-11'>{1}</div>";
+    "<div class='row'>" +
+    "<div class='col-md-2 col-sm-2 q-result q-type'>{0}</div>" +
+    "<div class='col-md q-result q-content'>{1}</div>" +
+    "</div>";
 
 function getExistingQuestionQueryset() {
-    var baseUrl = window.location.origin + window.location.pathname + "existingquestion";
+    return function() {
+        var baseUrl = window.location.origin + window.location.pathname + "existingquestion";
 
-    var searchElem = document.getElementById("searchExistingQuestion");         // the search bar
-    var resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
+        var typeElem = document.getElementById('dropdownMenuButton');               // the question type dropdown
+        var searchElem = document.getElementById("searchExistingQuestion");         // the search bar
+        var resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
+        var typeURL = "";
 
-    resultsCanvas.innerHTML = "";
+        resultsCanvas.innerHTML = "";
 
-    if (searchElem.value == "") {
-        return;
-    }
-
-    // construct full web API URI
-    fullAPIURL = baseUrl + "?content=" + searchElem.value;
-
-    // execute the web API call and handle data accordingly
-    $.getJSON(fullAPIURL, null, function(data) {
-        for (var i = 0; i < data.length; i++) {
-            resultsCanvas.innerHTML += resultsRowTemplate.format(getQuestionTypeString(data[i]['type']), data[i]['content']);
-            console.log(data[i]);
+        if (searchElem.value === "") {
+            return;
         }
-    });
-}
 
-function addNewQuestion() {
+        if (typeElem.innerHTML !== "Any") {
+            var type = questionTypesA2I[typeElem.innerHTML];
+            typeURL = "&type={0}".format(type);
+        }
 
+        // construct full web API URI
+        var fullAPIURL = baseUrl + "?content=" + searchElem.value + typeURL;
+
+        // execute the web API call and handle data accordingly
+        $.getJSON(fullAPIURL, null, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                resultsCanvas.innerHTML += resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content']);
+                console.log(data[i]);
+            }
+        });
+    }
 }

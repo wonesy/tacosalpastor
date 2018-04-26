@@ -5,6 +5,7 @@ from django.views import View
 from quiz.forms import MultipleChoiceForm, MultipleChoiceOptionForm
 from quiz.serializers import QuestionSerializer
 from rest_framework import generics
+from rest_framework.response import Response
 import json
 import enum
 
@@ -88,8 +89,13 @@ class SaveNewQuiz(View):
         opt_is_correct = option_json['is_correct']
 
 class AddExistingQuestionView(generics.ListCreateAPIView):
-    queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    queryset = MultipleChoiceOption.objects.all()
+
+    def get(self, request):
+        questions = self.get_queryset()
+        serializers = QuestionSerializer(questions, many=True)
+        return Response(serializers.data)
 
     def get_queryset(self):
         content_filter = self.request.query_params.get('content', None)
@@ -98,7 +104,10 @@ class AddExistingQuestionView(generics.ListCreateAPIView):
         if content_filter == None:
             return None
 
-        queryset = Question.objects.filter(content__icontains=content_filter)
+        if type_filter == None:
+            queryset = Question.objects.filter(content__icontains=content_filter)
+        else:
+            queryset = Question.objects.filter(content__icontains=content_filter, type=type_filter)
 
         if type_filter != None:
             queryset.filter(type__exact=type_filter)

@@ -40,15 +40,15 @@
     <!-- Modal -->
     <div class="modal fade" id="newQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content container-fluid">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Choose Question</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body row">
-                    <div class="blank-questions-wrapper col-md-4">
+                <div class="modal-body row flex-nowrap">
+                    <div class="blank-questions-wrapper col-md-3 col-sm-3">
                         <h3>Add Blank Question</h3>
                         <form id="blank-question-form">
                             <input type="radio" name="blank-question-opt" value="None" checked> None<br>
@@ -58,35 +58,35 @@
                             <input type="radio" name="blank-question-opt" value="Numeric Scale (i.e 1-10)"> Numeric Scale<br>
                         </form>
                     </div>
-                    <div class="existing-questions-wrapper col-md-8" tabindex="-1">
+                    <div class="dividing-bar"></div>
+                    <div class="existing-questions-wrapper col-md col-12" tabindex="-1">
                         <div class="row search-question-wrapper">
-                            <div class="search col-sm-8">
-                                <input id="searchExistingQuestion" type="text" class="form-control" placeholder="Search question">
-                            </div>
-                            <div class="search col-sm-4">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Question Type
+                            <div class="search col-sm-4 col-md-4">
+                                <!-- Example split danger button -->
+                                <div class="btn-group">
+                                    <button type="button" id="dropdownMenuButton" class="btn btn-info">Any</button>
+                                    <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
                                     </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Any</a>
-                                        <a class="dropdown-item" href="#">Essay</a>
-                                        <a class="dropdown-item" href="#">Multiple Choice</a>
-                                        <a class="dropdown-item" href="#">Checkbox</a>
-                                        <a class="dropdown-item" href="#">Numeric Scale</a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Any');">Any</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Essay');">Essay</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('M.C.');">Multiple Choice</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Checkbox');">Checkbox</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Numeric');">Numeric Scale</a>
                                     </div>
                                 </div>
                             </div>
+                            <div class="search text-input col-md col-sm-12">
+                                <input id="searchExistingQuestion" type="text" class="text-input form-control" placeholder="Search question">
+                            </div>
                         </div>
-                        <div class="row existing-questions-results">
-                            <div class="col-sm-1">Type</div>
-                            <div class="col-sm-11">Content</div>
-                            <div id="existingQuestionsResults" class="row">
+                        <div class="existing-questions-results">
+                            <div id="existingQuestionsResults" class="results-wrapper">
                                 <!-- Add results via javascript function -->
                             </div>
 
                         </div>
-                        <button type="button" onclick="getExistingQuestionQueryset();">Update Results</button>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -102,6 +102,16 @@
         $(".existing-questions-wrapper").focus(function () {
             refreshBlankQuestionRadio();
         });
+
+        $('#searchExistingQuestion').keyup(function() {
+            delay(getExistingQuestionQueryset(), 1000);
+        });
+
+        function updateDropdownValue(val) {
+            btn = document.getElementById('dropdownMenuButton');
+            btn.innerHTML = val;
+            getExistingQuestionQueryset()();
+        }
 
         function addMultipleChoiceQuestion() {
             var questionCanvas = document.getElementById('question-canvas');

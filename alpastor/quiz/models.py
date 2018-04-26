@@ -99,7 +99,7 @@ class Question(models.Model):
     type = models.IntegerField(null=False, verbose_name=_("Question Type"), choices=QUESTION_TYPES, default=ESSAY)
 
     def _str__(self):
-        return "{}".format(self.content)
+        return self.content
 
 
 """
@@ -169,7 +169,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
 
 class MultipleChoiceOption(models.Model):
 
-    question = models.ForeignKey(MultipleChoiceQuestion, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
+    question = models.ForeignKey(Question, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
     content = models.CharField(max_length=1024, blank=False, help_text="Enter the text you want displayed as an MC option")
     is_correct = models.BooleanField(default=False, blank=False, help_text="Is this the correct answer to the question?")
 
