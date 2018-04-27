@@ -81,7 +81,7 @@ class StudentCourseTest(TestCase):
             Schedule.objects.create(course_id=c1, date=datetime.date.today()+datetime.timedelta(days=i),
                                     start_time="10:00", end_time="11:00", room_id=room)
 
-    def test_course_count(self):
+    def test_models_course_count(self):
         s0_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn0").count()
         s1_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn1").count()
         s2_courses = StudentCourse.objects.filter(student_id__user__first_name__exact="fn2").count()
@@ -90,7 +90,7 @@ class StudentCourseTest(TestCase):
         self.assertEqual(s1_courses, 1)
         self.assertEqual(s2_courses, 1)
 
-    def test_attendance_by_course(self):
+    def test_models_attendance_by_course(self):
         c0_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 0").count()
         c1_schedules = Schedule.objects.filter(course_id__title__exact="Sample Course 1").count()
 

@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'epita',
     'accounts',
+    'jchart',
+    'rest_framework',
+    'chartit',
+
 ]
 
 MIDDLEWARE = [
@@ -134,3 +138,5 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
+
+TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"

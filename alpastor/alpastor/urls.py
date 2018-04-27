@@ -17,14 +17,23 @@ from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
 from epita import views
-from epita.views import AttendanceList, ScheduleList
+from epita.views import CourseList, ScheduleList, AttendanceDetail
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
-    path('attendance/', ScheduleList.as_view(), name='schedule'),
-    path('attendance/<semester>/<course_id>/', AttendanceList.as_view(), name='attendance'),
+    path('attendance/', CourseList.as_view(), name='course_list'),
+    path('attendance/schedule/', ScheduleList.as_view(), name='schedule_list'),
+    path('attendance/schedule/students/', AttendanceDetail.as_view(), name='attendance_list'),
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
     path('admin/', admin.site.urls),
+    # path('api/data/', get_data, name='api-data'),
+    # path('api/chart/data/', ChartData.as_view()),
+    #url(r'^dashboard$', ChartView.from_chart(dashboard), name='dashboard'),
+    # url(r'^api/data/$', get_data, name='api-data'),
+    # url(r'^api/chart/data/$', ChartData.as_view()),
+    path('dashboardex/', views.dashboard, name='dashboardex'),
+    #url(r'^export/$', 'export_to_excel', name='export_to_excel'),
+
 ]
