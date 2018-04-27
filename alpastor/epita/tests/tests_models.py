@@ -1,5 +1,6 @@
 from django.test import TestCase, Client, RequestFactory
 from epita.models import Student, Professor, Course, Room, Schedule, Attendance, StudentCourse
+from epita.forms import AttendanceForm
 from epita.views import CourseView
 from accounts.models import User
 from django.urls import reverse
@@ -17,10 +18,10 @@ class AttendanceTest(TestCase):
 
         self.factory = RequestFactory()
 
-        user0 = User.objects.create(first_name="first0", last_name="last0", external_email="external0@gmail.com",
+        student_user0 = User.objects.create(first_name="first0", last_name="last0", external_email="external0@gmail.com",
                             email="epita0@epita.fr", is_staff=False, is_active=True, is_superuser=False)
-        user0.set_password('abc')
-        user0.save()
+        student_user0.set_password('abc')
+        student_user0.save()
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
                                                                      specialization="Software Engineering",
@@ -136,17 +137,22 @@ class AttendanceTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
 
-    # def test_schedule_view_status_code_and_template(self):
-    #     url = reverse('schedule_list')
-    #     self.response = self.client.get(url, {'course_id':1})
-    #     self.assertEqual(self.response.status_code, 200)
-    #     self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
-    #
-    # def test_attendance_view_status_code_and_template(self):
-    #     url = reverse('attendance_list')
-    #     self.response = self.client.get(url, {'schedule_id':1})
-    #     self.assertEqual(self.response.status_code, 200)
-    #     self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
+    def test_schedule_view_status_code_and_template(self):
+        url = reverse('schedule_list')
+        schedule_list = Schedule.objects.filter(course_id__title="Sample Course 0")
+        self.response = self.client.get(url, {'schedule_list': schedule_list})
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
+
+    def test_attendance_view_status_code_and_template(self):
+        url = reverse('attendance_list')
+        schedule_id = self.client.get('schedule_id', '')
+        student_instance = User.objects.get(first_name="first0")
+        Attendance.objects.filter(student_id__user_id=student_instance)
+        self.client.login(email=student_instance.email, password="abc")
+        self.response = self.client.get(url, {'schedule_id': 0})
+        # self.assertEqual(self.response.status_code, 200)
+        # self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
 
     def test_schedule_view_contains_courses(self):
         self.assertIsNot(self, Schedule.objects.all(), [])
