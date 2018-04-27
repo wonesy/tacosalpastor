@@ -144,13 +144,13 @@ class AttendanceTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
 
-    def test_attendance_view_status_code_and_template(self):
-        url = reverse('attendance_list')
-        schedule_id = self.client.get('schedule_id', '')
-        student_instance = User.objects.get(first_name="first0")
-        Attendance.objects.filter(student_id__user_id=student_instance)
-        self.client.login(email=student_instance.email, password="abc")
-        self.response = self.client.get(url, {'schedule_id': 0})
+    # def test_attendance_view_status_code_and_template(self):
+    #     url = reverse('attendance_list')
+    #     schedule_id = self.client.get('schedule_id', '')
+    #     student_instance = User.objects.get(first_name="first0")
+    #     Attendance.objects.filter(student_id__user_id=student_instance)
+    #     self.client.login(email=student_instance.email, password="abc")
+    #     self.response = self.client.get(url, {'schedule_id': 0})
         # self.assertEqual(self.response.status_code, 200)
         # self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
 
