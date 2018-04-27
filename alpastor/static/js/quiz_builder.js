@@ -120,9 +120,17 @@ function refreshBlankQuestionRadio() {
 
 
 var resultsRowTemplate =
+    "<a href='#optionsCanvas{2}' data-toggle='collapse' role='button' aria-expanded='false' aria-controls='optionsCanvas{2}'>" +
+        "<div class='row q-result'>" +
+            "<div class='col-md-2 col-sm-2 q-type'>{0}</div>" +
+            "<div class='col-md q-content'>{1}</div>" +
+        "</div>" +
+    "</a>" +
+    "<div id='optionsCanvas{2}' class='row collapse hide'></div>";
+
+var optionsResultsRowTemplate =
     "<div class='row'>" +
-    "<div class='col-md-2 col-sm-2 q-result q-type'>{0}</div>" +
-    "<div class='col-md q-result q-content'>{1}</div>" +
+        "<div class='col-md q-option'>{0}</div> " +
     "</div>";
 
 function getExistingQuestionQueryset() {
@@ -151,8 +159,15 @@ function getExistingQuestionQueryset() {
         // execute the web API call and handle data accordingly
         $.getJSON(fullAPIURL, null, function (data) {
             for (var i = 0; i < data.length; i++) {
-                resultsCanvas.innerHTML += resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content']);
                 console.log(data[i]);
+                resultsCanvas.innerHTML += resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content'], i);
+
+                var canvasId = "optionsCanvas{0}".format(i);
+                var optionsCanvas = document.getElementById(canvasId);
+
+                for (var j = 0; j < data[i]['multiplechoiceoption_set'].length; j++) {
+                    optionsCanvas.innerHTML += optionsResultsRowTemplate.format(data[i]['multiplechoiceoption_set'][j]['content'])
+                }
             }
         });
     }
