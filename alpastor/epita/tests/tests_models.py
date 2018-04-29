@@ -144,19 +144,27 @@ class AttendanceTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
 
-    # def test_attendance_view_status_code_and_template(self):
+    def test_attendance_view_as_student_status_code_and_template(self):
+        student_instance = User.objects.get(first_name="first0")
+        self.client.login(email=student_instance.email, password="abc")
+        url = reverse('attendance_student')
+        self.response = self.client.get(url, {'schedule_id': 31})
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/attendance_student.html')
+
+    # def test_attendance_view_as_professor_status_code_and_template(self):
     #     url = reverse('attendance_list')
     #     schedule_id = self.client.get('schedule_id', '')
     #     student_instance = User.objects.get(first_name="first0")
     #     Attendance.objects.filter(student_id__user_id=student_instance)
     #     self.client.login(email=student_instance.email, password="abc")
     #     self.response = self.client.get(url, {'schedule_id': 0})
-        # self.assertEqual(self.response.status_code, 200)
-        # self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
+    #     self.assertEqual(self.response.status_code, 200)
+    #     self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
 
-    def test_schedule_view_contains_courses(self):
-        self.assertIsNot(self, Schedule.objects.all(), [])
-
-    def test_attendance_view_contains_students(self):
-        self.assertIsNotNone(Attendance.objects.get(id=1))
+    # def test_schedule_view_contains_courses(self):
+    #     self.assertIsNot(self, Schedule.objects.all(), [])
+    #
+    # def test_attendance_view_contains_students(self):
+    #     self.assertIsNotNone(Attendance.objects.get(id=1))
 

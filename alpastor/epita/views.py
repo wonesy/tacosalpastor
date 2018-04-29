@@ -57,7 +57,7 @@ class AttendanceView(ListView):
             form = form_list
 
         else:
-            self.template_name = 'epita/attendance_student'
+            self.template_name = 'epita/attendance_student.html'
             attendance_instance = Attendance.objects.filter(student_id__user_id=user_instance).filter(
                 schedule_id=schedule_instance)
             form = self.form_class(instance=attendance_instance[0])
