@@ -1,3 +1,5 @@
+var QuizData = {};
+
 var questionTypesI2A = {
     0: "Essay",
     1: "M.C.",
@@ -88,13 +90,14 @@ function getNewID() {
     return newID;
 }
 
-function deleteMCOption(canvas, option) {
+function deleteMCOption(canvasID, optionID) {
+    var option = document.getElementById(optionID);
+    var canvas = document.getElementById(canvasID);
     canvas.removeChild(option);
 }
 
-function isCorrectToggle(element, checkbox) {
+function isCorrectToggle(element) {
     var checkbox = element.querySelector("#id_is_correct");
-    console.log(checkbox);
     if (element.classList.contains('active')) {
         element.classList.remove('active');
         checkbox.value = "False";
@@ -108,6 +111,36 @@ function buildQuizJSON() {
     document.getElementById('json_quiz').value = JSON.stringify(mapAllQuestions());
 }
 
+function addExistingQuestions() {
+    var numChecked = 0;
+    var checkboxes = document.getElementById('existingQuestionsResults').getElementsByTagName('input');
+
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked === true) {
+            numChecked++;
+
+            switch (QuizData.existingResults[i].type) {
+                case 0:
+                    // TODO
+                    break;
+                case 1:
+                    addMultipleChoiceQuestion(QuizData.existingResults[i]);
+                    break;
+                default:
+                    // TODO
+                    break;
+            }
+        }
+    }
+
+    // If there is nothing to add, add the checked blank question
+    if (numChecked === 0) {
+        // TODO
+        console.log("A blank question will be added TODO")
+    }
+}
+
+
 /*
     Function:       refreshBlankQuestionRadio
 
@@ -120,18 +153,21 @@ function refreshBlankQuestionRadio() {
 
 
 var resultsRowTemplate =
-    "<a href='#optionsCanvas{2}' data-toggle='collapse' role='button' aria-expanded='false' aria-controls='optionsCanvas{2}'>" +
-        "<div class='row q-result'>" +
-            "<div class='col-md-2 col-sm-2 q-type'>{0}</div>" +
-            "<div class='col-md q-content'>{1}</div>" +
+    "<div class='q-result row'>" +
+        "<div class='col-sm-1 col-md-1 col-lg-1'>" +
+            "<input id='existingResult{2}' type='checkbox' value='{2}'>" +
         "</div>" +
-    "</a>" +
-    "<div id='optionsCanvas{2}' class='row collapse hide'></div>";
+        "<a href='#optionsCanvas{2}' data-toggle='collapse' role='button' aria-expanded='true' aria-controls='#optionsCanvas{2}' class='col-sm-11 col-md-11 col-lg-11'>" +
+            "<div class=''>" +
+                "<div class='q-type'>{0}</div>" +
+                "<div class='q-content'>{1}</div>" +
+            "</div>" +
+        "</a>" +
+    "</div>" +
+    "<div id='optionsCanvas{2}' class='collapse'></div>";
 
 var optionsResultsRowTemplate =
-    "<div class='row'>" +
-        "<div class='col-md q-option'>{0}</div> " +
-    "</div>";
+    "<div class='row q-option {1}'>{0}</div>";
 
 function getExistingQuestionQueryset() {
     return function() {
@@ -158,15 +194,25 @@ function getExistingQuestionQueryset() {
 
         // execute the web API call and handle data accordingly
         $.getJSON(fullAPIURL, null, function (data) {
+
+            // add results to global quiz namespace
+            QuizData.existingResults = data;
+
+            // loop through all results, append them to their canvases accordingly
             for (var i = 0; i < data.length; i++) {
-                console.log(data[i]);
                 resultsCanvas.innerHTML += resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content'], i);
 
                 var canvasId = "optionsCanvas{0}".format(i);
                 var optionsCanvas = document.getElementById(canvasId);
 
+                // loop through all of the options (multiple choice and checkbox questions)
                 for (var j = 0; j < data[i]['multiplechoiceoption_set'].length; j++) {
-                    optionsCanvas.innerHTML += optionsResultsRowTemplate.format(data[i]['multiplechoiceoption_set'][j]['content'])
+
+                    var isCorrectClass = "";
+                    if (data[i]['multiplechoiceoption_set'][j]['is_correct'] === true) {
+                        isCorrectClass = "is-correct";
+                    }
+                    optionsCanvas.innerHTML += optionsResultsRowTemplate.format(data[i]['multiplechoiceoption_set'][j]['content'], isCorrectClass);
                 }
             }
         });

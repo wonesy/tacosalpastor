@@ -4,8 +4,12 @@
 */
 String.prototype.format = function() {
     var formatted = this;
+    var replace = "";
+    var re = null;
     for(arg in arguments) {
-        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+        replace = "\\{" + arg + "\\}";
+        re = new RegExp(replace, "g");
+        formatted = formatted.replace(re, arguments[arg]);
     }
     return formatted;
 };

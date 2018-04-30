@@ -180,5 +180,36 @@
     margin: 0;
 }
 
+.q-option {
+    margin-left: 15px;
+}
+
+.is-correct {
+    color: green;
+}
+
 .q-result {
+    color: black;
+    background: #fafafa;
+    border: none;
+    border-radius: 0;
+    padding: 10px 15px;
+    margin: 0;
+    margin-top: 5px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+    content: none;
+}
+
+.q-type {
+    float: left;
+    color: #000000;
+    margin-right: 10px;
+}
+
+.collapse.show {
+  visibility: visible;
 }

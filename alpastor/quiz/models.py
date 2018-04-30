@@ -112,6 +112,7 @@ Multiple Choice Section
 class MultipleChoiceQuestion(Question):
 
     randomize = models.BooleanField(default=False, verbose_name=_("Randomize Options"), help_text="randomize the option order")
+    type = Question.MULTIPLE_CHOICE
 
     def clean(self):
         super(MultipleChoiceQuestion, self).clean()
@@ -137,6 +138,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
     missed_choice_points_lost = models.DecimalField(max_digits=4, decimal_places=2, default=0, verbose_name=_("Missed Choice Points Lost"),
                                                     help_text="the number of points lost for a correct choice that's missed")
     allow_negative_score = models.BooleanField(default=False, verbose_name=_("Allow Negative Scores"), help_text="allow negative scores")
+    type = Question.CHECKBOX
 
     def clean(self):
         super(CheckboxQuestion, self).clean()
@@ -192,6 +194,7 @@ class NumericScaleQuestion(Question):
     max = models.IntegerField(verbose_name=_("Maximum Scale Value"), blank=False)
     step = models.IntegerField(verbose_name=_("Step Value"), default=1)
     correct_value = models.IntegerField(verbose_name=_("Correct Value"), blank=True, null=True)
+    type = Question.NUMERIC_SCALE
 
     def clean(self):
         super(NumericScaleQuestion, self).clean()
