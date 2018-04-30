@@ -99,7 +99,7 @@ class Question(models.Model):
     type = models.IntegerField(null=False, verbose_name=_("Question Type"), choices=QUESTION_TYPES, default=ESSAY)
 
     def _str__(self):
-        return "[{}] {}".format(self.quiz.id, self.content)
+        return self.content
 
 
 """
@@ -112,6 +112,7 @@ Multiple Choice Section
 class MultipleChoiceQuestion(Question):
 
     randomize = models.BooleanField(default=False, verbose_name=_("Randomize Options"), help_text="randomize the option order")
+    type = Question.MULTIPLE_CHOICE
 
     def clean(self):
         super(MultipleChoiceQuestion, self).clean()
@@ -124,6 +125,9 @@ class MultipleChoiceQuestion(Question):
 
         return opt.is_correct
 
+    def __str__(self):
+        return "{}".format(self.content)
+
 class CheckboxQuestion(MultipleChoiceQuestion):
     multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))
     partial_credit = models.BooleanField(default=False, verbose_name=_("Partial Credit"),
@@ -134,6 +138,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
     missed_choice_points_lost = models.DecimalField(max_digits=4, decimal_places=2, default=0, verbose_name=_("Missed Choice Points Lost"),
                                                     help_text="the number of points lost for a correct choice that's missed")
     allow_negative_score = models.BooleanField(default=False, verbose_name=_("Allow Negative Scores"), help_text="allow negative scores")
+    type = Question.CHECKBOX
 
     def clean(self):
         super(CheckboxQuestion, self).clean()
@@ -166,7 +171,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
 
 class MultipleChoiceOption(models.Model):
 
-    question = models.ForeignKey(MultipleChoiceQuestion, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
+    question = models.ForeignKey(Question, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
     content = models.CharField(max_length=1024, blank=False, help_text="Enter the text you want displayed as an MC option")
     is_correct = models.BooleanField(default=False, blank=False, help_text="Is this the correct answer to the question?")
 
@@ -189,6 +194,7 @@ class NumericScaleQuestion(Question):
     max = models.IntegerField(verbose_name=_("Maximum Scale Value"), blank=False)
     step = models.IntegerField(verbose_name=_("Step Value"), default=1)
     correct_value = models.IntegerField(verbose_name=_("Correct Value"), blank=True, null=True)
+    type = Question.NUMERIC_SCALE
 
     def clean(self):
         super(NumericScaleQuestion, self).clean()

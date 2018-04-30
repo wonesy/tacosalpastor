@@ -23,7 +23,7 @@
             </div>
 
             <div style="text-align: center">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newQuestionModal" onclick="addMultipleChoiceQuestion();">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newQuestionModal" onclick="getExistingQuestionQueryset();">
                     Add Question
                 </button>
             </div>
@@ -37,143 +37,165 @@
         </div>
     </div>
 
-    <!-- Modal
+    <!-- Modal -->
     <div class="modal fade" id="newQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content container-fluid">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Question</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    ...
+                <div class="modal-body row flex-nowrap">
+                    <div class="blank-questions-wrapper col-md-3 col-sm-3">
+                        <h3>New Question</h3>
+                        <form id="blank-question-form">
+                            <input type="radio" name="blank-question-opt" value="None" checked> None<br>
+                            <input type="radio" name="blank-question-opt" value="Essay" > Essay<br>
+                            <input type="radio" name="blank-question-opt" value="Multiple Choice"> Multiple Choice<br>
+                            <input type="radio" name="blank-question-opt" value="Checkbox (multiple correct answers)"> Checkbox<br>
+                            <input type="radio" name="blank-question-opt" value="Numeric Scale (i.e 1-10)"> Numeric Scale<br>
+                        </form>
+                    </div>
+                    <div class="dividing-bar"></div>
+                    <div class="existing-questions-wrapper col-md col-12" tabindex="-1">
+                        <h3>Existing Question</h3>
+                        <div class="row search-question-wrapper">
+                            <div class="search col-sm-4 col-md-4">
+                                <!-- Example split danger button -->
+                                <div class="btn-group">
+                                    <button type="button" id="dropdownMenuButton" class="btn btn-info">Any</button>
+                                    <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Any');">Any</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Essay');">Essay</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('M.C.');">Multiple Choice</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Checkbox');">Checkbox</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Numeric');">Numeric Scale</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="search text-input col-md col-sm-12">
+                                <input id="searchExistingQuestion" type="text" class="text-input form-control" placeholder="Search question">
+                            </div>
+                        </div>
+                        <div class="existing-questions-results">
+                            <div id="existingQuestionsResults" class="results-wrapper">
+                                <!-- Add results via javascript function -->
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="addExistingQuestions();">Add</button>
                 </div>
             </div>
         </div>
     </div>
-    -->
 
     <script type="application/javascript">
-        function addMultipleChoiceQuestion() {
-            var questionCanvas = document.getElementById('question-canvas');
 
-            var wrapperDiv = document.createElement('div');
-            wrapperDiv.classList.add('question-wrapper');
+        $(".existing-questions-wrapper").focus(function () {
+            refreshBlankQuestionRadio();
+        });
 
-            var cardDiv = document.createElement('div');
-            cardDiv.classList.add('card');
-            cardDiv.classList.add('question');
+        $('#searchExistingQuestion').keyup(function() {
+            delay(getExistingQuestionQueryset(), 1000);
+        });
 
-            {% for field in mcform.visible_fields %}
-                cardDiv.innerHTML += '<span class="question-label">{{ field.label }}</span>';
-                cardDiv.innerHTML += '{{ field }}';
-            {% endfor %}
-
-            {% for field in mcform.hidden_fields %}
-                cardDiv.innerHTML += '{{ field }}';
-            {% endfor %}
-
-            var optionCanvas = document.createElement('div');
-            optionCanvas.classList.add('card-body');
-            optionCanvas.classList.add('opt-canvas');
-            var optionCanvasId = getNewID();
-            optionCanvas.setAttribute('id', optionCanvasId);
-
-            wrapperDiv.appendChild(cardDiv);
-            cardDiv.appendChild(optionCanvas);
-
-            var newQuestionButtonDiv = document.createElement('button');
-            newQuestionButtonDiv.classList.add('new-question-btn');
-            newQuestionButtonDiv.classList.add('btn');
-            newQuestionButtonDiv.classList.add('fa');
-            newQuestionButtonDiv.classList.add('fa-plus');
-            newQuestionButtonDiv.type = "button";
-
-            var buttonOnClick = "addMultipleChoiceOption(" + optionCanvasId + ");";
-            newQuestionButtonDiv.setAttribute('onclick', buttonOnClick);
-
-            cardDiv.appendChild(newQuestionButtonDiv);
-            questionCanvas.appendChild(wrapperDiv);
+        function updateDropdownValue(val) {
+            btn = document.getElementById('dropdownMenuButton');
+            btn.innerHTML = val;
+            getExistingQuestionQueryset()();
         }
 
-        function addMultipleChoiceOption(optCanvasId) {
-            optCanvas = document.getElementById(optCanvasId);
+        // this is the element template for every new multiple-choice question that gets added to the DOM
+        var multipleChoiceTemplate =
+            "<div class='question-wrapper'>" +
+                "<div class='card question'>" +
+                    "<span class='question-label'>Question Content</span>" +
+                    "<input type='text' name='content' class='form-control' maxlength='1023' required='true' id='id_content' value='{1}'>" +
+                    "<span class='question-label'>Explanation</span>" +
+                    "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+                    "<span class='question-label'>Randomize Options</span>" +
+                    "<input type='checkbox' name='randomize' id='id_randomize' '{3}'>" +
+                    "<input type='hidden' name='type' value='1' id='id_type'>" +
+                    "<div class='card-body opt-canvas' id={0}></div>" +
+                    "<button class='new-question-btn btn fa fa-plus' type='button' onclick='addMultipleChoiceOption({0});'>" +
+                    "</button>" +
+                "</div>" +
+            "</div>";
 
-            var optWrapper = document.createElement('div');
-            optWrapper.classList.add('row');
-            optWrapper.classList.add('mc-opt-wrapper');
+        // Every time this is called, a new MC template will be added to the DOM and filled out accordingly
+        function addMultipleChoiceQuestion(existingQuestion) {
+            var questionCanvas = document.getElementById('question-canvas');
 
-            var deleteSidebar = document.createElement('div');
-            deleteSidebar.classList.add('col');
-            deleteSidebar.classList.add('col-sm');
-            deleteSidebar.classList.add('mc-opt-delete-sidebar');
+            var content = "";
+            var explanation = "";
+            var randomize = "";
+            var optionLength = 0;
 
-            /* Adding trash button and icons */
-            var trashButton = document.createElement('button');
-            trashButton.classList.add('btn');
-            trashButton.classList.add('btn-block');
-            trashButton.classList.add('h-100');
-            trashButton.classList.add('w-100');
-            trashButton.type = "button";
+            if (existingQuestion !== undefined) {
+                content = existingQuestion['content'];
+                explanation = existingQuestion['explanation'];
 
-            trashButton.onclick = function() {deleteMCOption(optCanvas, optWrapper)};
+                if (existingQuestion['randomize'] === true) {
+                    randomize = "checked='true'";
+                }
 
-            var trashIcon = document.createElement('i');
-            trashIcon.classList.add('fa');
-            trashIcon.classList.add('fa-lg');
-            trashIcon.classList.add('fa-trash-alt');
+                optionLength = existingQuestion['multiplechoiceoption_set'].length;
+            }
 
-            trashButton.appendChild(trashIcon);
-            deleteSidebar.appendChild(trashButton);
+            var canvasID = getNewID();
+            questionCanvas.innerHTML += multipleChoiceTemplate.format(canvasID, content, explanation, randomize);
 
-            /* Main MC question content */
-            var optContent = document.createElement('div');
-            optContent.classList.add('mc-opt-content');
-            optContent.classList.add('col');
+            // loop through and all all options
+            for (var i = 0; i < optionLength; i++) {
+                console.log(existingQuestion['multiplechoiceoption_set'][i]);
+                addMultipleChoiceOption(canvasID, existingQuestion['multiplechoiceoption_set'][i]);
+            }
+        }
 
-            optContent.innerHTML += '{{ mcoptform.content }}';
+        var multipleChoiceOptionTemplate =
+            "<div class='row mc-opt-wrapper' id='mcOption{0}'>" +
+                "<div class='col col-sm mc-opt-delete-sidebar'>" +
+                    "<button class='btn btn-block h-100 w-100' type='button' onclick='deleteMCOption({1}, \"mcOption{0}\");'>" +
+                        "<i class='fa fa-lg fa-trash-alt'></i>" +
+                    "</button>" +
+                "</div>" +
+                "<div class='mc-opt-content col'>" +
+                    "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{2}'>" +
+                "</div>" +
+                "<div class='col col-sm mc-opt-correct-sidebar'>" +
+                    "<button class='btn btn-block h-100 w-100 {3}' type='button' onclick='isCorrectToggle(this);'>" +
+                        "<input type='hidden' name='is_correct' value='{4}' id='id_is_correct'>" +
+                        "<i class='fa fa-lg fa-check-circle'></i>" +
+                    "</button>" +
+                "</div>" +
+            "</div>";
 
-            /* Right-most sidebar for whether question is correct */
-            var isCorrectSidebar = document.createElement('div');
-            isCorrectSidebar.classList.add('col');
-            isCorrectSidebar.classList.add('col-sm');
-            isCorrectSidebar.classList.add('mc-opt-correct-sidebar');
+        function addMultipleChoiceOption(optCanvasId, existingOption) {
+            var optCanvas = document.getElementById(optCanvasId);
 
-            /* Adding checkmark button and icons */
-            var checkmarkButton = document.createElement('button');
-            checkmarkButton.classList.add('btn');
-            checkmarkButton.classList.add('btn-block');
-            checkmarkButton.classList.add('h-100');
-            checkmarkButton.classList.add('w-100');
-            checkmarkButton.innerHTML += '{{ mcoptform.is_correct.as_hidden }}';
-            checkmarkButton.innerHTML += '{{ mcoptform.is_correct_hidden }}';
+            var content = "";
+            var isCorrect = false;
+            var activeClass = "";
 
-            checkmarkButton.type = "button";
+            if (existingOption !== undefined) {
+                content = existingOption['content'];
+                isCorrect = existingOption['is_correct'];
 
+                if (isCorrect === true) {
+                    activeClass = "active";
+                }
+            }
 
-            checkmarkButton.onclick = function() {isCorrectToggle(checkmarkButton)};
-
-            var checkmarkIcon = document.createElement('i');
-            checkmarkIcon.classList.add('fa');
-            checkmarkIcon.classList.add('fa-lg');
-            checkmarkIcon.classList.add('fa-check-circle');
-            isCorrectSidebar.appendChild(checkmarkIcon);
-
-            checkmarkButton.appendChild(checkmarkIcon);
-            isCorrectSidebar.appendChild(checkmarkButton);
-
-            /* Add everything to HTML */
-            optWrapper.appendChild(deleteSidebar);
-            optWrapper.appendChild(optContent);
-            optWrapper.appendChild(isCorrectSidebar);
-
-            optCanvas.appendChild(optWrapper);
+            console.log(multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content));
+            optCanvas.innerHTML += multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect);
         }
 
     </script>
