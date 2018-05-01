@@ -1,5 +1,11 @@
+/*
+This will be the namespace defined for keeping track of global quiz data
+ */
 var QuizData = {};
 
+/*
+Translates integer question-type data into a compact string form
+ */
 var questionTypesI2A = {
     0: "Essay",
     1: "M.C.",
@@ -7,6 +13,9 @@ var questionTypesI2A = {
     3: "N.S."
 };
 
+/*
+Translates string form type into the corresponding integer type
+ */
 var questionTypesA2I = {
     "Essay": 0,
     "M.C.": 1,
@@ -14,6 +23,19 @@ var questionTypesA2I = {
     "Numeric": 3
 };
 
+/*
+Translates an integer type to it's corresponding addTypeQuestion() function
+ */
+var questionTypesI2Function = {
+    0: addEssayQuestion,
+    1: addMultipleChoiceQuestion,
+    2: addCheckboxQuestion,
+    3: addNumericScaleQuestion
+};
+
+/*
+Generic JSON template for a question
+ */
 function _getNewQuestionMap() {
     return {
         "type": "",
@@ -24,14 +46,32 @@ function _getNewQuestionMap() {
     };
 }
 
+/*
+Generic JSON template for an option of a MC or CB question
+ */
 function _getNewOptionMap() {
     return {
         "content": "",
         "is_correct": false
     };
 }
-var totalQuestions = 0;
 
+// Total questions added to the entire quiz
+QuizData.totalQuestions = 0;
+
+/*
+This function loops through the entire quiz as it exists and collects the relevant information, sending to server as JSON
+
+General algorithm:
+
+    1) get quiz title
+    2) forall questions:
+    3) .... fill out _getNewQuestionMap()
+    4) .... if multiple choice or checkbox:
+    5) .... .... forall options:
+    6) .... .... .... fill out _getNewOptionMap()
+    7) ssubmit all acquired data as stringified JSON
+ */
 function mapAllQuestions() {
 
     var quizMap = {
@@ -84,18 +124,41 @@ function mapAllQuestions() {
     return quizMap;
 }
 
+/*
+Wrapper function that assigns the submission form input value as the stringified JSON
+ */
+function buildQuizJSON() {
+    document.getElementById('json_quiz').value = JSON.stringify(mapAllQuestions());
+}
+
+/*
+Returns a new ID based on number of ID objects already created
+ */
 function getNewID() {
-    var newID = String(totalQuestions);
-    totalQuestions++;
+    var newID = String(QuizData.totalQuestions);
+    QuizData.totalQuestions++;
     return newID;
 }
 
+/*
+Deletes a multiple choice option
+
+Parameters:
+    canvasID: the dom ID to which optionCanvas this option belongs
+    optionID: the dom ID of the specific option that will be removed
+ */
 function deleteMCOption(canvasID, optionID) {
     var option = document.getElementById(optionID);
     var canvas = document.getElementById(canvasID);
     canvas.removeChild(option);
 }
 
+/*
+Toggles the 'is_correct' aspect of a MC option. This updates the field value and toggles visual green checkbox effect
+
+Parameters:
+    element: this is the specific button element that was clicked
+ */
 function isCorrectToggle(element) {
     var checkbox = element.querySelector("#id_is_correct");
     if (element.classList.contains('active')) {
@@ -107,11 +170,15 @@ function isCorrectToggle(element) {
     }
 }
 
-function buildQuizJSON() {
-    document.getElementById('json_quiz').value = JSON.stringify(mapAllQuestions());
-}
+/*
+This will add a new question to the DOM, depending on what the user chose.
 
-function addExistingQuestions() {
+It prioritizes existing questions that are chosen, and in the case where both existing AND blank questions were chosen,
+the blank question is ignored.
+
+In order to get a blank question added to the Quiz, the user must select only from the blank radio buttons.
+ */
+function addNewOrExistingQuestions() {
     var numChecked = 0;
     var checkboxes = document.getElementById('existingQuestionsResults').getElementsByTagName('input');
 
@@ -119,39 +186,33 @@ function addExistingQuestions() {
         if (checkboxes[i].checked === true) {
             numChecked++;
 
-            switch (QuizData.existingResults[i].type) {
-                case 0:
-                    // TODO
-                    break;
-                case 1:
-                    addMultipleChoiceQuestion(QuizData.existingResults[i]);
-                    break;
-                default:
-                    // TODO
-                    break;
-            }
+            var addQuestionFunc = questionTypesI2Function[QuizData.existingResults[i].type];
+
+            addQuestionFunc(QuizData.existingResults[i]);
         }
     }
 
-    // If there is nothing to add, add the checked blank question
-    if (numChecked === 0) {
-        // TODO
-        console.log("A blank question will be added TODO")
+    // If numChecked is non-zero, it means question have already been added and we can return
+    if (numChecked !== 0) {
+        return numChecked;
     }
+
+    // If we're here, we have no existing questions to add and look through the blank questions radio buttons
+    var blankOption = $('input[name=blank-question-opt]:checked', '#blank-question-form').val();
+
+    questionTypesI2Function[blankOption]();
 }
 
 
 /*
-    Function:       refreshBlankQuestionRadio
-
-    Description:    This is executed whenever the "existing questions" canvas is focused and marks the "blank questions"
-                    as None/empty
+This is executed whenever the "existing questions" canvas is focused and marks the "blank questions" as None/empty
  */
 function refreshBlankQuestionRadio() {
     $('input[name=blank-question-opt][value=\'None\']').prop("checked",true);
 }
 
 
+// HTML template for a dyanmically-added "existing question" result
 var resultsRowTemplate =
     "<div class='q-result row'>" +
         "<div class='col-sm-1 col-md-1 col-lg-1'>" +
@@ -166,11 +227,18 @@ var resultsRowTemplate =
     "</div>" +
     "<div id='optionsCanvas{2}' class='collapse'></div>";
 
+// HTML template for a dynamically-added "existing option" result
 var optionsResultsRowTemplate =
     "<div class='row q-option {1}'>{0}</div>";
 
+/*
+Calls the webAPI to access the database, searching for existing questions. Takes information from a search bar
+and from a question-type dropdown menu
+
+Returns: a function that does everything described
+ */
 function getExistingQuestionQueryset() {
-    return function() {
+    return function () {
         var baseUrl = window.location.origin + window.location.pathname + "existingquestion";
 
         var typeElem = document.getElementById('dropdownMenuButton');               // the question type dropdown
@@ -216,5 +284,111 @@ function getExistingQuestionQueryset() {
                 }
             }
         });
+    };
+}
+
+/*
+Simple function to update the value of the dropdown menu
+ */
+function updateDropdownValue(val) {
+    btn = document.getElementById('dropdownMenuButton');
+    btn.innerHTML = val;
+    getExistingQuestionQueryset()();
+}
+
+// this is the element template for every new multiple-choice question that gets added to the DOM
+var multipleChoiceTemplate =
+    "<div class='question-wrapper'>" +
+        "<div class='card question'>" +
+            "<span class='question-label'>Question Content</span>" +
+            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
+            "<span class='question-label'>Explanation</span>" +
+            "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+            "<span class='question-label'>Randomize Options</span>" +
+            "<input type='checkbox' name='randomize' id='id_randomize' '{3}'>" +
+            "<input type='hidden' name='type' value='1' id='id_type'>" +
+        "<div class='card-body opt-canvas' id={0}></div>" +
+            "<button class='new-question-btn btn fa fa-plus' type='button' onclick='addMultipleChoiceOption({0});'>" +
+            "</button>" +
+        "</div>" +
+    "</div>";
+
+// Every time this is called, a new MC template will be added to the DOM and filled out accordingly
+function addMultipleChoiceQuestion(existingQuestion) {
+    var questionCanvas = document.getElementById('question-canvas');
+
+    var content = "";
+    var explanation = "";
+    var randomize = "";
+    var optionLength = 0;
+
+    if (existingQuestion !== undefined) {
+        content = existingQuestion['content'];
+        explanation = existingQuestion['explanation'];
+
+        if (existingQuestion['randomize'] === true) {
+            randomize = "checked='true'";
+        }
+
+        optionLength = existingQuestion['multiplechoiceoption_set'].length;
     }
+
+    var canvasID = getNewID();
+    questionCanvas.innerHTML += multipleChoiceTemplate.format(canvasID, content, explanation, randomize);
+
+    // loop through and all all options
+    for (var i = 0; i < optionLength; i++) {
+        console.log(existingQuestion['multiplechoiceoption_set'][i]);
+        addMultipleChoiceOption(canvasID, existingQuestion['multiplechoiceoption_set'][i]);
+    }
+}
+
+var multipleChoiceOptionTemplate =
+    "<div class='row mc-opt-wrapper' id='mcOption{0}'>" +
+        "<div class='col col-sm mc-opt-delete-sidebar'>" +
+            "<button class='btn btn-block h-100 w-100' type='button' onclick='deleteMCOption({1}, \"mcOption{0}\");'>" +
+                "<i class='fa fa-lg fa-trash-alt'></i>" +
+            "</button>" +
+        "</div>" +
+        "<div class='mc-opt-content col'>" +
+            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{2}'>" +
+        "</div>" +
+        "<div class='col col-sm mc-opt-correct-sidebar'>" +
+            "<button class='btn btn-block h-100 w-100 {3}' type='button' onclick='isCorrectToggle(this);'>" +
+                "<input type='hidden' name='is_correct' value={4} id='id_is_correct'>" +
+                "<i class='fa fa-lg fa-check-circle'></i>" +
+            "</button>" +
+        "</div>" +
+    "</div>";
+
+function addMultipleChoiceOption(optCanvasId, existingOption) {
+    var optCanvas = document.getElementById(optCanvasId);
+
+    var content = "";
+    var isCorrect = false;
+    var activeClass = "";
+
+    if (existingOption !== undefined) {
+        content = existingOption['content'];
+        isCorrect = existingOption['is_correct'];
+
+        if (isCorrect === true) {
+            activeClass = "active";
+        }
+    }
+
+    console.log(multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content));
+    optCanvas.innerHTML += multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect);
+}
+
+function addEssayQuestion() {
+    console.log("Adding essay question");
+}
+
+function addCheckboxQuestion() {
+    console.log("Adding checkbox question");
+}
+
+function addNumericScaleQuestion() {
+    console.log("Adding numeric scale question");
 }
