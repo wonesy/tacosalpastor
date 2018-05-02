@@ -101,6 +101,7 @@ function mapAllQuestions() {
     for (var i = 0; i < questionElems.length; i++) {
 
         var curQuestion = questionElems[i];
+        var numCorrectAnswers = 0;
 
         /* Collect salient information about each question */
         var questionContent = curQuestion.querySelector("#id_content").value;
@@ -132,9 +133,19 @@ function mapAllQuestions() {
                 var optionContent = curOption.querySelector("#id_content").value;
                 var optionIsCorrect = curOption.querySelector("#id_is_correct").value;
 
-                /* Error check - nothing to add if this is empty */
+                if (questionType === 1 && optionIsCorrect === true) {
+                    numCorrectAnswers++;
+
+                    if (numCorrectAnswers > 1) {
+                        insertError(curQuestion.querySelector(".opt-error-msg"), "Multiple choice questions cannot have more than 1 correct answer", true);
+                        return null;
+                    }
+                }
+
+                /* Error check */
                 if (optionContent === "") {
-                    continue;
+                    insertError(curQuestion.querySelector(".opt-error-msg"), "All options must have content", true);
+                    return null;
                 }
 
                 /* Assign collected information to the option section of the quiz map */
@@ -207,6 +218,7 @@ function isCorrectToggle(element) {
     }
 }
 
+
 /*
 This will add a new question to the DOM, depending on what the user chose.
 
@@ -221,6 +233,9 @@ function addNewOrExistingQuestions() {
 
     for (var i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked === true) {
+
+            checkboxes[i].checked = false;  // cleanup, set it false for next time around
+
             numChecked++;
 
             var addQuestionFunc = questionTypesI2Function[QuizData.existingResults[i].type];
@@ -324,6 +339,13 @@ function getExistingQuestionQueryset() {
     };
 }
 
+function deleteQuestion(questionID) {
+    var questionCanvas = document.getElementById('question-canvas');
+    var question = document.getElementById(questionID);
+
+    questionCanvas.removeChild(question);
+}
+
 /*
 Simple function to update the value of the dropdown menu
  */
@@ -345,9 +367,11 @@ var multipleChoiceTemplate =
             "<span class='question-label'>Randomize Options</span>" +
             "<input type='checkbox' name='randomize' id='id_randomize' '{3}'>" +
             "<input type='hidden' name='type' value='1' id='id_type'>" +
-        "<div class='card-body opt-canvas' id={0}></div>" +
-            "<button class='new-question-btn btn fa fa-plus' type='button' onclick='addMultipleChoiceOption({0});'>" +
-            "</button>" +
+            "<div class='card-body opt-canvas' id={0}></div>" +
+                "<div class='opt-error-msg'></div>" +
+                "<button class='new-question-btn btn fa fa-plus' type='button' onclick='addMultipleChoiceOption({0});'></button>" +
+                "<button class='btn btn-danger question-delete' onclick='deleteQuestion(\"question{0}\");'>Delete Question</button>" +
+            "</div>" +
         "</div>" +
     "</div>";
 
@@ -426,6 +450,7 @@ function addEssayQuestion(existingQuestion) {
                 "<span class='question-label'>Explanation</span>" +
                 "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
                 "<input type='hidden' name='type' value='0' id='id_type'>" +
+                "<button class='btn btn-danger question-delete' onclick='deleteQuestion(\"question{0}\");'>Delete Question</button>" +
             "</div>" +
         "</div>";
 
@@ -475,6 +500,7 @@ function addNumericScaleQuestion(existingQuestion) {
                     "</div>" +
                 "</div>" +
                 "<div id='preview{0}' class='scale-preview'><span class='question-label'>Preview</span></div>" +
+                "<button class='btn btn-danger question-delete' onclick='deleteQuestion(\"question{0}\");'>Delete Question</button>" +
             "</div>" +
         "</div>";
 
