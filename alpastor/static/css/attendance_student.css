@@ -1,11 +1,60 @@
-.student-form {
-    text-align: center;
+.col-md-6 {
+    background: #dee2e6;
+    border-style: inset;
+    border-width: 15px;
+    border-color: lightseagreen;
 }
 
-ul {
-    list-style-type: none;
+
+.courseName {
+    font-size: .9em;
+    color: #000;
+    margin-top: 0;
+    padding-left: 0;
+    text-align: left;
+    border-bottom: 2px solid #1e1e1e;
 }
 
-.people-img {
-    float: None;
+.courseDateDiv {
+    padding-top: 3em;
+    padding-bottom: 3em;
+}
+
+.courseDate {
+    margin: 0;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    font-size: 2em;
+}
+
+.btn1 {
+    margin-top: .5em;
+    margin-bottom: .5em;
+    padding-top: .75em;
+    padding-bottom: .75em;
+    width: 48%;
+}
+
+.btn-success {
+    float: left;
+    margin-right: .25em;
+}
+
+.btn-danger {
+    float: right;
+    margin-left: .25em;
+}
+
+.btn-secondary {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    width: 100%;
+    font-size: 1.25em;
+}
+
+#id_file_upload {
+    padding-top: 2em;
+    padding-bottom: 2em;
 }
