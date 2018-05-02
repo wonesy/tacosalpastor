@@ -15,6 +15,7 @@
 
             <div class="form-group">
                 <label for="quizTitle">Quiz Title</label>
+                <div id="titleErrorCanvas"></div>
                 <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title">
             </div>
 
@@ -28,7 +29,7 @@
                 </button>
             </div>
 
-            <form id="quizBuilderForm" onsubmit="buildQuizJSON();" action="savenewquiz/" method="post">
+            <form id="quizBuilderForm" onsubmit="return buildQuizJSON();" action="savenewquiz/" method="post">
                 {% csrf_token %}
                 <input type="hidden" id="json_quiz" name="json_quiz" value="">
                 <input type="submit" value="Submit" />

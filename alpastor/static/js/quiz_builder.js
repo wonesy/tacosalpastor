@@ -59,6 +59,17 @@ function _getNewOptionMap() {
 // Total questions added to the entire quiz
 QuizData.totalQuestions = 0;
 
+function insertError(element, msg, clean) {
+    var item = "<p class='form-error-msg'>" + msg + "</p>";
+    console.log(item);
+
+    if (clean) {
+        element.innerHTML = "";
+    }
+
+    element.innerHTML += item;
+}
+
 /*
 This function loops through the entire quiz as it exists and collects the relevant information, sending to server as JSON
 
@@ -73,13 +84,17 @@ General algorithm:
     7) ssubmit all acquired data as stringified JSON
  */
 function mapAllQuestions() {
-
     var quizMap = {
         "title": "",
         "questions": []
     };
 
     quizMap['title'] = document.getElementById('quizTitle').value;
+
+    if (quizMap['title'] === "") {
+        insertError(document.getElementById('titleErrorCanvas'), "Quiz must have a title", true);
+        return null;
+    }
 
     /* Loop through all question elements */
     var questionElems = document.getElementsByClassName('question');
@@ -93,6 +108,12 @@ function mapAllQuestions() {
         var questionRandomize = curQuestion.querySelector("#id_randomize").checked;
         var questionType = curQuestion.querySelector('#id_type').value;
 
+        /* Error check */
+        if (questionContent === "") {
+            insertError(curQuestion.querySelector(".form-error-msg"), "Question must have content filled out", true);
+            return null;
+        }
+
         /* Assign collected information to the quiz map */
         var question = _getNewQuestionMap();
         question['content'] = questionContent;
@@ -100,22 +121,29 @@ function mapAllQuestions() {
         question['randomize'] = questionRandomize;
         question['type'] = questionType;
 
-        /* Loop through all possible options for each question */
-        // TODO [if type is multiple-choice]
-        var optionElems = curQuestion.querySelectorAll(".mc-opt-wrapper");
-        for (var j = 0; j < optionElems.length; j++) {
-            var curOption = optionElems[j];
+        /* Loop through all possible options for each question if this is Multiple Choice or Checkbox*/
+        if (questionType === 1 || questionType === 2) {
+            var optionElems = curQuestion.querySelectorAll(".mc-opt-wrapper");
 
-            /* Collect salient information about each option */
-            var optionContent = curOption.querySelector("#id_content").value;
-            var optionIsCorrect = curOption.querySelector("#id_is_correct").value;
+            for (var j = 0; j < optionElems.length; j++) {
+                var curOption = optionElems[j];
 
-            /* Assign collected information to the option section of the quiz map */
-            var option = _getNewOptionMap();
-            option['content'] = optionContent;
-            option['is_correct'] = optionIsCorrect;
+                /* Collect salient information about each option */
+                var optionContent = curOption.querySelector("#id_content").value;
+                var optionIsCorrect = curOption.querySelector("#id_is_correct").value;
 
-            question['options'].push(option);
+                /* Error check - nothing to add if this is empty */
+                if (optionContent === "") {
+                    continue;
+                }
+
+                /* Assign collected information to the option section of the quiz map */
+                var option = _getNewOptionMap();
+                option['content'] = optionContent;
+                option['is_correct'] = optionIsCorrect;
+
+                question['options'].push(option);
+            }
         }
 
         quizMap['questions'].push(question);
@@ -128,7 +156,16 @@ function mapAllQuestions() {
 Wrapper function that assigns the submission form input value as the stringified JSON
  */
 function buildQuizJSON() {
-    document.getElementById('json_quiz').value = JSON.stringify(mapAllQuestions());
+
+    var json = mapAllQuestions();
+
+    if (json === null) {
+        return false;
+    }
+
+    document.getElementById('json_quiz').value = JSON.stringify(json);
+
+    return true;
 }
 
 /*
@@ -298,9 +335,10 @@ function updateDropdownValue(val) {
 
 // this is the element template for every new multiple-choice question that gets added to the DOM
 var multipleChoiceTemplate =
-    "<div class='question-wrapper'>" +
+    "<div class='question-wrapper' id='question{0}'>" +
         "<div class='card question'>" +
             "<span class='question-label'>Question Content</span>" +
+            "<div class='form-error-msg'></div>" +
             "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
             "<span class='question-label'>Explanation</span>" +
             "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
@@ -338,7 +376,6 @@ function addMultipleChoiceQuestion(existingQuestion) {
 
     // loop through and all all options
     for (var i = 0; i < optionLength; i++) {
-        console.log(existingQuestion['multiplechoiceoption_set'][i]);
         addMultipleChoiceOption(canvasID, existingQuestion['multiplechoiceoption_set'][i]);
     }
 }
@@ -377,18 +414,104 @@ function addMultipleChoiceOption(optCanvasId, existingOption) {
         }
     }
 
-    console.log(multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content));
     optCanvas.innerHTML += multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect);
 }
 
-function addEssayQuestion() {
-    console.log("Adding essay question");
+function addEssayQuestion(existingQuestion) {
+    var essayQuestionTemplate =
+        "<div class='question-wrapper essay-question' id='question{0}'>" +
+            "<div class='card question'>" +
+                "<span class='question-label'>Question Content</span>" +
+                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
+                "<span class='question-label'>Explanation</span>" +
+                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+                "<input type='hidden' name='type' value='0' id='id_type'>" +
+            "</div>" +
+        "</div>";
+
+    var questionCanvas = document.getElementById('question-canvas');
+
+    var content = "";
+    var explanation = "";
+
+    if (existingQuestion !== undefined) {
+        content = existingQuestion['content'];
+        explanation = existingQuestion['explanation'];
+    }
+
+    var canvasID = getNewID();
+    questionCanvas.innerHTML += essayQuestionTemplate.format(canvasID, content, explanation);
 }
 
 function addCheckboxQuestion() {
     console.log("Adding checkbox question");
 }
 
-function addNumericScaleQuestion() {
+function addNumericScaleQuestion(existingQuestion) {
+    var numericScaleQuestionTemplate =
+        "<div class='question-wrapper numeric-scale-question' id='question{0}'>" +
+            "<div class='card question'>" +
+                "<span class='question-label'>Question Content</span>" +
+                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
+                "<span class='question-label'>Explanation</span>" +
+                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+                "<input type='hidden' name='type' value='3' id='id_type'>" +
+                "<div class='row'>" +
+                    "<div class='col-sm-3 col-md-3 col-lg-3>'" +
+                        "<span class='question-label'>Min</span>" +
+                        "<input type='number scale-value' class='form-control' maxlength='300' name='min' value='{3}' id='id_min'>" +
+                    "</div>" +
+                    "<div class='col-sm-3 col-md-3 col-lg-3>'" +
+                        "<span class='question-label'>Max</span>" +
+                        "<input type='number scale-value' class='form-control' maxlength='300' name='max' value='{4}' id='id_max'>" +
+                    "</div>" +
+                    "<div class='col-sm-3 col-md-3 col-lg-3>'" +
+                        "<span class='question-label'>Step</span>" +
+                        "<input type='number scale-value' class='form-control' maxlength='300' name='step' value='{5}' id='id_step'>" +
+                    "</div>" +
+                    "<div class='col-sm-3 col-md-3 col-lg-3>'" +
+                        "<span class='question-label'>Answer</span>" +
+                        "<input type='number scale-value' class='form-control' maxlength='300' name='step' value='{6}' id='id_correct_value'>" +
+                    "</div>" +
+                "</div>" +
+                "<div id='preview{0}' class='scale-preview'><span class='question-label'>Preview</span></div>" +
+            "</div>" +
+        "</div>";
+
+    var questionCanvas = document.getElementById('question-canvas');
+
+    var content = "";
+    var explanation = "";
+    var min = 1;
+    var max = 10;
+    var step = 1;
+    var correct_value = 5;
+
+    if (existingQuestion !== undefined) {
+        //TODO
+    }
+
+    var questionID = getNewID();
+    questionCanvas.innerHTML += numericScaleQuestionTemplate.format(questionID, content, explanation, min, max, step, correct_value);
+
+    updateNumericScalePreview("preview{0}".format(questionID), min, max, step, correct_value);
     console.log("Adding numeric scale question");
+}
+
+function updateNumericScalePreview(elemID, min, max, step, correct_value) {
+    var sliderTemplate =
+        "<div class='row'>" +
+            "<span class='question-label col-sm-1 col-md-1 col-lg-1' style='text-align: center'>{0}</span>" +
+            "<input class='form-control col-sm-10 col-md-10 col-lg-10' type='range' min='{0}' max='{1}' step='{2}' value='{3}' onchange='updateSliderValue(\"{4}\", this);'>" +
+            "<span class='question-label col-sm-1 col-md-1 col-lg-1' style='text-align: center'>{1}</span>" +
+        "</div>" +
+        "<div class='slider-value' style='text-align: center;'>5</div>";
+
+    document.getElementById(elemID).innerHTML += sliderTemplate.format(min, max, step, correct_value, elemID);
+}
+
+function updateSliderValue(elemID, slider) {
+    var valueDiv = document.getElementById(elemID).querySelector('.slider-value');
+
+    valueDiv.innerHTML = slider.value;
 }
