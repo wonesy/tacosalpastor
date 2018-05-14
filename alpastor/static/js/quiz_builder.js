@@ -1,12 +1,12 @@
 /*
 This will be the namespace defined for keeping track of global quiz data
  */
-var QuizData = {};
+let QuizData = {};
 
 /*
 Translates integer question-type data into a compact string form
  */
-var questionTypesI2A = {
+let questionTypesI2A = {
     0: "Essay",
     1: "M.C.",
     2: "C.B.",
@@ -16,7 +16,7 @@ var questionTypesI2A = {
 /*
 Translates string form type into the corresponding integer type
  */
-var questionTypesA2I = {
+let questionTypesA2I = {
     "Essay": 0,
     "M.C.": 1,
     "Checkbox": 2,
@@ -26,7 +26,7 @@ var questionTypesA2I = {
 /*
 Translates an integer type to it's corresponding addTypeQuestion() function
  */
-var questionTypesI2Function = {
+let questionTypesI2Function = {
     0: addEssayQuestion,
     1: addMultipleChoiceQuestion,
     2: addCheckboxQuestion,
@@ -60,14 +60,13 @@ function _getNewOptionMap() {
 QuizData.totalQuestions = 0;
 
 function insertError(element, msg, clean) {
-    var item = "<p class='form-error-msg'>" + msg + "</p>";
-    console.log(item);
+    let item = "<p class='form-error-msg'>" + msg + "</p>";
 
     if (clean) {
         element.innerHTML = "";
     }
 
-    element.innerHTML += item;
+    element.insertAdjacentHTML("beforeend", item);
 }
 
 /*
@@ -84,30 +83,29 @@ General algorithm:
     7) ssubmit all acquired data as stringified JSON
  */
 function mapAllQuestions() {
-    var quizMap = {
+    let quizMap = {
         "title": "",
         "questions": []
     };
 
-    quizMap['title'] = document.getElementById('quizTitle').value;
+    quizMap.title = document.getElementById('quizTitle').value;
 
-    if (quizMap['title'] === "") {
+    if (quizMap.title === "") {
         insertError(document.getElementById('titleErrorCanvas'), "Quiz must have a title", true);
         return null;
     }
 
     /* Loop through all question elements */
-    var questionElems = document.getElementsByClassName('question');
-    for (var i = 0; i < questionElems.length; i++) {
+    let questionElems = document.getElementsByClassName('question');
+    for (let i = 0; i < questionElems.length; i++) {
 
-        var curQuestion = questionElems[i];
-        var numCorrectAnswers = 0;
+        let curQuestion = questionElems[i];
 
         /* Collect salient information about each question */
-        var questionContent = curQuestion.querySelector("#id_content").value;
-        var questionExplanation = curQuestion.querySelector("#id_explanation").value;
-        var questionRandomize = curQuestion.querySelector("#id_randomize").checked;
-        var questionType = curQuestion.querySelector('#id_type').value;
+        let questionContent = curQuestion.querySelector("#id_content").value;
+        let questionExplanation = curQuestion.querySelector("#id_explanation").value;
+        let questionRandomize = curQuestion.querySelector("#id_randomize").checked;
+        let questionType = curQuestion.querySelector('#id_type').value;
 
         /* Error check */
         if (questionContent === "") {
@@ -116,31 +114,22 @@ function mapAllQuestions() {
         }
 
         /* Assign collected information to the quiz map */
-        var question = _getNewQuestionMap();
-        question['content'] = questionContent;
-        question['explanation'] = questionExplanation;
-        question['randomize'] = questionRandomize;
-        question['type'] = questionType;
+        let question = _getNewQuestionMap();
+        question.content = questionContent;
+        question.explanation = questionExplanation;
+        question.randomize = questionRandomize;
+        question.type = questionType;
 
         /* Loop through all possible options for each question if this is Multiple Choice or Checkbox*/
-        if (questionType === 1 || questionType === 2) {
-            var optionElems = curQuestion.querySelectorAll(".mc-opt-wrapper");
+        if (questionType === '1') {
+            let optionElems = curQuestion.querySelectorAll(".mc-opt-wrapper");
 
-            for (var j = 0; j < optionElems.length; j++) {
-                var curOption = optionElems[j];
+            for (let j = 0; j < optionElems.length; j++) {
+                let curOption = optionElems[j];
 
                 /* Collect salient information about each option */
-                var optionContent = curOption.querySelector("#id_content").value;
-                var optionIsCorrect = curOption.querySelector("#id_is_correct").value;
-
-                if (questionType === 1 && optionIsCorrect === true) {
-                    numCorrectAnswers++;
-
-                    if (numCorrectAnswers > 1) {
-                        insertError(curQuestion.querySelector(".opt-error-msg"), "Multiple choice questions cannot have more than 1 correct answer", true);
-                        return null;
-                    }
-                }
+                let optionContent = curOption.querySelector("#id_content").value;
+                let optionIsCorrect = curOption.querySelector("#id_is_correct").value;
 
                 /* Error check */
                 if (optionContent === "") {
@@ -149,7 +138,7 @@ function mapAllQuestions() {
                 }
 
                 /* Assign collected information to the option section of the quiz map */
-                var option = _getNewOptionMap();
+                let option = _getNewOptionMap();
                 option['content'] = optionContent;
                 option['is_correct'] = optionIsCorrect;
 
@@ -168,7 +157,7 @@ Wrapper function that assigns the submission form input value as the stringified
  */
 function buildQuizJSON() {
 
-    var json = mapAllQuestions();
+    let json = mapAllQuestions();
 
     if (json === null) {
         return false;
@@ -183,7 +172,7 @@ function buildQuizJSON() {
 Returns a new ID based on number of ID objects already created
  */
 function getNewID() {
-    var newID = String(QuizData.totalQuestions);
+    let newID = String(QuizData.totalQuestions);
     QuizData.totalQuestions++;
     return newID;
 }
@@ -196,8 +185,8 @@ Parameters:
     optionID: the dom ID of the specific option that will be removed
  */
 function deleteMCOption(canvasID, optionID) {
-    var option = document.getElementById(optionID);
-    var canvas = document.getElementById(canvasID);
+    let option = document.getElementById(optionID);
+    let canvas = document.getElementById(canvasID);
     canvas.removeChild(option);
 }
 
@@ -208,7 +197,7 @@ Parameters:
     element: this is the specific button element that was clicked
  */
 function isCorrectToggle(element) {
-    var checkbox = element.querySelector("#id_is_correct");
+    let checkbox = element.querySelector("#id_is_correct");
     if (element.classList.contains('active')) {
         element.classList.remove('active');
         checkbox.value = "False";
@@ -228,17 +217,17 @@ the blank question is ignored.
 In order to get a blank question added to the Quiz, the user must select only from the blank radio buttons.
  */
 function addNewOrExistingQuestions() {
-    var numChecked = 0;
-    var checkboxes = document.getElementById('existingQuestionsResults').getElementsByTagName('input');
+    let numChecked = 0;
+    let checkboxes = document.getElementById('existingQuestionsResults').getElementsByTagName('input');
 
-    for (var i = 0; i < checkboxes.length; i++) {
+    for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked === true) {
 
             checkboxes[i].checked = false;  // cleanup, set it false for next time around
 
             numChecked++;
 
-            var addQuestionFunc = questionTypesI2Function[QuizData.existingResults[i].type];
+            let addQuestionFunc = questionTypesI2Function[QuizData.existingResults[i].type];
 
             addQuestionFunc(QuizData.existingResults[i]);
         }
@@ -250,7 +239,7 @@ function addNewOrExistingQuestions() {
     }
 
     // If we're here, we have no existing questions to add and look through the blank questions radio buttons
-    var blankOption = $('input[name=blank-question-opt]:checked', '#blank-question-form').val();
+    let blankOption = $('input[name=blank-question-opt]:checked', '#blank-question-form').val();
 
     questionTypesI2Function[blankOption]();
 }
@@ -265,7 +254,7 @@ function refreshBlankQuestionRadio() {
 
 
 // HTML template for a dyanmically-added "existing question" result
-var resultsRowTemplate =
+let resultsRowTemplate =
     "<div class='q-result row'>" +
         "<div class='col-sm-1 col-md-1 col-lg-1'>" +
             "<input id='existingResult{2}' type='checkbox' value='{2}'>" +
@@ -280,7 +269,7 @@ var resultsRowTemplate =
     "<div id='optionsCanvas{2}' class='collapse'></div>";
 
 // HTML template for a dynamically-added "existing option" result
-var optionsResultsRowTemplate =
+let optionsResultsRowTemplate =
     "<div class='row q-option {1}'>{0}</div>";
 
 /*
@@ -291,12 +280,12 @@ Returns: a function that does everything described
  */
 function getExistingQuestionQueryset() {
     return function () {
-        var baseUrl = window.location.origin + window.location.pathname + "existingquestion";
+        let baseUrl = window.location.origin + window.location.pathname + "existingquestion";
 
-        var typeElem = document.getElementById('dropdownMenuButton');               // the question type dropdown
-        var searchElem = document.getElementById("searchExistingQuestion");         // the search bar
-        var resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
-        var typeURL = "";
+        let typeElem = document.getElementById('dropdownMenuButton');               // the question type dropdown
+        let searchElem = document.getElementById("searchExistingQuestion");         // the search bar
+        let resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
+        let typeURL = "";
 
         resultsCanvas.innerHTML = "";
 
@@ -305,12 +294,12 @@ function getExistingQuestionQueryset() {
         }
 
         if (typeElem.innerHTML !== "Any") {
-            var type = questionTypesA2I[typeElem.innerHTML];
+            let type = questionTypesA2I[typeElem.innerHTML];
             typeURL = "&type={0}".format(type);
         }
 
         // construct full web API URI
-        var fullAPIURL = baseUrl + "?content=" + searchElem.value + typeURL;
+        let fullAPIURL = baseUrl + "?content=" + searchElem.value + typeURL;
 
         // execute the web API call and handle data accordingly
         $.getJSON(fullAPIURL, null, function (data) {
@@ -319,20 +308,21 @@ function getExistingQuestionQueryset() {
             QuizData.existingResults = data;
 
             // loop through all results, append them to their canvases accordingly
-            for (var i = 0; i < data.length; i++) {
-                resultsCanvas.innerHTML += resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content'], i);
+            for (let i = 0; i < data.length; i++) {
+                resultsCanvas.insertAdjacentHTML("beforeend", resultsRowTemplate.format(questionTypesI2A[data[i]['type']], data[i]['content'], i));
 
-                var canvasId = "optionsCanvas{0}".format(i);
-                var optionsCanvas = document.getElementById(canvasId);
+                let canvasId = "optionsCanvas{0}".format(i);
+                let optionsCanvas = document.getElementById(canvasId);
 
                 // loop through all of the options (multiple choice and checkbox questions)
-                for (var j = 0; j < data[i]['multiplechoiceoption_set'].length; j++) {
+                for (let j = 0; j < data[i]['multiplechoiceoption_set'].length; j++) {
 
-                    var isCorrectClass = "";
+                    let isCorrectClass = "";
                     if (data[i]['multiplechoiceoption_set'][j]['is_correct'] === true) {
                         isCorrectClass = "is-correct";
                     }
-                    optionsCanvas.innerHTML += optionsResultsRowTemplate.format(data[i]['multiplechoiceoption_set'][j]['content'], isCorrectClass);
+
+                    optionsCanvas.insertAdjacentHTML("beforeend", optionsResultsRowTemplate.format(data[i]['multiplechoiceoption_set'][j]['content'], isCorrectClass));
                 }
             }
         });
@@ -340,8 +330,8 @@ function getExistingQuestionQueryset() {
 }
 
 function deleteQuestion(questionID) {
-    var questionCanvas = document.getElementById('question-canvas');
-    var question = document.getElementById(questionID);
+    let questionCanvas = document.getElementById('question-canvas');
+    let question = document.getElementById(questionID);
 
     questionCanvas.removeChild(question);
 }
@@ -356,7 +346,7 @@ function updateDropdownValue(val) {
 }
 
 // this is the element template for every new multiple-choice question that gets added to the DOM
-var multipleChoiceTemplate =
+let multipleChoiceTemplate =
     "<div class='question-wrapper' id='question{0}'>" +
         "<div class='card question'>" +
             "<span class='question-label'>Question Content</span>" +
@@ -377,12 +367,13 @@ var multipleChoiceTemplate =
 
 // Every time this is called, a new MC template will be added to the DOM and filled out accordingly
 function addMultipleChoiceQuestion(existingQuestion) {
-    var questionCanvas = document.getElementById('question-canvas');
+    let questionCanvas = document.getElementById('question-canvas');
 
-    var content = "";
-    var explanation = "";
-    var randomize = "";
-    var optionLength = 0;
+
+    let content = "";
+    let explanation = "";
+    let randomize = "";
+    let optionLength = 0;
 
     if (existingQuestion !== undefined) {
         content = existingQuestion['content'];
@@ -395,16 +386,16 @@ function addMultipleChoiceQuestion(existingQuestion) {
         optionLength = existingQuestion['multiplechoiceoption_set'].length;
     }
 
-    var canvasID = getNewID();
-    questionCanvas.innerHTML += multipleChoiceTemplate.format(canvasID, content, explanation, randomize);
+    let canvasID = getNewID();
+    questionCanvas.insertAdjacentHTML("beforeend", multipleChoiceTemplate.format(canvasID, content, explanation, randomize));
 
     // loop through and all all options
-    for (var i = 0; i < optionLength; i++) {
+    for (let i = 0; i < optionLength; i++) {
         addMultipleChoiceOption(canvasID, existingQuestion['multiplechoiceoption_set'][i]);
     }
 }
 
-var multipleChoiceOptionTemplate =
+let multipleChoiceOptionTemplate =
     "<div class='row mc-opt-wrapper' id='mcOption{0}'>" +
         "<div class='col col-sm mc-opt-delete-sidebar'>" +
             "<button class='btn btn-block h-100 w-100' type='button' onclick='deleteMCOption({1}, \"mcOption{0}\");'>" +
@@ -423,11 +414,11 @@ var multipleChoiceOptionTemplate =
     "</div>";
 
 function addMultipleChoiceOption(optCanvasId, existingOption) {
-    var optCanvas = document.getElementById(optCanvasId);
+    let optCanvas = document.getElementById(optCanvasId);
 
-    var content = "";
-    var isCorrect = false;
-    var activeClass = "";
+    let content = "";
+    let isCorrect = false;
+    let activeClass = "";
 
     if (existingOption !== undefined) {
         content = existingOption['content'];
@@ -438,11 +429,11 @@ function addMultipleChoiceOption(optCanvasId, existingOption) {
         }
     }
 
-    optCanvas.innerHTML += multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect);
+    optCanvas.insertAdjacentHTML("beforeend", multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect));
 }
 
 function addEssayQuestion(existingQuestion) {
-    var essayQuestionTemplate =
+    let essayQuestionTemplate =
         "<div class='question-wrapper essay-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
@@ -454,18 +445,18 @@ function addEssayQuestion(existingQuestion) {
             "</div>" +
         "</div>";
 
-    var questionCanvas = document.getElementById('question-canvas');
+    let questionCanvas = document.getElementById('question-canvas');
 
-    var content = "";
-    var explanation = "";
+    let content = "";
+    let explanation = "";
 
     if (existingQuestion !== undefined) {
         content = existingQuestion['content'];
         explanation = existingQuestion['explanation'];
     }
 
-    var canvasID = getNewID();
-    questionCanvas.innerHTML += essayQuestionTemplate.format(canvasID, content, explanation);
+    let canvasID = getNewID();
+    questionCanvas.insertAdjacentHTML("beforeend", essayQuestionTemplate.format(canvasID, content, explanation));
 }
 
 function addCheckboxQuestion() {
@@ -473,7 +464,7 @@ function addCheckboxQuestion() {
 }
 
 function addNumericScaleQuestion(existingQuestion) {
-    var numericScaleQuestionTemplate =
+    let numericScaleQuestionTemplate =
         "<div class='question-wrapper numeric-scale-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
@@ -504,28 +495,28 @@ function addNumericScaleQuestion(existingQuestion) {
             "</div>" +
         "</div>";
 
-    var questionCanvas = document.getElementById('question-canvas');
+    let questionCanvas = document.getElementById('question-canvas');
 
-    var content = "";
-    var explanation = "";
-    var min = 1;
-    var max = 10;
-    var step = 1;
-    var correct_value = 5;
+    let content = "";
+    let explanation = "";
+    let min = 1;
+    let max = 10;
+    let step = 1;
+    let correct_value = 5;
 
     if (existingQuestion !== undefined) {
         //TODO
     }
 
-    var questionID = getNewID();
-    questionCanvas.innerHTML += numericScaleQuestionTemplate.format(questionID, content, explanation, min, max, step, correct_value);
+    let questionID = getNewID();
+    questionCanvas.insertAdjacentHTML("beforeend", numericScaleQuestionTemplate.format(questionID, content, explanation, min, max, step, correct_value));
 
     updateNumericScalePreview("preview{0}".format(questionID), min, max, step, correct_value);
     console.log("Adding numeric scale question");
 }
 
 function updateNumericScalePreview(elemID, min, max, step, correct_value) {
-    var sliderTemplate =
+    let sliderTemplate =
         "<div class='row'>" +
             "<span class='question-label col-sm-1 col-md-1 col-lg-1' style='text-align: center'>{0}</span>" +
             "<input class='form-control col-sm-10 col-md-10 col-lg-10' type='range' min='{0}' max='{1}' step='{2}' value='{3}' onchange='updateSliderValue(\"{4}\", this);'>" +
@@ -533,11 +524,11 @@ function updateNumericScalePreview(elemID, min, max, step, correct_value) {
         "</div>" +
         "<div class='slider-value' style='text-align: center;'>5</div>";
 
-    document.getElementById(elemID).innerHTML += sliderTemplate.format(min, max, step, correct_value, elemID);
+    document.getElementById(elemID).insertAdjacentHTML("beforeend", sliderTemplate.format(min, max, step, correct_value, elemID));
 }
 
 function updateSliderValue(elemID, slider) {
-    var valueDiv = document.getElementById(elemID).querySelector('.slider-value');
+    let valueDiv = document.getElementById(elemID).querySelector('.slider-value');
 
     valueDiv.innerHTML = slider.value;
 }
