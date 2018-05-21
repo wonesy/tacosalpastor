@@ -3,23 +3,54 @@
 {% load static %}
 
 {% block content %}
-        <table class="table text-center">
-            <thead class="thead-inverse">
-                <tr>
-                    <th>Student List</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in attendance_list %}
+    <table class="table table-striped">
+        <thead>
+            <th class="text-center">Photo</th>
+            <th class="text-center">Student Name</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Supporting Documents</th>
+            <link href="{% static 'css/attendance.css' %}" rel="stylesheet">
+        </thead>
+        <tbody>
+            {% for form_item in form %}
+                <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
                     <tr>
-                        {%  if student.schedule_id.course_id.title == "Java Programming" %}
-                            <h2>{{ student.schedule_id.course_id.title }}</h2>
-                            <td>
-                            <a class="btn btn-primary" href="#">{{ student.student_id }}</a>
-                            </td>
-                        {% endif %}
+                        <td>
+                            {% if form_item.student_id.photo_location != None %}
+                                {% with 'image/portraits/'|add:form_item.student_id.photo_location as image_static %}
+                                    <img src="{% static image_static %}" alt={{ form_item.student_id.user }}>
+                                {% endwith %}
+                            {% else %}
+                                <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar" class="people-img">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ form_item.instance.student_id }}
+                            {{ form_item.student_id.as_hidden }}
+                            {{ form_item.schedule_id.as_hidden }}
+                            <input name="id" value="{{ form_item.instance.id }}" type="hidden">
+                        </td>
+                        <td>
+                            {{ form_item.status }}
+                        </td>
+                        <td>
+                            {{ form_item.file_upload }}
+                            <input type="submit">
+                        </td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </form>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        function disableButton() {
+            var auxRadio = document.getElementById("rGroup1");
+            var aux = document.getElementById("uploadForm");
+            if (auxRadio.elements["status"].value === "3") {
+                aux.disabled = false;
+            } else {
+                aux.disabled = true;
+            }
+        }
+    </script>
 {% endblock %}

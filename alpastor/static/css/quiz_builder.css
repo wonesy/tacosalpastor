@@ -1,0 +1,119 @@
+.quiz-canvas {
+    width: 100%;
+    padding: 15px 10px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 40px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+.quiz-title {
+    text-align: center;
+}
+
+.quiz {
+    max-width: 750px;
+    margin: auto;
+}
+
+.question-wrapper {
+    background: #17a2b8;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.question {
+    margin-left: 50px;
+    padding: 5px;
+}
+
+.opt-canvas {
+    min-height: 0;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.new-question-btn {
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    color: #fff;
+    background: #5a6268;
+}
+
+/* --- */
+.mc-opt-wrapper {
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.mc-opt-delete-sidebar {
+    max-width: 50px;
+    min-width: 50px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding-left: 0;
+}
+
+.mc-opt-delete-sidebar button {
+    width: 100%;
+    text-align: center;
+    max-width: 50px;
+    min-width: 50px;
+    padding: 0;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.mc-opt-delete-sidebar button:hover {
+    background: #a41515;
+    color: #ffffff;
+}
+
+.mc-opt-content {
+    background: #17a2b8;
+    padding: 5px;
+}
+
+.mc-opt-content input {
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.mc-opt-correct-sidebar {
+    max-width: 50px;
+    min-width: 50px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 0;
+}
+
+.mc-opt-correct-sidebar button {
+    width: 100%;
+    text-align: center;
+    max-width: 50px;
+    min-width: 50px;
+    padding: 0;
+    margin: 0;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: #cccccc;
+}
+
+.mc-opt-correct-sidebar i {
+    padding-top: 5px;
+}
+
+.mc-opt-correct-sidebar button.active {
+    color: #2ecc71;
+}
+

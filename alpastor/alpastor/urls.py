@@ -16,24 +16,40 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
+from quiz import views as quiz_views
 from epita import views
-from epita.views import CourseList, ScheduleList, AttendanceDetail
+from epita.views import CourseView, ScheduleView, AttendanceView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
-    path('attendance/', CourseList.as_view(), name='course_list'),
-    path('attendance/schedule/', ScheduleList.as_view(), name='schedule_list'),
-    path('attendance/schedule/students/', AttendanceDetail.as_view(), name='attendance_list'),
+
+    # Professor/superuser view Attendance
+    path('attendance/', CourseView.as_view(), name='course_list'),
+    path('attendance/course/', ScheduleView.as_view(), name='schedule_list'),
+    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_list'),
+
+    # Student view Attendance
+    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_student'),
+
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
+    path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
+    path('quizbuilder/savenewquiz/', quiz_views.SaveNewQuiz.as_view(), name='savenewquiz'),
     path('admin/', admin.site.urls),
     # path('api/data/', get_data, name='api-data'),
     # path('api/chart/data/', ChartData.as_view()),
-    #url(r'^dashboard$', ChartView.from_chart(dashboard), name='dashboard'),
+    # url(r'^dashboard$', ChartView.from_chart(dashboard), name='dashboard'),
     # url(r'^api/data/$', get_data, name='api-data'),
     # url(r'^api/chart/data/$', ChartData.as_view()),
     path('dashboardex/', views.dashboard, name='dashboardex'),
-    #url(r'^export/$', 'export_to_excel', name='export_to_excel'),
+    # url(r'^export/$', 'export_to_excel', name='export_to_excel'),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

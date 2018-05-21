@@ -39,10 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'epita',
     'accounts',
-    'jchart',
-    'rest_framework',
-    'chartit',
-
+    'quiz',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
@@ -140,3 +137,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
 
 TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"
+
+# Media files (uploaded files)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
