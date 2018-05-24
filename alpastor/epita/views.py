@@ -67,6 +67,7 @@ class AttendanceView(ListView):
     def post(self, request):
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
         form = self.form_class(request.POST, request.FILES, instance=instance)
+        schedule_instance = request.GET.get('schedule_id', '')
         if form.is_valid():
             form.save()
             file = form.cleaned_data['file_upload']
