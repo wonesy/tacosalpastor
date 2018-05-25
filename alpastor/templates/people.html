@@ -2,13 +2,19 @@
 
 {% load static %}
 
+<!-- Adding additional CSS/JS scripts -->
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/people.css' %}">
+{% endblock %}
+
+<!-- Main content for people page -->
 {% block content %}
     <form>
         <input id="searcher" type="text" placeholder="Search">
 
     </form>
 
-    ME<input type="checkbox" id="ME" align="right">
+    <input type="checkbox" id="ME" align="right">
 
     <div class="row">
             {%  for student in students %}
