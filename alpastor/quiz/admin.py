@@ -7,4 +7,3 @@ admin.site.register(Question)
 admin.site.register(MultipleChoiceQuestion)
 admin.site.register(NumericScaleQuestion)
 admin.site.register(MultipleChoiceOption)
-

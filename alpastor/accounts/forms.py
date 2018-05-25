@@ -30,6 +30,7 @@ class LoginForm(forms.Form):
     def get_user(self):
         return self.user_cache
 
+
 class CustomUserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
@@ -52,15 +53,15 @@ class CustomUserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'first_name', 'last_name', 'external_email', 'is_active', 'is_staff', 'is_superuser']
+        fields = ['email', 'password', 'first_name', 'last_name', 'external_email', 'is_active', 'is_staff',
+                  'is_superuser']
 
     def save(self, commit=False):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
-
-

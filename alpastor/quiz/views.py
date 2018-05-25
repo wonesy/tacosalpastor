@@ -6,11 +6,13 @@ from .forms import MultipleChoiceForm, MultipleChoiceOptionForm
 import json
 import enum
 
+
 class QuizErrors(enum.Enum):
     NOTITLE = 1
 
+
 # Create your views here.
-#@login_required()
+# @login_required()
 class QuizBuilderView(View):
     template_name = "quiz_builder.html"
     model = Course
@@ -32,6 +34,7 @@ class QuizBuilderView(View):
     def get_queryset(self):
         return Course.objects.all()
 
+
 class SaveNewQuiz(View):
     def get(self, request):
         return redirect('quizbuilder')
@@ -44,7 +47,6 @@ class SaveNewQuiz(View):
 
         # TODO redirect to quiz list that dodo is working on
         return redirect('quizbuilder')
-
 
     def processQuizJSON(self, quiz_json):
         quiz_title = quiz_json['title']
@@ -79,7 +81,6 @@ class SaveNewQuiz(View):
             # Process every option for this question
             for option in question_json['options']:
                 self.processOptionJSON(question, option)
-
 
     def processOptionJSON(self, question, option_json):
         opt_content = option_json['content']

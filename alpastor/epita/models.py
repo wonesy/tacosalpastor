@@ -254,8 +254,11 @@ class Attendance(models.Model):
     upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):
-        return "Attendance(student_id={}, schedule_id={}, status={}, file_upload={}, upload_time={})".format(self.student_id,
+        return "Attendance(student_id={}, schedule_id={}, status={}, file_upload={}, upload_time={})".format(
+            self.student_id,
             self.schedule_id, self.status, self.file_upload, self.upload_time)
 
     def __str__(self):
-        return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status), str(self.schedule_id), self.file_upload, self.upload_time)
+        return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status),
+                                                               str(self.schedule_id), self.file_upload,
+                                                               self.upload_time)

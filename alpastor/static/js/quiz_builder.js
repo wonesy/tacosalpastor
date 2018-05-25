@@ -1,4 +1,3 @@
-
 function _getNewQuestionMap() {
     return {
         "type": "",
@@ -15,6 +14,7 @@ function _getNewOptionMap() {
         "is_correct": false
     };
 }
+
 var totalQuestions = 0;
 
 function mapAllQuestions() {

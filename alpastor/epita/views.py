@@ -24,6 +24,7 @@ from django.db.models import Count
 def home(request):
     return render(request, 'base_generic.html')
 
+
 # @login_required
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
@@ -52,6 +53,7 @@ class ScheduleView(ListView):
         course_instance = request.GET.get('course_name', '')
         schedule_list = Schedule.objects.filter(course_id__title=course_instance)
         return render(request, self.template_name, {'schedule_list': schedule_list})
+
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
@@ -132,4 +134,10 @@ def dashboard(request):
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
     print(program)
 
-    return render(request, 'dashboardex.html', {'country': country, 'vaar2': vaar2, 'program': program})
+    # bar graph by specialization
+    splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
+        'specialization')
+
+    # bar graph by year
+    return render(request, 'dashboardex.html',
+                  {'country': country, 'vaar2': vaar2, 'program': program, 'splgraph': splgraph})

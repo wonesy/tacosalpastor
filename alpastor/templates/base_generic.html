@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,19 +30,23 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <!-- Our Custom CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
     <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css' %}">
+    {% block additional_links %}
+    {% endblock %}
 </head>
-<body>
 
+<body>
 
 <div class="wrapper">
 
     <!-- Sidebar Holder -->
     <nav id="sidebar">
-        <div class="sidebar-header">
+        <div class="active sidebar-header">
             <img src="{% static 'image/portraits/generic_avatar.jpg' %}" class="nav-avatar">
             <button type="button" class="btn">Logout</button>
         </div>
@@ -60,9 +65,15 @@
                 </a>
             </li>
             <li class="active hover-left-brdr">
-                <a href="quizbuilder">
+                <a href="#">
                     <i class="fa fa-pencil-alt"></i>
                     <span class="base-generic-lmargin">Quiz</span>
+                </a>
+            </li>
+            <li class="active hover-left-brdr">
+                <a href="/quizbuilder">
+                    <i class="fa fa-pencil-alt"></i>
+                    <span class="base-generic-lmargin">[DEV] Quiz Builder</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
@@ -71,54 +82,55 @@
                     <span class="base-generic-lmargin">Attendance</span>
                 </a>
             </li>
+            {#            <li class="active hover-left-brdr">#}
+            {#                <a href="/attendance-student">#}
+            {#                    <i class="fa fa-pencil-alt"></i>#}
+            {#                    <span class="base-generic-lmargin">Attendance-Student</span>#}
+            {#                </a>#}
+            {#            </li>#}
         </ul>
     </nav>
 
-            <!-- Page Content Holder -->
-            <div id="content" class="fill-width">
+    <!-- Page Content Holder -->
+    <div id="content" class="fill-width">
 
-                <nav class="navbar navbar-default">
-                    <div class="container-fluid">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
 
-                        <div class="navbar-header">
-                            <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-                                <i class="glyphicon glyphicon-align-left"></i>
-                                <span>Toggle Sidebar</span>
-                            </button>
-                        </div>
+                <div class="navbar-header">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                        <i id="sideToggleBtn" class="fa fa-arrow-circle-left"></i>
+                        <span>Toggle Sidebar</span>
+                    </button>
+                </div>
 
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#">A</a></li>
-                                <li><a href="#">B</a></li>
-                                <li><a href="#">C</a></li>
-                                <li><a href="#">D</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">A</a></li>
+                        <li><a href="#">B</a></li>
+                        <li><a href="#">C</a></li>
+                        <li><a href="#">D</a></li>
+                    </ul>
+                </div>
 
-                {% block content %}
-                {% endblock %}
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#sidebarCollapse').on('click', function () {
+                            $('#sidebar').toggleClass('active');
+                            $('#sideToggleBtn').toggleClass('fa-arrow-circle-left fa-arrow-circle-right');
+                        });
+                    });
+                </script>
 
-            </div>
+        </nav>
+
+        <div class="wrapper">
+
+            {% block content %}
+            {% endblock %}
+
         </div>
-
-
-
-
-
-        <!-- jQuery CDN -->
-         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-         <!-- Bootstrap Js CDN -->
-         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-         <script type="text/javascript">
-             $(document).ready(function () {
-                 $('#sidebarCollapse').on('click', function () {
-                     $('#sidebar').toggleClass('active');
-                 });
-             });
-         </script>
-    </body>
+    </div>
+</div>
+</body>
 </html>

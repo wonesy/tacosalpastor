@@ -3,49 +3,43 @@
 {% load static %}
 
 {% block content %}
-    <form>
-        <input id="searcher" type="text" placeholder="Search">
+    <div class="col-md-12">
+        <div class="people-canvas">
+            <form class="search">
+                <input id="searcher" placeholder="Search" class="sbar" type="text">
+            </form>
 
-    </form>
-    <br>
-    <button id="sort">Alphabetical</button>
-    <br>
-{#    <form method='GET'>#}
-{#    <input type='hidden' name='format' value='csv'>#}
-{#    <input type='hidden' name='lab_query' value={{lab_query}}>#}
-{#    <input type='submit'>#}
-{#</form>#}
-    <button class="accordion">Filter</button>
+
+            <button id="sort" class="btnalpha">Alphabetical</button>
+
+
+            <br>
+
+            <button class="accordion">Filter</button>
 
 
     <div class="panel">
 
         <br>
-        <!--
-                <input id="ME" value="ME" type="checkbox"> ME
-                <br>
-                <input id="MSc" value="MSc" type="checkbox">MSc
-            -->
         <label class="container">ME
-            <input id="ME" value="ME" type="checkbox" onclick="sort()">
+            <input type="checkbox" id="ME" value="ME">
             <span class="checkmark"></span>
         </label>
 
+
         <label class="container">Msc
-            <input id="MSc" value="MSc" value="MSC" type="checkbox" onclick="sort()">
+            <input type="checkbox" id="MSc" value="Msc">
             <span class="checkmark"></span>
         </label>
 
     </div>
 
+        </div>
 
 
-
-
-
-    <div class="row">
+        <div class="row wrapper stdfilter">
         {% for student in students %}
-            <div class="secondDiv">
+            <div class="secondDiv" data-category="{{ student.program }}">
 
                 <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv newDiv">
                     <div class="people-top">
@@ -80,6 +74,7 @@
                             {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
                             <!-- <input hidden value="{{ student.program }} {{ student.specialization }}"> -->
                             {{ student.program }}: {{ student.specialization }}<br>[{{ student.classof }}]
+
                         </div>
                     </div>
                 </div>
@@ -91,11 +86,15 @@
 
     </div>
 
+    </div>
+
 
     <script>
         // search everything
         $("#searcher").on("keyup click input", function () {
             var val = $(this).val();
+            $('.prod >div').show();
+
             if (val.length) {
                 $(".secondDiv .entryDiv").hide().filter(function () {
                     return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
@@ -108,32 +107,58 @@
 
         // filter by option 2
 
+        $('input[type="checkbox"]').click(function () {
+            console.log("hii");
+            if ($('input[type="checkbox"]:checked').length > 0) {
+                console.log("hi")
+
+                $('.stdfilter > div').hide();
+                $('input[type="checkbox"]:checked').each(function () {
+                    $('.stdfilter >div[data-category=' + this.id + ']').show();
+                });
+            } else {
+                $('.stdfilter >div').show();
+
+            }
+        });
+
+
 
         // filter by option 1
+        {##}
+        {#$("#ME").on("click", function () {#}
+        {#    console.log("ME");#}
+        {#    var val = $(this).val();#}
+        {#    if (val.length) {#}
+        {#        $(".secondDiv .newDiv").hide().filter(function () {#}
+        {#            return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;#}
+        {#        }).show();#}
+        {#    }#}
+        {#    else {#}
+        {#        $(".secondDiv .newDiv").show();#}
+        {#    }#}
+        {#})
+        ;
+        #}
+        {##}
+        {#$("#MSc").on("click", function () {#}
+        {#    console.log("MSC");#}
+        {#    var val = $(this).val();#}
+        {#    if (val.length) {#}
+        {#        $(".secondDiv .newDiv").hide().filter(function () {#}
+        {#            return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;#}
+        {#        }).show();#}
+        {#    }#}
+        {#    else {#}
+        {#        $(".secondDiv .newDiv").show();#}
+        {#    }#}
+        {#})
+        ;
+        #}
 
-        $("#ME").on("click", function () {
-            var val = $(this).val();
-            if (val.length) {
-                $(".secondDiv .newDiv").hide().filter(function () {
-                    return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
-                }).show();
-            }
-            else {
-                $(".secondDiv .newDiv").show();
-            }
-        });
 
-        $("#MSc").on("click", function () {
-            var val = $(this).val();
-            if (val.length) {
-                $(".secondDiv .newDiv").hide().filter(function () {
-                    return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
-                }).show();
-            }
-            else {
-                $(".secondDiv .newDiv").show();
-            }
-        });
+
+
 
 
         // accordion
