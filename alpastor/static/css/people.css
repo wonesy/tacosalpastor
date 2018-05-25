@@ -10,6 +10,28 @@
     text-align: center;
 }
 
+.filter-container {
+    width: 100%;
+}
+
+.search-bar {
+    width: 100%;
+}
+
+.people-container {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.filter-container {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.search-bar {
+    width: 100%;
+}
+
 .people-top {
     min-height: 100px;
 }
