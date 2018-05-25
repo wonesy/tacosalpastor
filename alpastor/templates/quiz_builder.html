@@ -1,0 +1,110 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/quiz_builder.css' %}">
+    <script src="{% static 'js/quiz_builder.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="quiz-canvas">
+        <div class="quiz">
+            <h1 class="quiz-title">Quiz Builder</h1>
+
+            <div class="form-group">
+                <label for="quizTitle">Quiz Title</label>
+                <div id="titleErrorCanvas"></div>
+                <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title">
+            </div>
+
+            <div id="question-canvas">
+                <!-- This is to be filled in via javascript functions -->
+            </div>
+
+            <div style="text-align: center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newQuestionModal" onclick="">
+                    Add Question
+                </button>
+            </div>
+
+            <form id="quizBuilderForm" onsubmit="return buildQuizJSON();" action="savenewquiz/" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="json_quiz" name="json_quiz" value="">
+                <input type="submit" value="Submit" />
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="newQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content container-fluid">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Question</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body row flex-nowrap">
+                    <div class="blank-questions-wrapper col-md-3 col-sm-3">
+                        <h3>New Question</h3>
+                        <form id="blank-question-form">
+                            <input type="radio" name="blank-question-opt" value=-1 checked> None<br>
+                            <input type="radio" name="blank-question-opt" value=0 > Essay<br>
+                            <input type="radio" name="blank-question-opt" value=1> Multiple Choice<br>
+                            <input type="radio" name="blank-question-opt" value=2> Checkbox<br>
+                            <input type="radio" name="blank-question-opt" value=3> Numeric Scale<br>
+                        </form>
+                    </div>
+                    <div class="dividing-bar"></div>
+                    <div class="existing-questions-wrapper col-md col-12" tabindex="-1">
+                        <h3>Existing Question</h3>
+                        <div class="row search-question-wrapper">
+                            <div class="search col-sm-4 col-md-4">
+                                <!-- Example split danger button -->
+                                <div class="btn-group">
+                                    <button type="button" id="dropdownMenuButton" class="btn btn-info">Any</button>
+                                    <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Any');">Any</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Essay');">Essay</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('M.C.');">Multiple Choice</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Checkbox');">Checkbox</a>
+                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Numeric');">Numeric Scale</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="search text-input col-md col-sm-12">
+                                <input id="searchExistingQuestion" type="text" class="text-input form-control" placeholder="Search question">
+                            </div>
+                        </div>
+                        <div class="existing-questions-results">
+                            <div id="existingQuestionsResults" class="results-wrapper">
+                                <!-- Add results via javascript function -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="addNewOrExistingQuestions();">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        $(".existing-questions-wrapper").focus(function () {
+            refreshBlankQuestionRadio();
+        });
+
+        $('#searchExistingQuestion').keyup(function() {
+            delay(getExistingQuestionQueryset(), 1000);
+        });
+    </script>
+{% endblock %}

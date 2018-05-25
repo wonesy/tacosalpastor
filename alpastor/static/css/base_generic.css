@@ -63,7 +63,7 @@ a, a:hover, a:focus {
 }
 
 #sidebar.active {
-    margin-left: -250px;
+    margin-left: -200px;
 }
 
 #sidebar .sidebar-header {
@@ -87,14 +87,12 @@ a, a:hover, a:focus {
 }
 #sidebar ul li a:hover {
     color: #7386D5;
-    background: #fff;
 }
 
-#sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    /*background: #6d7fcc;*/
-    background: #222222;
-}
+/*#sidebar ul li.active > a, a[aria-expanded="true"] {*/
+    /*color: #fff;*/
+    /*!*background: #6d7fcc;*!*/
+/*}*/
 
 .base-generic-lmargin {
     margin-left: 10px;
@@ -102,7 +100,7 @@ a, a:hover, a:focus {
 
 .hover-left-brdr:hover {
     border-left: 3px solid #d19b3d;
-    background-color: #4f5b69;
+    background-color: #c0c0c0;
     -webkit-transition: all 1s ease;
     -moz-transition: all 1s ease;
     -o-transition: all 1s ease;

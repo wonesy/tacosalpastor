@@ -1,2 +1,5 @@
 Django>=2.0
 mysqlclient
+redgreenunittest
+pillow
+djangorestframework

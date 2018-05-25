@@ -9,4 +9,6 @@ done
 
 source venv/bin/activate
 
+pip -q install -r requirements.txt
+
 echo "Environment activated"
