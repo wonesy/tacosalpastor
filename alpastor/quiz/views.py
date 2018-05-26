@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from django.shortcuts import render, redirect
 from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion
 from epita.models import Course
@@ -117,3 +118,28 @@ class AddExistingQuestionView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """ Save the POST data """
         serializer.save()
+=======
+from django.shortcuts import render
+from quiz.models import Quiz
+
+# Create your views here.
+
+"""import operator
+
+from quiz.models import Quiz
+
+class SearchCourse:
+
+    def get_queryset(self):
+        result = super(SearchCourse, self).get_queryset()
+
+        query = self.request.GET.get('q')
+        if query:
+            query_list = query.split()
+            result = result.filter(
+                reduce(operator.and_(Quiz(title_icontains=q) for q in query_list)) |
+                reduce(operator.and_(Quiz(course_icontains=q) for q in query_list))
+            )
+
+            return result """
+>>>>>>> Stashed changes

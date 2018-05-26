@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 from .models import Student, Course, Attendance, Schedule
 from .forms import AttendanceForm
+from quiz.models import Quiz
 
 
 
@@ -81,4 +82,40 @@ def people(request):
 
     people_dict['students'] = active_students
 
+<<<<<<< Updated upstream
     return render(request, 'people.html', people_dict)
+=======
+    return render(request, 'people.html', people_dict)
+
+def quizHomePage(request):
+    quizzes = Quiz.objects.all()
+    return render(request, "quiz.html", {'quizzes': quizzes})
+
+#@login_required()
+class QuizBuilderView(View):
+    template_name = "quiz_builder.html"
+    model = Course
+
+    def post(self, request):
+        pass
+
+    def get(self, request):
+        return render(request, "quiz_builder.html")
+
+    def get_queryset(self):
+        return Course.objects.all()
+
+
+class EditQuizPage(View):
+    template_name = "edit_quiz.html"
+
+
+    def post(self, request):
+        pass
+
+    def get(self, request):
+        return render(request, "edit_quiz.html")
+
+    def get_queryset(self):
+        return Quiz.objects.all()
+>>>>>>> Stashed changes

@@ -19,18 +19,30 @@
     <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css' %}">
+<<<<<<< Updated upstream
     <script src="{% static 'js/utils.js' %}"></script>
+=======
+    <link rel="icon" type="image/png" href="{% static 'image/favicon.ico' %}" />
+    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="{% static 'image/favicon.ico' %}" /><![endif]-->
+
+>>>>>>> Stashed changes
     {% block additional_links %}
     {% endblock %}
 </head>
 
 <body>
 
+
 <div class="wrapper">
 
     <!-- Sidebar Holder -->
     <nav id="sidebar">
+<<<<<<< Updated upstream
         <div class="active sidebar-header">
+=======
+
+        <div class="sidebar-header">
+>>>>>>> Stashed changes
             <img src="{% static 'image/portraits/generic_avatar.jpg' %}" class="nav-avatar">
             <button type="button" class="btn">Logout</button>
         </div>
@@ -44,25 +56,25 @@
             </li>
             <li class="active hover-left-brdr">
                 <a href="/people">
-                    <i class="fa fa-address-book"></i>
+                    <i class="fa fa-address-book fa-fw"></i>
                     <span class="base-generic-lmargin">People</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
-                <a href="#">
-                    <i class="fa fa-pencil-alt"></i>
+                <a href="/quiz">
+                    <i class="fa fa-pencil-alt fa-fw"></i>
                     <span class="base-generic-lmargin">Quiz</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
                 <a href="/quizbuilder">
-                    <i class="fa fa-pencil-alt"></i>
+                    <i class="fa fa-pencil-alt fa-fw"></i>
                     <span class="base-generic-lmargin">[DEV] Quiz Builder</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
                 <a href="/attendance">
-                    <i class="fa fa-pencil-alt"></i>
+                    <img src="{% static 'image/attendance_icon.png' %}" id="attendance_icon"/>
                     <span class="base-generic-lmargin">Attendance</span>
                 </a>
             </li>
@@ -75,12 +87,20 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
 
+<<<<<<< Updated upstream
                 <div class="navbar-header">
                     <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
                         <i id="sideToggleBtn" class="fa fa-arrow-circle-left"></i>
                         <span>Toggle Sidebar</span>
                     </button>
                 </div>
+=======
+            <button type="button" id="sidebarCollapse" class="navbar-btn">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+>>>>>>> Stashed changes
 
             </div>
 
@@ -88,20 +108,25 @@
                 $(document).ready(function () {
                     $('#sidebarCollapse').on('click', function () {
                         $('#sidebar').toggleClass('active');
+<<<<<<< Updated upstream
                         $('#sideToggleBtn').toggleClass('fa-arrow-circle-left fa-arrow-circle-right');
+=======
+                        $(this).toggleClass('active');
+>>>>>>> Stashed changes
                     });
                 });
             </script>
 
         </nav>
+        <hr>
 
-        <div class="wrapper">
+{% block content %}
+{% endblock %}
 
-            {% block content %}
-            {% endblock %}
-
-        </div>
     </div>
+
 </div>
+
 </body>
+
 </html>
