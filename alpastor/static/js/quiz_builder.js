@@ -351,9 +351,9 @@ let multipleChoiceTemplate =
         "<div class='card question'>" +
             "<span class='question-label'>Question Content</span>" +
             "<div class='form-error-msg'></div>" +
-            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
-            "<span class='question-label'>Explanation</span>" +
-            "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+            "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
+            "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
             "<span class='question-label'>Randomize Options</span>" +
             "<input type='checkbox' name='randomize' id='id_randomize' '{3}'>" +
             "<input type='hidden' name='type' value='1' id='id_type'>" +
@@ -437,9 +437,9 @@ function addEssayQuestion(existingQuestion) {
         "<div class='question-wrapper essay-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
-                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
-                "<span class='question-label'>Explanation</span>" +
-                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+                "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
+                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
                 "<input type='hidden' name='type' value='0' id='id_type'>" +
                 "<button class='btn btn-danger question-delete' onclick='deleteQuestion(\"question{0}\");'>Delete Question</button>" +
             "</div>" +
@@ -468,9 +468,9 @@ function addNumericScaleQuestion(existingQuestion) {
         "<div class='question-wrapper numeric-scale-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
-                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}'>" +
-                "<span class='question-label'>Explanation</span>" +
-                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}'>" +
+                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+                "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
+                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
                 "<input type='hidden' name='type' value='3' id='id_type'>" +
                 "<div class='row'>" +
                     "<div class='col-sm-3 col-md-3 col-lg-3>'" +
