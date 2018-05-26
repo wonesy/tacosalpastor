@@ -40,12 +40,12 @@ urlpatterns = [
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
-    path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
+    path('quiz/quiz_builder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
     path('quizbuilder/savenewquiz/', quiz_views.SaveNewQuiz.as_view(), name='savenewquiz'),
     path('quizbuilder/existingquestion/', quiz_views.AddExistingQuestionView.as_view(), name='existingquestion'),
     path('admin/', admin.site.urls),
-    path('quiz/', views.quizHomePage, name='quiz_home_page'),
-    path('quiz/edit', views.EditQuizPage.as_view(), name='editquiz'),
+    path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
+    path('quiz/edit', quiz_views.EditQuizPage.as_view(), name='editquiz'),
    # path('quiz/', views.SearchCourse, name='SearchCourse'),
 ]
 

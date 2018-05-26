@@ -13,14 +13,14 @@
  <div class="header">
      <form method="get" action="">
           <input type="text" name="search" id="searchForCourse" placeholder="search for course or quiz title...">
-          <button type="button" class="btn btn-warning">Create Quiz</button>
+          <a href="quiz_builder/"><button type="button" class="btn btn-warning">Create Quiz</button></a>
      </form>
  </div>
 
 {% for quiz in quizzes %}
 
 <div class="card">
-    <h5>{{ quiz.course.title }}</h5>
+    <h5>{{ quiz.title }}</h5>
    <ol>
        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"><span class="fa fa-trash" data-toggle="tool-tip" data-placement="top" title="Delete quiz"></span></button>
        <a href="/quiz/edit"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
@@ -50,8 +50,8 @@
     </ol>
     <hr>
   <div class="container">
-    <h6><b>{{ quiz.title }}</b></h6>
-    <p>Q1: What are the 10 knowledge areas of PM?</p>
+    <h6><b>{{ quiz.course.title }}</b></h6>
+      <br>
   </div>
     <hr>
     <ul>

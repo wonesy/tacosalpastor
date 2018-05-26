@@ -12,6 +12,7 @@ from quiz.models import Quiz
 def home(request):
     return render(request, 'base_generic.html')
 
+
 # @login_required
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
@@ -87,34 +88,4 @@ def people(request):
 
     return render(request, 'people.html', people_dict)
 
-def quizHomePage(request):
-    quizzes = Quiz.objects.all()
-    return render(request, "quiz.html", {'quizzes': quizzes})
 
-#@login_required()
-class QuizBuilderView(View):
-    template_name = "quiz_builder.html"
-    model = Course
-
-    def post(self, request):
-        pass
-
-    def get(self, request):
-        return render(request, "quiz_builder.html")
-
-    def get_queryset(self):
-        return Course.objects.all()
-
-
-class EditQuizPage(View):
-    template_name = "edit_quiz.html"
-
-
-    def post(self, request):
-        pass
-
-    def get(self, request):
-        return render(request, "edit_quiz.html")
-
-    def get_queryset(self):
-        return Quiz.objects.all()

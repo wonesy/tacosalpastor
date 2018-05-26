@@ -149,6 +149,22 @@ class AddExistingQuestionView(generics.ListCreateAPIView):
         """ Save the POST data """
         serializer.save()
 
+
+class EditQuizPage(View):
+    template_name = "edit_quiz.html"
+
+    def post(self, request):
+        pass
+
+    def get(self, request):
+        return render(request, "edit_quiz.html")
+
+    def get_queryset(self):
+        return Quiz.objects.all()
+
+def quizHomePage(request):
+    quizzes = Quiz.objects.all()
+    return render(request, "quiz.html", {'quizzes': quizzes})
 """
 class SearchCourse:
 
