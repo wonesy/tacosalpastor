@@ -1,44 +1,42 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
-from django.contrib.auth.models import User
-from django.views.generic import ListView, View
-from .models import Student, Course, Attendance, Schedule
+from django.views.generic import ListView
+from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
-from quiz.models import Quiz
-
+from .serializers import AttendanceSerializer
+from rest_framework import generics
+from rest_framework.response import Response
 
 
 def home(request):
     return render(request, 'base_generic.html')
 
-
 # @login_required
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
 
-    def get(self, request):
+    def get(self, request, **kwargs):
         user_instance = request.user
 
         if user_instance.is_superuser:
-            course_list = Attendance.objects.all()
+            course_list = Course.objects.all().order_by(
+                'title').values_list('title', flat=True).distinct()
 
         elif user_instance.is_staff:
-            course_list = Attendance.objects.filter(schedule_id__course_id__professor_id__user_id=user_instance)
+            course_list = Course.objects.filter(professor_id__user_id=user_instance).order_by(
+                'title').values_list('title', flat=True).distinct()
 
         else:
-            course_list = Attendance.objects.filter(student_id__user_id=user_instance)
+            course_list = StudentCourse.objects.filter(student_id__user_id=user_instance).order_by(
+                'course_id__title').values_list('course_id__title', flat=True).distinct()
 
-        course_list = course_list.order_by('schedule_id__course_id__title')
-        course_list = course_list.values_list('schedule_id__course_id__title', flat=True).distinct()
         return render(request, self.template_name, {'course_list': course_list})
-
 
 class ScheduleView(ListView):
     template_name = 'epita/schedule_list.html'
 
-    def get(self, request):
-        course_instance = request.GET.get('course_name', '')
+    def get(self, request, **kwargs):
+        course_instance = request.GET.get('course_name', )
         schedule_list = Schedule.objects.filter(course_id__title=course_instance)
         return render(request, self.template_name, {'schedule_list': schedule_list})
 
@@ -47,30 +45,41 @@ class AttendanceView(ListView):
     form_class = AttendanceForm
 
     def get(self, request, *args, **kwargs):
-        schedule_instance = request.GET.get('schedule_id', '')
+        schedule_instance = request.GET.get('schedule_id', )
         user_instance = request.user
 
+        # Error immediately if no such schedule_id exists
+        _ = get_object_or_404(Schedule, pk=schedule_instance)
+
         if user_instance.is_staff or user_instance.is_superuser:
+            self.template_name = 'epita/attendance_prof.html'
             attendance_objects = Attendance.objects.filter(schedule_id=schedule_instance).order_by(
                 'student_id__user__first_name')
+            print(attendance_objects)
             form_list = []
             for i in attendance_objects:
                 form = self.form_class(instance=i)
                 form_list.append(form)
             form = form_list
 
+
         else:
             self.template_name = 'epita/attendance_student.html'
-            attendance_instance = Attendance.objects.filter(student_id__user_id=user_instance).filter(
-                schedule_id=schedule_instance)
-            form = self.form_class(instance=attendance_instance[0])
+            attendance_instance, created = Attendance.objects.get_or_create(
+                student_id=Student.objects.get(user_id=user_instance.id),
+                defaults = {
+                    'schedule_id': Schedule.objects.get(id=schedule_instance),
+                }
+            )
+
+            form = self.form_class(instance=attendance_instance)
 
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
         form = self.form_class(request.POST, request.FILES, instance=instance)
-        schedule_instance = request.GET.get('schedule_id', '')
+        schedule_instance = request.GET.get('schedule_id', )
         if form.is_valid():
             form.save()
             file = form.cleaned_data['file_upload']
@@ -88,4 +97,25 @@ def people(request):
 
     return render(request, 'people.html', people_dict)
 
+class GetStudentAttendanceData(generics.ListCreateAPIView):
+    serializer_class = AttendanceSerializer
+    queryset = Attendance.objects.all()
 
+    def get(self, request, **kwargs):
+        attendance = self.get_queryset()
+        serializers = AttendanceSerializer(attendance, many=True)
+        return Response(serializers.data)
+
+    def get_queryset(self):
+        schedule_filter = self.request.query_params.get('schedule_id', )
+
+        if schedule_filter == None:
+            return None
+
+        queryset = Attendance.objects.filter(schedule_id=schedule_filter)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        """ Save the POST data """
+        serializer.save()

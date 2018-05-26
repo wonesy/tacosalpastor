@@ -259,3 +259,13 @@ class Attendance(models.Model):
 
     def __str__(self):
         return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status), str(self.schedule_id), self.file_upload, self.upload_time)
+
+@receiver(post_save, sender=Schedule)
+def create_attendance_instances(sender, instance, created, **kwargs):
+    if created:
+        student_courses = StudentCourse.objects.filter(course_id=instance.course_id).select_related('student_id')
+        for sc in student_courses:
+            Attendance.objects.create(
+                student_id=sc.student_id,
+                schedule_id=instance,
+            )

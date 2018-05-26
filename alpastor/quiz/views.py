@@ -123,7 +123,7 @@ class AddExistingQuestionView(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
     queryset = MultipleChoiceOption.objects.all()
 
-    def get(self, request):
+    def get(self, request, **kwargs):
         questions = self.get_queryset()
         serializers = QuestionSerializer(questions, many=True)
         return Response(serializers.data)

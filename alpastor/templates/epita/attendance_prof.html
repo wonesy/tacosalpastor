@@ -1,0 +1,31 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+<!-- Adding additional css/js links -->
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/attendance_prof.css' %}">
+    <script src="{% static 'js/attendance.js' %}"></script>
+{% endblock %}
+
+<!-- Page content -->
+{% block content %}
+
+    <div class="attendance-container">
+
+        <!-- These divs will be filled via ajax calls -->
+        <div class="present-container">
+        </div>
+
+        <div class="excused-container">
+        </div>
+
+        <div class="absent-container">
+        </div>
+    </div>
+
+    <script>
+        window.onload = getAttendanceData()(); setInterval(getAttendanceData(), 5000);
+    </script>
+
+{% endblock %}
