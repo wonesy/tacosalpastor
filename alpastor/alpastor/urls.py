@@ -21,6 +21,9 @@ from epita import views
 from epita.views import CourseView, ScheduleView, AttendanceView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.urlpatterns import format_suffix_patterns
+
+
 
 
 # add new URL to this structure in alpastor/urls.py
@@ -39,6 +42,7 @@ urlpatterns = [
     path('login/', accounts_views.login, name='login'),
     path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
     path('quizbuilder/savenewquiz/', quiz_views.SaveNewQuiz.as_view(), name='savenewquiz'),
+    path('quizbuilder/existingquestion/', quiz_views.AddExistingQuestionView.as_view(), name='existingquestion'),
     path('admin/', admin.site.urls),
     # path('api/data/', get_data, name='api-data'),
     # path('api/chart/data/', ChartData.as_view()),
@@ -49,6 +53,8 @@ urlpatterns = [
     # url(r'^export/$', 'export_to_excel', name='export_to_excel'),
 
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

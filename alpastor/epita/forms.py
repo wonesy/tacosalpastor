@@ -1,12 +1,11 @@
 from django import forms
 from .models import Attendance
 
-
 class AttendanceForm(forms.ModelForm):
+
     class Meta:
         model = Attendance
-        fields = ['id', 'schedule_id', 'student_id', 'status', 'file_upload']
+        fields = ['id', 'status', 'schedule_id', 'student_id', 'file_upload']
         widgets = {
-            'status': forms.RadioSelect(choices=Attendance.ATTENDANCE_CHOICES),
-            'upload_time': forms.HiddenInput(),
+            'upload_time': forms.HiddenInput()
         }

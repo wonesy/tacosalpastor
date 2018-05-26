@@ -1,0 +1,55 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+    <head>
+        <link href="{% static 'css/attendance_student.css' %}" rel="stylesheet">
+        <script src="{% static 'js/attendance_student.js' %}"></script>
+    </head>
+    <body onload="showTime()">
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 box">
+                <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <p class="courseName">{{ form.instance.schedule_id.course_id }}</p>
+                    <div>
+                        <div class="courseDateDiv">
+                            <h2>Check-in</h2>
+                            <p class="courseDate">{{ form.instance.schedule_id.date }}</p>
+                            <p id="clock"></p>
+                        </div>
+                        <div>
+
+                            {#                            TODO: Fix status values and hide file upload button#}
+
+                            {#                            <button type="button"#}
+                            {#                                    class="btn btn-success btn-lg btn1">{{ form.present }}</button>#}
+                            {#                            <button type="button" class="btn btn-danger btn-lg btn1"#}
+                            {#                                    onclick="uploadFile('id_file_upload')"#}
+                            {#                                    onload="initHide('id_file_upload')">{{ form.excused }}</button>#}
+
+                            <div class="o-switch btn-group btn-group-toggle" data-toggle="buttons" role="group">
+                                <label class="btn btn-success btn-lg btn1">
+                                    <input type="radio" name="status" id="id_status_0" value="1" autocomplete="off" checked> Present
+                                </label>
+                                <label class="btn btn-danger btn-lg btn1">
+                                    <input type="radio" name="status" id="id_status_2" value="3" autocomplete="off"> Excused
+                                </label>
+                            </div>
+
+                            {{ form.student_id.as_hidden }}
+                            {{ form.schedule_id.as_hidden }}
+                            <input name="id" value="{{ form.instance.id }}" type="hidden">
+                        </div>
+                        {{ form.file_upload }}
+                        <button type="submit" class="btn btn-secondary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    </body>
+{% endblock %}
