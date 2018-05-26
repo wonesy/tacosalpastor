@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 from .models import Student, Course, Attendance, Schedule
 from .forms import AttendanceForm
 from quiz.models import Quiz
@@ -82,9 +82,6 @@ def people(request):
 
     people_dict['students'] = active_students
 
-<<<<<<< Updated upstream
-    return render(request, 'people.html', people_dict)
-=======
     return render(request, 'people.html', people_dict)
 
 def quizHomePage(request):
@@ -118,4 +115,3 @@ class EditQuizPage(View):
 
     def get_queryset(self):
         return Quiz.objects.all()
->>>>>>> Stashed changes
