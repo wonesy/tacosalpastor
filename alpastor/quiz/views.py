@@ -148,3 +148,20 @@ class AddExistingQuestionView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """ Save the POST data """
         serializer.save()
+
+"""
+class SearchCourse:
+
+    def get_queryset(self):
+        result = super(SearchCourse, self).get_queryset()
+
+        query = self.request.GET.get('q')
+        if query:
+            query_list = query.split()
+            result = result.filter(
+                reduce(operator.and_(Quiz(title_icontains=q) for q in query_list)) |
+                reduce(operator.and_(Quiz(course_icontains=q) for q in query_list))
+            )
+
+            return result
+"""

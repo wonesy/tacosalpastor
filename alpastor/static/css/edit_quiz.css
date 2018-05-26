@@ -1,0 +1,59 @@
+h3{
+    text-align: center;
+    color: #2980b9;
+}
+
+.card{
+    width:650px;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 0 auto;
+    float: none;
+}
+
+.btn-warning{
+    width: 150px;
+    border-radius: 20px;
+    margin: 0 auto;
+    float: none;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 3px;
+    border-radius: 10px;
+    rows: 5;
+}
+
+.modal-dialog input{
+    width: 100%;
+    padding: 10px;
+    margin: 3px;
+    border-radius: 10px;
+}
+
+.modal-body{
+    input:100px;
+}
+
+.modal-header{
+    background-color: darkgray;
+}
+
+.modal-footer{
+    background-color: darkgray;
+}
+
+.modal-dialog {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: auto;
+}
+@media(max-width: 768px) {
+  .modal-dialog {
+    min-height: calc(100vh - 20px);
+  }
+}
