@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+from django.http import QueryDict, HttpResponse
+from django.views.generic import ListView, View
 from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 from rest_framework.response import Response
+import json
 
 
 def home(request):
@@ -55,7 +57,6 @@ class AttendanceView(ListView):
             self.template_name = 'epita/attendance_prof.html'
             attendance_objects = Attendance.objects.filter(schedule_id=schedule_instance).order_by(
                 'student_id__user__first_name')
-            print(attendance_objects)
             form_list = []
             for i in attendance_objects:
                 form = self.form_class(instance=i)
@@ -129,3 +130,17 @@ class GetStudentAttendanceData(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """ Save the POST data """
         serializer.save()
+
+class OverrideStudentAttendanceData(View):
+    def get(self, request, **kwargs):
+        pass
+
+    def post(self, request, **kwargs):
+        schedule_id = QueryDict(request.body).get('schedule_id')
+        attendance_payload = QueryDict(request.body).get('students')
+        attendance_json = json.loads(attendance_payload)
+
+        for student in attendance_json:
+            Attendance.objects.filter(schedule_id=schedule_id, student_id=student['id']).update(status=student['status'])
+            print("Updated status: " + student['name'] + " --> " + str(student['status']))
+            return HttpResponse()

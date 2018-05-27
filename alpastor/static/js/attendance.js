@@ -1,6 +1,10 @@
 // Global array that keeps track of all students for this schedule
 let allStudents = [];
 
+// Enumeration for attendance statuses
+let StatusEnum = {"present":1, "absent":2, "excused":3};
+Object.freeze(StatusEnum);
+
 /*
 StudentAttendance
 
@@ -21,6 +25,7 @@ class StudentAttendance {
         this.id = id;
         this.name = name;
         this.status = status;
+        this.statusOverride = status;
 
         if (image === "") {
             image = "/static/image/portraits/generic_avatar.jpg";
@@ -34,11 +39,11 @@ class StudentAttendance {
      */
     getStatusString() {
         switch (this.status) {
-            case 1:
+            case StatusEnum.present:
                 return "Present";
-            case 2:
+            case StatusEnum.absent:
                 return "Absent";
-            case 3:
+            case StatusEnum.excused:
                 return "Excused";
             default:
                 return "Unknown Status";
@@ -57,11 +62,11 @@ class StudentAttendance {
      */
     static getContainer(status) {
         switch (status) {
-            case 1:
+            case StatusEnum.present:
                 return document.getElementsByClassName('present-container')[0];
-            case 2:
+            case StatusEnum.absent:
                 return document.getElementsByClassName('absent-container')[0];
-            case 3:
+            case StatusEnum.excused:
                 return document.getElementsByClassName('excused-container')[0];
             default:
                 return null;
@@ -70,16 +75,26 @@ class StudentAttendance {
 
     static getHTMLTemplate(status) {
         switch (status) {
-            case 1:
+            case StatusEnum.present:
                 return studentStatusPresentTemplate;
-            case 2:
+            case StatusEnum.absent:
                 return studentStatusAbsentTemplate;
-            case 3:
+            case StatusEnum.excused:
                 return studentStatusExcusedTemplate;
             default:
                 return null;
         }
     }
+}
+
+function findStudentById(student_id) {
+    for (let i = 0; i < allStudents.length; i++) {
+        if (allStudents[i].id === student_id) {
+            return allStudents[i];
+        }
+    }
+
+    return null;
 }
 
 /*
@@ -92,7 +107,6 @@ Params:
  */
 function populateStudentArray(data) {
     for (let i = 0; i < data.length; i++) {
-        console.log("Populate: " + data[i].name);
         student = new StudentAttendance(data[i].student_id, data[i].name, data[i].status, data[i].image);
         allStudents.push(student);
         reorganizeStudent(student, -1);
@@ -141,10 +155,12 @@ let studentStatusPresentTemplate =
             "<div class=\"card-footer\">" +
                 "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
                     "<label class=\"btn btn-present active\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\" checked> Present" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option1\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.present);' checked> Present" +
                     "</label>" +
                     "<label class=\"btn btn-absent\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\"> Absent" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option2\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.absent);'> Absent" +
                     "</label>" +
                 "</div>" +
             "</div>" +
@@ -162,10 +178,12 @@ let studentStatusAbsentTemplate =
             "<div class=\"card-footer\">" +
                 "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
                     "<label class=\"btn btn-present\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\"> Present" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option1\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.present);'> Present" +
                     "</label>" +
                     "<label class=\"btn btn-absent active\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\" checked> Absent" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option2\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.absent);' checked> Absent" +
                     "</label>" +
                 "</div>" +
             "</div>" +
@@ -183,15 +201,77 @@ let studentStatusExcusedTemplate =
             "<div class=\"card-footer\">" +
                 "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
                     "<label class=\"btn btn-present\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\"> Present" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option1\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.present);'> Present" +
                     "</label>" +
                     "<label class=\"btn btn-absent\">" +
-                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\" > Absent" +
+                        "<input type=\"radio\" name=\"options{0}\" id=\"option2\" autocomplete=\"off\"" +
+                            " onchange='markForStatusChange({0}, StatusEnum.absent);'> Absent" +
                     "</label>" +
                 "</div>" +
             "</div>" +
         "</div>" +
     "</div>";
+
+/*
+This function will mark the statusOverride field for the student, indicating that the professor has manually
+changed the status of their attendance
+
+Params:
+    student_id  - Integer of the student ID
+    status      - Integer of the status that the professor has manually changed to
+ */
+function markForStatusChange(student_id, status) {
+    student = findStudentById(student_id);
+    if (student === null) {
+        console.log("Could not find student with id {0}, will not mark for change".format(student_id));
+        return;
+    }
+
+    console.log("Marking change on student[" + student_id + "]: " + student.status + "--> " + status);
+
+    student.statusOverride = status;
+}
+
+function dispatchStatusChangesToDatabase() {
+    changedStudents = [];
+
+    allStudents.forEach(function(student) {
+        if (student.status !== student.statusOverride) {
+            tmp = new StudentAttendance(student.id, student.name, student.status, student.image);
+            tmp.status =student.statusOverride;
+            changedStudents.push(tmp);
+        }
+    });
+
+    // Return early if the array of changed students is empty
+    if (changedStudents.length === 0) {
+        return;
+    }
+
+    let baseUrl = window.location.origin + window.location.pathname + "manualoverride";
+
+    $.ajax({
+        type: "POST",
+        url: baseUrl,
+
+        data: {
+            schedule_id: parseGET()['schedule_id'],
+            students: JSON.stringify(changedStudents)
+        },
+
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            console.log("success");
+        },
+        failure: function(errMsg) {
+            console.log(errMsg);
+        }
+    });
+
+    getAttendanceData()();
+}
 
 /*
 This will only be called in the event that a change is detected in the student's status
@@ -213,7 +293,7 @@ function reorganizeStudent(student, oldStatus) {
     }
 
     let template = StudentAttendance.getHTMLTemplate(student.status);
-    console.log(template);
+
     newContainer.insertAdjacentHTML("beforeend", template.format(
         student.id,
         student.name,

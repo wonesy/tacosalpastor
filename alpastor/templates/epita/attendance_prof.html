@@ -11,7 +11,9 @@
 <!-- Page content -->
 {% block content %}
 
-    <div class="attendance-container">
+    <div class="attendance-container text-center">
+        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes
+        </button>
 
         <!-- These divs will be filled via ajax calls -->
         <div class="present-container row">
@@ -26,6 +28,12 @@
 
     <script>
         window.onload = getAttendanceData()(); setInterval(getAttendanceData(), 5000);
+
+        $("body").bind("ajaxSend", function(elm, xhr, s){
+            if (s.type === "POST") {
+                xhr.setRequestHeader('X-CSRF-Token', getCSRFTokenValue());
+            }
+        });
     </script>
 
 {% endblock %}

@@ -18,3 +18,8 @@
 .btn-absent.active{
     background: #dc3545;
 }
+
+.override-submit {
+    text-align: center;
+    margin-bottom: 10px;
+}
