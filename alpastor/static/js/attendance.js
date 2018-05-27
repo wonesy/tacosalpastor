@@ -121,14 +121,11 @@ Params:
     student - StudentAttendance class instance
  */
 function processStudentStatus(student) {
-    let existingStudent = null;
+    let existingStudent = findStudentById(student['student_id']);
 
-    // Find the matching student in the global array
-    for (let i = 0; i < allStudents.length; i++) {
-        if (allStudents[i].id === student['student_id']) {
-            existingStudent = allStudents[i];
-            break;
-        }
+    if (existingStudent === null) {
+        console.log("Processing student status, invalid student id {0}".format(student['student_id']));
+        return;
     }
 
     // Determine if any changes need to be made for this student
@@ -239,7 +236,7 @@ function dispatchStatusChangesToDatabase() {
     allStudents.forEach(function(student) {
         if (student.status !== student.statusOverride) {
             tmp = new StudentAttendance(student.id, student.name, student.status, student.image);
-            tmp.status =student.statusOverride;
+            tmp.status = student.statusOverride;
             changedStudents.push(tmp);
         }
     });
@@ -264,13 +261,14 @@ function dispatchStatusChangesToDatabase() {
         dataType: "json",
         success: function(data) {
             console.log("success");
+            for (let i = 0; i < data.length; i++) {
+                    processStudentStatus(data[i]);
+            }
         },
         failure: function(errMsg) {
             console.log(errMsg);
         }
     });
-
-    getAttendanceData()();
 }
 
 /*

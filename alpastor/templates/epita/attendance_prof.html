@@ -27,13 +27,7 @@
     </div>
 
     <script>
-        window.onload = getAttendanceData()(); setInterval(getAttendanceData(), 5000);
-
-        $("body").bind("ajaxSend", function(elm, xhr, s){
-            if (s.type === "POST") {
-                xhr.setRequestHeader('X-CSRF-Token', getCSRFTokenValue());
-            }
-        });
+        window.onload = getAttendanceData()(); setInterval(getAttendanceData(), 10000);
     </script>
 
 {% endblock %}

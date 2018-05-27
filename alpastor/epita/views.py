@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, HttpResponse
+from django.http import QueryDict
 from django.views.generic import ListView, View
 from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
@@ -143,4 +143,7 @@ class OverrideStudentAttendanceData(View):
         for student in attendance_json:
             Attendance.objects.filter(schedule_id=schedule_id, student_id=student['id']).update(status=student['status'])
             print("Updated status: " + student['name'] + " --> " + str(student['status']))
-            return HttpResponse()
+
+        response = redirect('update_attendance')
+        response['Location'] += '?schedule_id=' + schedule_id
+        return response
