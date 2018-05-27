@@ -265,7 +265,7 @@ def create_attendance_instances(sender, instance, created, **kwargs):
     if created:
         student_courses = StudentCourse.objects.filter(course_id=instance.course_id).select_related('student_id')
         for sc in student_courses:
-            Attendance.objects.create(
+            Attendance.objects.get_or_create(
                 student_id=sc.student_id,
                 schedule_id=instance,
             )

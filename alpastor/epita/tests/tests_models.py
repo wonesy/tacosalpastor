@@ -100,8 +100,9 @@ class AttendanceTest(TestCase):
         schedule2 = Schedule.objects.create(course_id=course2, date=datetime.date.today(), start_time="18:30",
                                             end_time="20:30", room_id=room1)
 
-        Attendance.objects.create(student_id=student0, schedule_id=schedule0, status=1)
-        Attendance.objects.create(student_id=student1, schedule_id=schedule1, status=2)
+        # These are now created automatically whenever a schedule is created
+        # Attendance.objects.create(student_id=student0, schedule_id=schedule0, status=1)
+        # Attendance.objects.create(student_id=student1, schedule_id=schedule1, status=2)
 
         for i in range(20):
             Attendance.objects.create(student_id=student2, schedule_id=schedule2, status=3)
@@ -121,10 +122,22 @@ class AttendanceTest(TestCase):
         self.assertEqual(course1_schedules, 12)
 
     def test_models_attendance_by_schedule(self):
-        schedule0_attendance = Attendance.objects.filter(schedule_id__course_id__title__exact="Sample Course 1").count()
-        schedule1_attendance = Attendance.objects.filter(schedule_id__course_id__title__exact="Sample Course 2").count()
-        self.assertEqual(schedule0_attendance, 2)
-        self.assertEqual(schedule1_attendance, 20)
+        course0 = Course.objects.get(title__exact="Sample Course 1")
+        course1 = Course.objects.get(title__exact="Sample Course 2")
+
+        schedule0_attendance = Attendance.objects.filter(schedule_id__course_id=course0)
+        schedule1_attendance = Attendance.objects.filter(schedule_id__course_id=course1)
+
+        '''
+        We expect an attendance record for each student enrolled in the course, for each schedule instance
+        
+        numAttendance = (numStudentsEnrolled * numScheduleInstances)
+        '''
+        num_students_enrolled = StudentCourse.objects.filter(course_id=course0).count()
+        num_sched_instances = Schedule.objects.filter(course_id=course0).count()
+
+        self.assertEqual(schedule0_attendance.count(), (num_students_enrolled * num_sched_instances))
+        self.assertEqual(schedule1_attendance.count(), 20)
 
     def test_course_view_status_code_and_template(self):
         url = reverse('course_list')

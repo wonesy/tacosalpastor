@@ -46,12 +46,12 @@ class AttendanceView(ListView):
 
     def get(self, request, *args, **kwargs):
         schedule_instance = request.GET.get('schedule_id', )
-        user_instance = request.user
+        logged_in_user = request.user
 
         # Error immediately if no such schedule_id exists
         _ = get_object_or_404(Schedule, pk=schedule_instance)
 
-        if user_instance.is_staff or user_instance.is_superuser:
+        if logged_in_user.is_staff or logged_in_user.is_superuser:
             self.template_name = 'epita/attendance_prof.html'
             attendance_objects = Attendance.objects.filter(schedule_id=schedule_instance).order_by(
                 'student_id__user__first_name')
@@ -64,12 +64,11 @@ class AttendanceView(ListView):
 
 
         else:
+            student_instance = Student.objects.get(user_id=logged_in_user.id)
             self.template_name = 'epita/attendance_student.html'
             attendance_instance, created = Attendance.objects.get_or_create(
-                student_id=Student.objects.get(user_id=user_instance.id),
-                defaults = {
-                    'schedule_id': Schedule.objects.get(id=schedule_instance),
-                }
+                student_id=student_instance,
+                schedule_id=schedule_instance
             )
 
             form = self.form_class(instance=attendance_instance)
