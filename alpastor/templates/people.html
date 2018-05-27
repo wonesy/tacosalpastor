@@ -10,7 +10,16 @@
             </form>
 
 
-            <button id="sort" class="btnalpha">Alphabetical</button>
+            <div class="dropdownn" style="float:right">
+                <button class="dropbtn">Sort</button>
+                <div class="dropdownn-content">
+                    <button id="sort">By name</button>
+                    <button id="numBnt">By year</button>
+                </div>
+            </div>
+
+            {#            <button id="sort" class="btnalpha">Alphabetical</button>#}
+            {#            <button id="numBnt">Numerical</button>#}
 
 
             <br>
@@ -18,73 +27,74 @@
             <button class="accordion">Filter</button>
 
 
-    <div class="panel">
+            <div class="panel">
 
-        <br>
-        <label class="container">ME
-            <input type="checkbox" id="ME" value="ME">
-            <span class="checkmark"></span>
-        </label>
+                <br>
+                <label class="container">ME
+                    <input type="checkbox" id="ME" value="ME">
+                    <span class="checkmark"></span>
+                </label>
 
 
-        <label class="container">Msc
-            <input type="checkbox" id="MSc" value="Msc">
-            <span class="checkmark"></span>
-        </label>
+                <label class="container">Msc
+                    <input type="checkbox" id="MSc" value="Msc">
+                    <span class="checkmark"></span>
+                </label>
 
-    </div>
+            </div>
 
         </div>
 
 
         <div class="row wrapper stdfilter">
-        {% for student in students %}
-            <div class="secondDiv" data-category="{{ student.program }}">
+            {% for student in students %}
+                <div class="secondDiv" data-category="{{ student.program }}">
 
-                <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv newDiv">
-                    <div class="people-top">
-                        <div class="people-img">
-                            <!-- Show student image, if exists, otherwise show default image -->
-                            {% if student.photo_location != "" %}
-                                {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                    <img class="center-block" src="{% static image_static %}"
-                                         alt={{ student.first_name }}>
+                    <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv newDiv">
+                        <div class="people-top">
+                            <div class="people-img">
+                                <!-- Show student image, if exists, otherwise show default image -->
+                                {% if student.photo_location != "" %}
+                                    {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                        <img class="center-block" src="{% static image_static %}"
+                                             alt={{ student.first_name }}>
+                                    {% endwith %}
+                                {% else %}
+                                    <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
+                                         class="people-img">
+                                {% endif %}
+                            </div>
+
+                            <div class="people-names" id="demo">
+
+                                <input hidden
+                                       value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.classof }} {{ student.user.email }}">
+                                <div class="text-block"> {{ student.user.first_name }} {{ student.user.last_name }}</div>
+
+                                {{ student.country }} <br>
+                                {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                                    <img src="{% static image_static %}" alt={{ student.first_name }}>
                                 {% endwith %}
-                            {% else %}
-                                <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
-                                     class="people-img">
-                            {% endif %}
+                            </div>
                         </div>
+                        <div class="people-bot">
 
-                        <div class="people-names" id="demo">
+                            <div class="people-info">
+                                {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
+                                <!-- <input hidden value="{{ student.program }} {{ student.specialization }}"> -->
+                                {{ student.program }}: {{ student.specialization }}<br>
+                                <div class="text-block2"> [{{ student.classof }}]</div>
 
-                            <input hidden
-                                   value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.classof }} {{ student.user.email }}">
-                            <div class="text-block"> {{ student.user.first_name }} </div>
-                            {{ student.user.last_name }} <br>
-                            {{ student.country }} <br>
-                            {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                                <img src="{% static image_static %}" alt={{ student.first_name }}>
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <div class="people-bot">
-
-                        <div class="people-info">
-                            {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
-                            <!-- <input hidden value="{{ student.program }} {{ student.specialization }}"> -->
-                            {{ student.program }}: {{ student.specialization }}<br>[{{ student.classof }}]
-
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
 
-        {% endfor %}
+            {% endfor %}
 
 
-    </div>
+        </div>
 
     </div>
 
@@ -124,37 +134,6 @@
 
 
 
-        // filter by option 1
-        {##}
-        {#$("#ME").on("click", function () {#}
-        {#    console.log("ME");#}
-        {#    var val = $(this).val();#}
-        {#    if (val.length) {#}
-        {#        $(".secondDiv .newDiv").hide().filter(function () {#}
-        {#            return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;#}
-        {#        }).show();#}
-        {#    }#}
-        {#    else {#}
-        {#        $(".secondDiv .newDiv").show();#}
-        {#    }#}
-        {#})
-        ;
-        #}
-        {##}
-        {#$("#MSc").on("click", function () {#}
-        {#    console.log("MSC");#}
-        {#    var val = $(this).val();#}
-        {#    if (val.length) {#}
-        {#        $(".secondDiv .newDiv").hide().filter(function () {#}
-        {#            return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;#}
-        {#        }).show();#}
-        {#    }#}
-        {#    else {#}
-        {#        $(".secondDiv .newDiv").show();#}
-        {#    }#}
-        {#})
-        ;
-        #}
 
 
 
@@ -191,6 +170,14 @@
             $(".row").html(alpha);
 
         });
+
+        $('#numBnt').on('click', function () {
+            var numericallyOrderedDivs = $divs.sort(function (a, b) {
+                return $(a).find(".text-block2").text() > $(b).find(".text-block2").text();
+            });
+            $(".row").html(numericallyOrderedDivs);
+        });
+
 
     </script>
 {% endblock %}
