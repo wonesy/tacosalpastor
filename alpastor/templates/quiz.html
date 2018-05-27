@@ -1,0 +1,85 @@
+
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/quiz.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+ <div class="header">
+     <form method="get" action="">
+          <input type="text" name="search" id="searchForCourse" placeholder="search for course or quiz title...">
+          <a href="quiz_builder/"><button type="button" class="btn btn-warning">Create Quiz</button></a>
+     </form>
+ </div>
+
+{% for quiz in quizzes %}
+
+<div class="card">
+    <h5>{{ quiz.title }}</h5>
+   <ol>
+       <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"><span class="fa fa-trash" data-toggle="tool-tip" data-placement="top" title="Delete quiz"></span></button>
+       <a href="/quiz/edit"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
+       <button type="button" class="btn btn-success" onclick="myFunction()" data-toggle="tool-tip" data-placement="top" title="Open quiz"><span class="fa fa-lock" id="openCloseSpan"></span></button>
+
+
+  <div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><img src="{% static 'image/cancel.png' %}"></button>
+            <h4 class="modal-title"></h4>
+          </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete {{ quiz.course.title }} ??</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Yes, I am sure</button>
+        </div>
+        </div>
+    </div>
+  </div>
+       <div id="snackbar">{{ quiz.course.title }} Quiz is open. It ends in 59 minutes</div>
+    </ol>
+    <hr>
+  <div class="container">
+    <h6><b>{{ quiz.course.title }}</b></h6>
+      <br>
+  </div>
+    <hr>
+    <ul>
+      <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz date"><i class="fa fa-calendar fa-fw"></i> {{quiz.created_on }}</li></a>
+      <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz duration"><img src="{% static 'image/old-hourglass-.png' %}"> 60 min</li></a>
+
+    </ul>
+
+     <script>
+      //tooltip
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+      //snackbar
+            function myFunction() {
+    // Get the snackbar DIV
+    var x = document.getElementById("snackbar");
+
+    // Add the "show" class to DIV
+    x.className = "show";
+
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+     </script>
+
+
+
+</div>
+{% endfor %}
+{% endblock %}

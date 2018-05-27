@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+
     <title>EPITA International</title>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -30,17 +31,23 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css' %}">
+    <script src="{% static 'js/utils.js' %}"></script>
+    <link rel="icon" type="image/png" href="{% static 'image/favicon.ico' %}" />
+    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="{% static 'image/favicon.ico' %}" /><![endif]-->
+
     {% block additional_links %}
     {% endblock %}
 </head>
 
 <body>
+
 
 <div class="wrapper">
 
@@ -48,7 +55,9 @@
     <nav id="sidebar">
         <div class="active sidebar-header">
             <img src="{% static 'image/portraits/generic_avatar.jpg' %}" class="nav-avatar">
-            <button type="button" class="btn">Logout</button>
+            <a href="/login">
+                <button type="button" class="btn">Logout</button>
+            </a>
         </div>
 
         <ul class="list-unstyled components">
@@ -60,13 +69,13 @@
             </li>
             <li class="active hover-left-brdr">
                 <a href="/people">
-                    <i class="fa fa-address-book"></i>
+                    <i class="fa fa-address-book fa-fw"></i>
                     <span class="base-generic-lmargin">People</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
-                <a href="#">
-                    <i class="fa fa-pencil-alt"></i>
+                <a href="/quiz">
+                    <i class="fa fa-pencil-alt fa-fw"></i>
                     <span class="base-generic-lmargin">Quiz</span>
                 </a>
             </li>
@@ -78,16 +87,16 @@
             </li>
             <li class="active hover-left-brdr">
                 <a href="/attendance">
-                    <i class="fa fa-pencil-alt"></i>
+                    <img src="{% static 'image/attendance_icon.png' %}" id="attendance_icon"/>
                     <span class="base-generic-lmargin">Attendance</span>
                 </a>
             </li>
-            {#            <li class="active hover-left-brdr">#}
-            {#                <a href="/attendance-student">#}
-            {#                    <i class="fa fa-pencil-alt"></i>#}
-            {#                    <span class="base-generic-lmargin">Attendance-Student</span>#}
-            {#                </a>#}
-            {#            </li>#}
+{#            <li class="active hover-left-brdr">#}
+{#                <a href="/attendance-student">#}
+{#                    <i class="fa fa-pencil-alt"></i>#}
+{#                    <span class="base-generic-lmargin">Attendance-Student</span>#}
+{#                </a>#}
+{#            </li>#}
         </ul>
     </nav>
 
@@ -97,40 +106,37 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
 
-                <div class="navbar-header">
-                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-                        <i id="sideToggleBtn" class="fa fa-arrow-circle-left"></i>
-                        <span>Toggle Sidebar</span>
-                    </button>
-                </div>
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#">A</a></li>
-                        <li><a href="#">B</a></li>
-                        <li><a href="#">C</a></li>
-                        <li><a href="#">D</a></li>
-                    </ul>
-                </div>
 
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        $('#sidebarCollapse').on('click', function () {
-                            $('#sidebar').toggleClass('active');
-                            $('#sideToggleBtn').toggleClass('fa-arrow-circle-left fa-arrow-circle-right');
-                        });
+            <button type="button" id="sidebarCollapse" class="navbar-btn">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            </div>
+
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#sidebarCollapse').on('click', function () {
+                        $('#sidebar').toggleClass('active');
+
+                        $(this).toggleClass('active');
                     });
-                </script>
+                });
+            </script>
 
         </nav>
+        <hr>
 
-        <div class="wrapper">
-
-            {% block content %}
-            {% endblock %}
+{% block content %}
+{% endblock %}
 
         </div>
     </div>
+
 </div>
+
 </body>
+
 </html>

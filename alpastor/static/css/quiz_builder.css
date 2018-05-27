@@ -17,10 +17,19 @@
     margin: auto;
 }
 
+.question-label {
+    margin-top: 5px;
+}
+
 .question-wrapper {
     background: #17a2b8;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.question-delete {
+    margin-top: 15px;
 }
 
 .question {
@@ -69,6 +78,7 @@
     border-bottom-left-radius: 10px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    background: #cccccc;
 }
 
 .mc-opt-delete-sidebar button:hover {
@@ -79,6 +89,19 @@
 .mc-opt-content {
     background: #17a2b8;
     padding: 5px;
+}
+
+.essay-question {
+    background: #5E5694;
+}
+
+.numeric-scale-question {
+    background: #2ecc71;
+}
+
+.scale-value {
+    padding: 0;
+    min-width: 80px;
 }
 
 .mc-opt-content input {
@@ -118,3 +141,103 @@
     color: #2ecc71;
 }
 
+.form-error-msg {
+    color: red;
+}
+
+/******************************************************/
+/************          MODAL           ****************/
+/******************************************************/
+
+.modal-body {
+    margin: 10px;
+}
+
+.modal-content {
+    min-width: 760px;
+    min-height: 450px;
+}
+
+.blank-questions-wrapper {
+    float: left;
+    padding: 0;
+}
+
+#dropdownMenuButton {
+    width: 100px;
+}
+
+.existing-questions-wrapper {
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+
+.results-wrapper {
+    margin-left: 0;
+}
+
+.search-question-wrapper {
+    margin: 0;
+    width: 100%;
+}
+
+.search {
+    padding: 0;
+    /*margin-left: 5px;*/
+}
+
+.dividing-bar {
+    width: 5px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background: black;
+    margin-left: 0;
+    margin-right: 15px;
+}
+
+.text-input {
+    padding-left: 10px;
+}
+
+.dropdown {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.q-option {
+    margin-left: 15px;
+}
+
+.is-correct {
+    color: green;
+}
+
+.q-result {
+    color: black;
+    background: #fafafa;
+    border: none;
+    border-radius: 0;
+    padding: 10px 15px;
+    margin: 0;
+    margin-top: 5px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+    content: none;
+}
+
+.q-type {
+    float: left;
+    color: #000000;
+    margin-right: 10px;
+}
+
+.collapse.show {
+  visibility: visible;
+}

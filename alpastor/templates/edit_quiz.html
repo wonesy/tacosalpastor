@@ -1,0 +1,56 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block additional_links %}
+<link rel="stylesheet" href="{% static 'css/edit_quiz.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h3>Advanced Java</h3>
+<div class="card">
+    <h5><b>Question 1</b></h5>
+    <hr>
+    Which component is used to compile, debug and execute java program?
+    <br>
+    <br>
+    <form id="questionOne" class="form-group" method="post" enctype="multipart/form-data">
+        <input type="radio" id="a" name="status" value="1" onclick="disableButton()"> JVM<br>
+        <input type="radio" id="b" name="status" value="2" onclick="disableButton()"> JDK<br>
+        <input type="radio" id="c" name="status" value="3" onclick="disableButton()"> JIT<br>
+        <input type="radio" id="d" name="status" value="4" onclick="disableButton()"> JRE</input><br>
+    </form>
+    <hr>
+    <button class="btn btn-warning" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil-alt fa-fw"></i> Edit</button>
+    <div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><img src="{% static 'image/cancel.png' %}"></button>
+           <!-- <h4 class="modal-title">Question 1</h4>-->
+          </div>
+        <div class="modal-body">
+            <textarea type="text">Which component is used to compile, debug and execute java program?</textarea>
+            <br>
+            <br>
+            <input type="text" value="JVM">
+            <input type="text" value="JDK">
+            <input type="text" value="JIT">
+            <input type="text" value="JRE">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Save Changes</button>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% for quiz in quizzes %}
+
+
+{% endfor %}
+{% endblock %}

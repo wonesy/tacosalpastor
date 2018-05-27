@@ -188,9 +188,9 @@ class Room(models.Model):
         size = number of people/students that the room can accommodate
     """
     building = models.CharField(max_length=63)
-    has_whiteboard = models.BooleanField()
-    has_chalkboard = models.BooleanField()
-    has_projector = models.BooleanField()
+    has_whiteboard = models.BooleanField(blank=True, default=False)
+    has_chalkboard = models.BooleanField(blank=True, default=False)
+    has_projector = models.BooleanField(blank=True, default=False)
     size = models.IntegerField()
 
     def __repr__(self):
@@ -254,11 +254,18 @@ class Attendance(models.Model):
     upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):
-        return "Attendance(student_id={}, schedule_id={}, status={}, file_upload={}, upload_time={})".format(
-            self.student_id,
+        return "Attendance(student_id={}, schedule_id={}, status={}, file_upload={}, upload_time={})".format(self.student_id,
             self.schedule_id, self.status, self.file_upload, self.upload_time)
 
     def __str__(self):
-        return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status),
-                                                               str(self.schedule_id), self.file_upload,
-                                                               self.upload_time)
+        return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status), str(self.schedule_id), self.file_upload, self.upload_time)
+
+@receiver(post_save, sender=Schedule)
+def create_attendance_instances(sender, instance, created, **kwargs):
+    if created:
+        student_courses = StudentCourse.objects.filter(course_id=instance.course_id).select_related('student_id')
+        for sc in student_courses:
+            Attendance.objects.get_or_create(
+                student_id=sc.student_id,
+                schedule_id=instance,
+            )
