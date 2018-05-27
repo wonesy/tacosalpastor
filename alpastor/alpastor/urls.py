@@ -36,7 +36,7 @@ urlpatterns = [
     path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_list'),
 
     # Student view Attendance
-    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_student'),
+    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance'),
     path('attendance/course/schedule/update', GetStudentAttendanceData.as_view(), name='update_attendance'),
     path('attendance/course/schedule/manualoverride', OverrideStudentAttendanceData.as_view(), name='override_attendance'),
 

@@ -45,22 +45,25 @@ class AttendanceTest(TestCase):
                                                                      languages="English", photo_location="")
 
         User.objects.create(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
-                            password="abc", email="epitaprof@epita.fr", is_staff=True, is_active=True, is_superuser=False)
+                            email="epitaprof@epita.fr", is_staff=True, is_active=True, is_superuser=False)
 
-        Professor.objects.filter(user__email="epitaprof@epita.fr").update(phone="0987654321")
+        u = User.objects.get(email="epitaprof@epita.fr")
+        u.set_password("abc")
+        u.save()
 
-        professor1 = Professor.objects.filter(user__email="epitaprof@epita.fr")[0]
+        self.professor1 = Professor.objects.filter(user__email="epitaprof@epita.fr")[0]
+
         student0 = Student.objects.filter(user__email="epita0@epita.fr")[0]
         student1 = Student.objects.filter(user__email="epita1@epita.fr")[0]
         student2 = Student.objects.filter(user__email="epita2@epita.fr")[0]
 
-        course0 = Course.objects.create(professor_id=professor1, title="Sample Course 0", description="Sample Description",
+        course0 = Course.objects.create(professor_id=self.professor1, title="Sample Course 0", description="Sample Description",
                                    semester="Spring 2018", module="Advanced Technology", credits=3)
 
-        course1 = Course.objects.create(professor_id=professor1, title="Sample Course 1", description="Sample Description",
+        course1 = Course.objects.create(professor_id=self.professor1, title="Sample Course 1", description="Sample Description",
                                    semester="Spring 2018", module="Advanced Technology", credits=3)
 
-        course2 = Course.objects.create(professor_id=professor1, title="Sample Course 2", description="Sample Description",
+        course2 = Course.objects.create(professor_id=self.professor1, title="Sample Course 2", description="Sample Description",
                                    semester="Spring 2018", module="Java", credits=3)
 
         room0 = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
@@ -91,7 +94,7 @@ class AttendanceTest(TestCase):
             Schedule.objects.create(course_id=course1, date=datetime.date.today()+datetime.timedelta(days=i),
                                     start_time="10:00", end_time="11:00", room_id=room1)
 
-        schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00",
+        self.schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00",
                                             end_time="13:00", room_id=room0)
 
         schedule1 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="14:00",
@@ -149,6 +152,7 @@ class AttendanceTest(TestCase):
         self.response = self.client.get(url, {'course_list': course_list})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
+        self.client.logout()
 
     def test_schedule_view_status_code_and_template(self):
         url = reverse('schedule_list')
@@ -160,24 +164,17 @@ class AttendanceTest(TestCase):
     def test_attendance_view_as_student_status_code_and_template(self):
         student_instance = User.objects.get(first_name="first0")
         self.client.login(email=student_instance.email, password="abc")
-        url = reverse('attendance_student')
-        self.response = self.client.get(url, {'schedule_id': 31})
+        url = reverse('attendance')
+        self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/attendance_student.html')
+        self.client.logout()
 
-    # def test_attendance_view_as_professor_status_code_and_template(self):
-    #     url = reverse('attendance_list')
-    #     schedule_id = self.client.get('schedule_id', '')
-    #     student_instance = User.objects.get(first_name="first0")
-    #     Attendance.objects.filter(student_id__user_id=student_instance)
-    #     self.client.login(email=student_instance.email, password="abc")
-    #     self.response = self.client.get(url, {'schedule_id': 0})
-    #     self.assertEqual(self.response.status_code, 200)
-    #     self.assertTemplateUsed(self.response, 'epita/attendance_list.html')
-
-    # def test_schedule_view_contains_courses(self):
-    #     self.assertIsNot(self, Schedule.objects.all(), [])
-    #
-    # def test_attendance_view_contains_students(self):
-    #     self.assertIsNotNone(Attendance.objects.get(id=1))
+    def test_attendance_view_as_professor_status_code_and_template(self):
+        res = self.client.login(email=self.professor1.user.email, password="abc")
+        url = reverse('attendance')
+        self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/attendance_prof.html')
+        self.client.logout()
 

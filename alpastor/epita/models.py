@@ -188,9 +188,9 @@ class Room(models.Model):
         size = number of people/students that the room can accommodate
     """
     building = models.CharField(max_length=63)
-    has_whiteboard = models.BooleanField()
-    has_chalkboard = models.BooleanField()
-    has_projector = models.BooleanField()
+    has_whiteboard = models.BooleanField(blank=True, default=False)
+    has_chalkboard = models.BooleanField(blank=True, default=False)
+    has_projector = models.BooleanField(blank=True, default=False)
     size = models.IntegerField()
 
     def __repr__(self):

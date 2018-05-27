@@ -135,7 +135,7 @@ class OverrideStudentAttendanceData(View):
     def get(self, request, **kwargs):
         pass
 
-    def post(self, request, **kwargs):
+    def post(self, request):
         schedule_id = QueryDict(request.body).get('schedule_id')
         attendance_payload = QueryDict(request.body).get('students')
         attendance_json = json.loads(attendance_payload)
