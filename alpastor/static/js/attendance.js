@@ -25,7 +25,7 @@ class StudentAttendance {
         this.id = id;
         this.name = name;
         this.status = status;
-        this.statusOverride = status;
+        this.statusOverride = null;
 
         if (image === "") {
             image = "/static/image/portraits/generic_avatar.jpg";
@@ -234,9 +234,14 @@ function dispatchStatusChangesToDatabase() {
     changedStudents = [];
 
     allStudents.forEach(function(student) {
+        if (student.statusOverride === null) {
+            return;
+        }
+
         if (student.status !== student.statusOverride) {
             tmp = new StudentAttendance(student.id, student.name, student.status, student.image);
             tmp.status = student.statusOverride;
+            tmp.statusOverride = null;
             changedStudents.push(tmp);
         }
     });
