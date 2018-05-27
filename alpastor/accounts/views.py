@@ -11,7 +11,7 @@ def login(request):
         form = LoginForm(request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('home')
+            return redirect(request.GET.get('next', 'home'))
     else:
         form = LoginForm()
 

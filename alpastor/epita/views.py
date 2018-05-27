@@ -9,11 +9,10 @@ from rest_framework import generics
 from rest_framework.response import Response
 import json
 
-
+@login_required()
 def home(request):
     return render(request, 'base_generic.html')
 
-# @login_required
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
 
@@ -85,7 +84,7 @@ class AttendanceView(ListView):
         args = {'form': form, 'file': file}
         return render(request, self.template_name, args)
 
-
+@login_required()
 def people(request):
 
     people_dict = {}

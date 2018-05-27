@@ -22,33 +22,31 @@ from epita.views import CourseView, ScheduleView, AttendanceView, GetStudentAtte
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
-
-
-
+from django.contrib.auth.decorators import login_required
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
 
     # Professor/superuser view Attendance
-    path('attendance/', CourseView.as_view(), name='course_list'),
-    path('attendance/course/', ScheduleView.as_view(), name='schedule_list'),
-    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance_list'),
+    path('attendance/', login_required(CourseView.as_view()), name='course_list'),
+    path('attendance/course/', login_required(ScheduleView.as_view()), name='schedule_list'),
+    path('attendance/course/schedule/', login_required(AttendanceView.as_view()), name='attendance_list'),
 
     # Student view Attendance
-    path('attendance/course/schedule/', AttendanceView.as_view(), name='attendance'),
-    path('attendance/course/schedule/update', GetStudentAttendanceData.as_view(), name='update_attendance'),
-    path('attendance/course/schedule/manualoverride', OverrideStudentAttendanceData.as_view(), name='override_attendance'),
+    path('attendance/course/schedule/', login_required(AttendanceView.as_view()), name='attendance'),
+    path('attendance/course/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
+    path('attendance/course/schedule/manualoverride', login_required(OverrideStudentAttendanceData.as_view()), name='override_attendance'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
 
     # Quiz paths
-    path('quiz/quiz_builder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
-    path('quiz/quizbuilder/savenewquiz/', quiz_views.SaveNewQuiz.as_view(), name='savenewquiz'),
-    path('quiz/quizbuilder/existingquestion/', quiz_views.AddExistingQuestionView.as_view(), name='existingquestion'),
+    path('quiz/quiz_builder/', login_required(quiz_views.QuizBuilderView.as_view()), name='quizbuilder'),
+    path('quiz/quizbuilder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
+    path('quiz/quizbuilder/existingquestion/', login_required(quiz_views.AddExistingQuestionView.as_view()), name='existingquestion'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
-    path('quiz/edit', quiz_views.EditQuizPage.as_view(), name='editquiz'),
+    path('quiz/edit', login_required(quiz_views.EditQuizPage.as_view()), name='editquiz'),
 
 path('admin/', admin.site.urls),
    # path('quiz/', views.SearchCourse, name='SearchCourse'),

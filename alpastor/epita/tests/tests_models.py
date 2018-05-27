@@ -23,6 +23,9 @@ class AttendanceTest(TestCase):
         student_user0.set_password('abc')
         student_user0.save()
 
+        # login for all things that don't require a login
+        self.client.login(email="epita0@epita.fr", password="abc")
+
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
                                                                      specialization="Software Engineering",
                                                                      classof="Fall 2017", country="USA",
@@ -143,6 +146,7 @@ class AttendanceTest(TestCase):
         self.assertEqual(schedule1_attendance.count(), 20)
 
     def test_course_view_status_code_and_template(self):
+        self.client.logout()
         url = reverse('course_list')
         student_instance = User.objects.get(first_name="first0")
         self.client.login(email=student_instance.email, password='abc')
@@ -152,7 +156,6 @@ class AttendanceTest(TestCase):
         self.response = self.client.get(url, {'course_list': course_list})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
-        self.client.logout()
 
     def test_schedule_view_status_code_and_template(self):
         url = reverse('schedule_list')
@@ -162,19 +165,19 @@ class AttendanceTest(TestCase):
         self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
 
     def test_attendance_view_as_student_status_code_and_template(self):
+        self.client.logout()
         student_instance = User.objects.get(first_name="first0")
         self.client.login(email=student_instance.email, password="abc")
         url = reverse('attendance')
         self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/attendance_student.html')
-        self.client.logout()
 
     def test_attendance_view_as_professor_status_code_and_template(self):
+        self.client.logout()
         res = self.client.login(email=self.professor1.user.email, password="abc")
         url = reverse('attendance')
         self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/attendance_prof.html')
-        self.client.logout()
 
