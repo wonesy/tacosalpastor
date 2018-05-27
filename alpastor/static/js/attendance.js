@@ -1,14 +1,32 @@
+// Global array that keeps track of all students for this schedule
 let allStudents = [];
 
+/*
+StudentAttendance
+
+This class is an instance of a student and their associated attendance status for the given schedule
+ */
 class StudentAttendance {
+
+    /*
+    Default constructor
+
+    Params:
+        id      - (Int) student id
+        name    - (String) student's full name
+        status  - (Int) student's attendance status value (e.g. present, absent, excused)
+        image   - (String) path to student's image
+     */
     constructor(id, name, status, image) {
-        console.log("Created new obj");
         this.id = id;
         this.name = name;
         this.status = status;
         this.image = image;
     }
 
+    /*
+    Based on the current integer status of the student, this will return the corresponding string
+     */
     getStatusString() {
         switch (this.status) {
             case 1:
@@ -22,6 +40,16 @@ class StudentAttendance {
         }
     }
 
+    /*
+    Static class function that takes in a status and returns the corresponding DOM element that will house their
+    information on the webpage.
+
+    Ex: A student is 'present' and therefore will be organized in the 'present' div. This function returns this 'present'
+    div
+
+    Params:
+        status - Integer corresponding to an attendance status (e.g. present, absent, excused)
+     */
     static getContainer(status) {
         switch (status) {
             case 1:
@@ -36,6 +64,14 @@ class StudentAttendance {
     }
 }
 
+/*
+This function is only called once when the global array of students is recognized as being empty
+
+It will take the returned json student data and allocate new instances of each student in the array
+
+Params:
+    data - JSON results from the ajax call representing student attendance data
+ */
 function populateStudentArray(data) {
     for (let i = 0; i < data.length; i++) {
         console.log("Populate: " + data[i].name);
@@ -45,6 +81,13 @@ function populateStudentArray(data) {
     }
 }
 
+/*
+This function is called for each student when the attendance information refreshes in order to determine if changes have
+been made. If a change has been observed, another function (reorganizeStudent) will be called to take action.
+
+Params:
+    student - StudentAttendance class instance
+ */
 function processStudentStatus(student) {
     let existingStudent = null;
 
@@ -64,11 +107,22 @@ function processStudentStatus(student) {
     }
 }
 
+// Template to display a student' information
 let studentStatusTemplate =
     "<div id='{0}' class='row student-status'>{1}:{2}</div>";
 
+/*
+This will only be called in the event that a change is detected in the student's status
+
+Actions taken:
+    1) delete student information from the previous DOM element
+    2) add updated student information to the new, appropriate DOM element
+
+Params:
+    student     - StudentAttendance class instance for a student
+    oldStatus   - Integer value of their previous, out-of-date status
+ */
 function reorganizeStudent(student, oldStatus) {
-    console.log("Reorganizing " + student.name);
     let oldContainer = StudentAttendance.getContainer(oldStatus);
     let newContainer = StudentAttendance.getContainer(student.status);
 
@@ -79,6 +133,11 @@ function reorganizeStudent(student, oldStatus) {
     newContainer.insertAdjacentHTML("beforeend", studentStatusTemplate.format(student.id, student.name, student.getStatusString()));
 }
 
+/*
+Function called regularly in order to keep attendance information up-to-date.
+
+Talks with the backend in order to receive latest JSON-formatted attendance data and pushes it forward for processing
+ */
 function getAttendanceData() {
     return function() {
         let baseUrl = window.location.origin + window.location.pathname + "update";

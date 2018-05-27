@@ -97,6 +97,12 @@ def people(request):
     return render(request, 'people.html', people_dict)
 
 class GetStudentAttendanceData(generics.ListCreateAPIView):
+    '''
+    This class view is solely responsible for delivering JSON-formatted data on the updated attendance information
+    for a particular schedule instance
+
+    Serializers are simply fancy names for turning python model data (database queries) into JSON serialized data
+    '''
     serializer_class = AttendanceSerializer
     queryset = Attendance.objects.all()
 
@@ -106,6 +112,11 @@ class GetStudentAttendanceData(generics.ListCreateAPIView):
         return Response(serializers.data)
 
     def get_queryset(self):
+        '''
+        Queries database for all attendance records for a given schedule ID
+
+        :return: queryset of all attendance records for a particular schedule_id, received from HTTP GET
+        '''
         schedule_filter = self.request.query_params.get('schedule_id', )
 
         if schedule_filter == None:
