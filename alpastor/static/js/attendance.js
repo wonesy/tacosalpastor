@@ -21,6 +21,11 @@ class StudentAttendance {
         this.id = id;
         this.name = name;
         this.status = status;
+
+        if (image === "") {
+            image = "/static/image/portraits/generic_avatar.jpg";
+        }
+
         this.image = image;
     }
 
@@ -62,6 +67,19 @@ class StudentAttendance {
                 return null;
         }
     }
+
+    static getHTMLTemplate(status) {
+        switch (status) {
+            case 1:
+                return studentStatusPresentTemplate;
+            case 2:
+                return studentStatusAbsentTemplate;
+            case 3:
+                return studentStatusExcusedTemplate;
+            default:
+                return null;
+        }
+    }
 }
 
 /*
@@ -75,7 +93,7 @@ Params:
 function populateStudentArray(data) {
     for (let i = 0; i < data.length; i++) {
         console.log("Populate: " + data[i].name);
-        student = new StudentAttendance(data[i].student_id, data[i].name, data[i].status, null /* image */);
+        student = new StudentAttendance(data[i].student_id, data[i].name, data[i].status, data[i].image);
         allStudents.push(student);
         reorganizeStudent(student, -1);
     }
@@ -108,8 +126,72 @@ function processStudentStatus(student) {
 }
 
 // Template to display a student' information
-let studentStatusTemplate =
-    "<div id='{0}' class='row student-status'>{1}:{2}</div>";
+// let studentStatusTemplate =
+//     "<div id='{0}' class='row student-status'>{1}:{2}</div>";
+
+
+let studentStatusPresentTemplate =
+    "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
+        "<div class=\"card text-white mb-3\" >" +
+            "<div class=\"card-header bg-success\">{1}</div>" +
+            "<div class=\"card-body\">" +
+                "<img src='{3}'>" +
+                "<p class=\"card-text\">{2}</p>" +
+            "</div>" +
+            "<div class=\"card-footer\">" +
+                "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
+                    "<label class=\"btn btn-present active\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\" checked> Present" +
+                    "</label>" +
+                    "<label class=\"btn btn-absent\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\"> Absent" +
+                    "</label>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+    "</div>";
+
+let studentStatusAbsentTemplate =
+    "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
+        "<div class=\"card text-white mb-3\" >" +
+            "<div class=\"card-header bg-danger\">{1}</div>" +
+            "<div class=\"card-body\">" +
+                "<img src='{3}'>" +
+                "<p class=\"card-text\">{2}</p>" +
+            "</div>" +
+            "<div class=\"card-footer\">" +
+                "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
+                    "<label class=\"btn btn-present\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\"> Present" +
+                    "</label>" +
+                    "<label class=\"btn btn-absent active\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\" checked> Absent" +
+                    "</label>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+    "</div>";
+
+let studentStatusExcusedTemplate =
+    "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
+        "<div class=\"card text-white mb-3\" >" +
+            "<div class=\"card-header bg-warning\">{1}</div>" +
+            "<div class=\"card-body\">" +
+                "<img src='{3}'>" +
+                "<p class=\"card-text\">{2}</p>" +
+            "</div>" +
+            "<div class=\"card-footer\">" +
+                "<div class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">" +
+                    "<label class=\"btn btn-present\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option1\" autocomplete=\"off\"> Present" +
+                    "</label>" +
+                    "<label class=\"btn btn-absent\">" +
+                        "<input type=\"radio\" name=\"options\" id=\"option2\" autocomplete=\"off\" > Absent" +
+                    "</label>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+    "</div>";
 
 /*
 This will only be called in the event that a change is detected in the student's status
@@ -130,7 +212,14 @@ function reorganizeStudent(student, oldStatus) {
         oldContainer.removeChild(document.getElementById(student.id));
     }
 
-    newContainer.insertAdjacentHTML("beforeend", studentStatusTemplate.format(student.id, student.name, student.getStatusString()));
+    let template = StudentAttendance.getHTMLTemplate(student.status);
+    console.log(template);
+    newContainer.insertAdjacentHTML("beforeend", template.format(
+        student.id,
+        student.name,
+        student.getStatusString(),
+        student.image)
+    );
 }
 
 /*

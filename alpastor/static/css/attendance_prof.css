@@ -1,0 +1,20 @@
+.status-card {
+    max-width: 15rem;
+    min-width: 15rem;
+}
+
+.status-card img {
+    width: 100%;
+}
+
+.btn-present, .btn-absent {
+    background: #AAAAAA;
+}
+
+.btn-present.active {
+    background: #28a745;
+}
+
+.btn-absent.active{
+    background: #dc3545;
+}
