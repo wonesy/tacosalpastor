@@ -21,5 +21,9 @@
 
 .override-submit {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 50px;
+}
+
+.status-container {
+    margin: 50px 20px 50px 20px;
 }

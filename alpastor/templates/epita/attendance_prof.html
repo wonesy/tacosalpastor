@@ -12,6 +12,21 @@
 {% block content %}
 
     <div class="attendance-container text-center">
+
+        <div class="status-container">
+            <div class="progress">
+                <div id="progress-present" class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuemin="0" ></div>
+                <div id="progress-excused" class="progress-bar progress-bar-striped bg-warning" role="progressbar" aria-valuemin="0" ></div>
+                <div id="progress-absent"  class="progress-bar progress-bar-striped bg-danger" role="progressbar" aria-valuemin="0" ></div>
+            </div>
+            <div class="row">
+                <div id="stats-present" class="col-3"></div>
+                <div id="stats-excused" class="col-3"></div>
+                <div id="stats-absent" class="col-3"></div>
+                <div id="stats-total" class="col-3"></div>
+            </div>
+        </div>
+
         <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes
         </button>
 

@@ -2,8 +2,75 @@
 let allStudents = [];
 
 // Enumeration for attendance statuses
-let StatusEnum = {"present":1, "absent":2, "excused":3};
+let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3};
 Object.freeze(StatusEnum);
+
+/*
+Keep track of counts
+
+counts[0] = total
+counts[1] = present
+counts[2] = absent
+counts[3] = excused
+
+ */
+
+let counts = [0, 0, 0, 0];
+
+function updateCount(oldStatus, newStatus) {
+    // If there was no oldStatus, then that means we're adding a brand new item to the list
+    if (oldStatus === null) {
+        counts[StatusEnum.total]++;
+    } else {
+        counts[oldStatus]--;
+    }
+
+    counts[newStatus]++;
+
+    redrawProgressBar();
+}
+
+let statisticsTemplate =
+    "<p class='attendance-stats {0}'>{1}: {2}</p>";
+
+function redrawProgressBar() {
+
+    presentPct = (counts[StatusEnum.present] / counts[StatusEnum.total])*100;
+    excusedPct = (counts[StatusEnum.excused] / counts[StatusEnum.total])*100;
+    absentPct = (counts[StatusEnum.absent] / counts[StatusEnum.total])*100;
+
+    difference = (100 - presentPct - excusedPct - absentPct);
+
+    // Add the difference to the largest percentage to keep everything happy
+    if (presentPct > absentPct) {
+        presentPct += difference;
+    } else {
+        absentPct += difference;
+    }
+
+    $("#progress-present")
+        .attr('aria-valuenow', counts[StatusEnum.present])
+        .attr('aria-valuemax', counts[StatusEnum.total])
+        .css('width', presentPct+'%');
+
+    $("#stats-present").html(statisticsTemplate.format("present-stats", "Present", counts[StatusEnum.present]));
+
+    $("#progress-excused")
+        .attr('aria-valuenow', counts[StatusEnum.excused])
+        .attr('aria-valuemax', counts[StatusEnum.total])
+        .css('width', excusedPct+'%');
+
+    $("#stats-excused").html(statisticsTemplate.format("excused-stats", "Excused", counts[StatusEnum.excused]));
+
+    $("#progress-absent")
+        .attr('aria-valuenow', counts[StatusEnum.absent])
+        .attr('aria-valuemax', counts[StatusEnum.total])
+        .css('width', absentPct+'%');
+
+    $("#stats-absent").html(statisticsTemplate.format("absent-stats", "Absent", counts[StatusEnum.absent]));
+
+    $("#stats-total").html(statisticsTemplate.format("total-stats", "Total", counts[StatusEnum.total]));
+}
 
 /*
 StudentAttendance
@@ -108,6 +175,7 @@ Params:
 function populateStudentArray(data) {
     for (let i = 0; i < data.length; i++) {
         student = new StudentAttendance(data[i].student_id, data[i].name, data[i].status, data[i].image);
+        updateCount(null, student.status);
         allStudents.push(student);
         reorganizeStudent(student, -1);
     }
@@ -132,6 +200,7 @@ function processStudentStatus(student) {
     if (existingStudent.status !== student['status']) {
         let oldStatus = existingStudent.status;
         existingStudent.status = student['status'];
+        updateCount(oldStatus, existingStudent.status);
         reorganizeStudent(existingStudent, oldStatus);
     }
 }
