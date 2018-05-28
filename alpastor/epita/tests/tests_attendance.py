@@ -17,8 +17,8 @@ Professor/Staff Attendance Testing
 class StaffAttendanceTest(TestCase):
     def setUp(self):
         # Create 2 users
-        self.user0 = User.objects.create(email="professor0@epita.fr", password='pass', first_name='Alison', last_name='Anderson', is_staff=True)
-        self.user1 = User.objects.create(email="professor1@epita.fr", password='pass', first_name='Bill', last_name='Barker', is_staff=True)
+        self.user0 = User.objects.create_user(email="professor0@epita.fr", password='pass', first_name='Alison', last_name='Anderson', is_staff=True)
+        self.user1 = User.objects.create_user(email="professor1@epita.fr", password='pass', first_name='Bill', last_name='Barker', is_staff=True)
 
         self.prof0 = Professor.objects.get(user_id=self.user0)
         self.prof1 = Professor.objects.get(user_id=self.user1)
@@ -36,7 +36,7 @@ class StaffAttendanceTest(TestCase):
         for i in range(0,50):
             email = "student{}@epita.fr".format(i)
 
-            u = User.objects.create(email=email, password="pass", is_staff=False)
+            u = User.objects.create_user(email=email, password="pass", is_staff=False)
             s = Student.objects.get(user_id=u)
 
             # Assign the first 50 students to course0

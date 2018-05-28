@@ -18,10 +18,9 @@ class AttendanceTest(TestCase):
 
         self.factory = RequestFactory()
 
-        student_user0 = User.objects.create(first_name="first0", last_name="last0", external_email="external0@gmail.com",
-                            email="epita0@epita.fr", is_staff=False, is_active=True, is_superuser=False)
-        student_user0.set_password('abc')
-        student_user0.save()
+        student_user0 = User.objects.create_user(first_name="first0", last_name="last0", external_email="external0@gmail.com",
+                            email="epita0@epita.fr", password="abc", is_staff=False, is_active=True, is_superuser=False)
+
 
         # login for all things that don't require a login
         self.client.login(email="epita0@epita.fr", password="abc")
@@ -31,7 +30,7 @@ class AttendanceTest(TestCase):
                                                                      classof="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
-        User.objects.create(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
+        User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
                             email="epita1@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program="ME",
@@ -39,7 +38,7 @@ class AttendanceTest(TestCase):
                                                                      classof="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
 
-        User.objects.create(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
+        User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
                             email="epita2@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program="ME",
@@ -47,12 +46,9 @@ class AttendanceTest(TestCase):
                                                                      classof="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
-        User.objects.create(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
-                            email="epitaprof@epita.fr", is_staff=True, is_active=True, is_superuser=False)
+        User.objects.create_user(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
+                            email="epitaprof@epita.fr", password="abc", is_staff=True, is_active=True, is_superuser=False)
 
-        u = User.objects.get(email="epitaprof@epita.fr")
-        u.set_password("abc")
-        u.save()
 
         self.professor1 = Professor.objects.filter(user__email="epitaprof@epita.fr")[0]
 
