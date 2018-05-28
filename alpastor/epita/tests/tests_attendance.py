@@ -136,3 +136,17 @@ class StaffAttendanceTest(TestCase):
 
         self.client.logout()
 
+    def test_prof_manual_update_as_student_fail(self):
+        self.client.login(email="student1@epita.fr", password="pass")
+
+        data = {
+            'schedule_id': str(1),
+            'students': []
+        }
+
+        url = reverse('override_attendance', kwargs={'slug': self.course0.slug})
+        response = self.client.post(url, data, kwargs={'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+
+        self.assertEqual(400, response.status_code)
+
+        self.client.logout()

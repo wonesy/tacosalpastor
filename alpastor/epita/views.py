@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
 from django.views.generic import ListView, View
+from django.core.exceptions import PermissionDenied
+from rest_framework.exceptions import bad_request
+
 from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
 from .serializers import AttendanceSerializer
@@ -137,9 +140,14 @@ class GetStudentAttendanceData(generics.ListCreateAPIView):
 
 class OverrideStudentAttendanceData(View):
     def get(self, request, **kwargs):
-        return HttpResponseBadRequest
+        return bad_request(request, exception="Forbidden")
 
     def post(self, request, slug):
+
+        # Only available to staff/admin
+        if not (request.user.is_staff or request.user.is_superuser):
+            return bad_request(request, exception="Forbidden")
+
         schedule_id = QueryDict(request.body).get('schedule_id')
 
         # This is because testing comes in from a different way, django doesn't support ajax that well
@@ -165,12 +173,12 @@ class OverrideStudentAttendanceData(View):
 class ToggleAttendanceLock(View):
 
     def get(self, request):
-        return HttpResponseBadRequest
+        return bad_request(request, exception="Forbidden")
 
     def post(self, request, slug):
         # Only professors and admin can change this
         if not (request.user.is_staff or request.user.is_superuser):
-            return HttpResponseBadRequest
+            return bad_request(request, exception="Forbidden")
 
         # Grab POST data
         schedule_id = QueryDict(request.body).get('schedule_id')
