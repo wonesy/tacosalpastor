@@ -26,6 +26,7 @@ script:
 branches:
   only:
   - master
+  - dev-stable
 notifications:
   slack:
     secure: "lC1e1k+joqmuEug4tleLEoH813zzZVLBnCkXe3EuEpmiOGvRXsl0ot6ANT0OXCqftCzYuSp76ikUGAkCfhcysj5afMMsQvW+AKPGkRp/bRKNu9JvYM81u3uehcF4KuC5j24+/xrloI9oi7S1xZUJkt20izuFewjVEyAeu+l0itN/nIItX8atUeblHyfvojYDtTFwARtuFr+6B1J8whlCluas0hB9B5X1PJF33Mgw6PAo+KmC4K4MSXvHKmt/HdiOPSobgI3axEhhyqyZAckq/F80N/SVyh9z6mBzg4vjG2iLO0moYEsLcLEk00Sp9qekgQVa/ACW/oIMAY5GNnoBh8iXV03lv/RptvB7+pKR5/xg0wniOCMTiA/1eM9/WqputqmKxiOltckm8CMf7uRs8iEps0VrRAl1dFsln6hzz8AEAR/IkQNC+Rzs7XHGDU3KrWTy0KBhCXKmf3k5ezjr7IJknq8uhFan+vlfFbJYUou2ThRuqf81iojBupYatFJqG/JF4tuhYI6CUR5Ldo0OaxB2Q0zseEVkc2OyUWuo5qcWCyEu+ALWkFk6mj5mJKzqtgktkAVVbYtuhm7/vpSd1OULdBkd17XaJQ6sURno3a4L20Dcm0aLqBgIcHL6uIZr6X26u/QemxJb+YDS2D3olYujzxxsJrjT5bHG8sQfUIM="
