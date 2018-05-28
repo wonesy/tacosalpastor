@@ -106,3 +106,6 @@ alpastor/.idea/*
 migrations/
 
 secrets.env
+
+# Personal Environment
+env-setup.sh
