@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import re
 
 
 @receiver(post_save, sender=User)
@@ -122,6 +123,16 @@ class Course(models.Model):
     semester = models.CharField(max_length=31)
     module = models.CharField(max_length=63)
     credits = models.IntegerField()
+    slug = models.SlugField(max_length=158, blank=False, default='course-slug')
+
+    def clean(self):
+        super(Course, self).clean()
+
+        # Reduce unnecessary spacing
+        self.title = re.sub(' +', ' ', self.title)
+
+        # Save slug field (e.g. fall-2019-advanced-c-programming
+        self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
 
     def __repr__(self):
         return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(

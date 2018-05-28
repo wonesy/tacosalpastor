@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, View
 from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
@@ -21,26 +20,24 @@ class CourseView(ListView):
         user_instance = request.user
 
         if user_instance.is_superuser:
-            course_list = Course.objects.all().order_by(
-                'title').values_list('title', flat=True).distinct()
+            course_list = Course.objects.all().order_by('title')
 
         elif user_instance.is_staff:
-            course_list = Course.objects.filter(professor_id__user_id=user_instance).order_by(
-                'title').values_list('title', flat=True).distinct()
+            course_list = Course.objects.filter(professor_id__user_id=user_instance).order_by('title')
 
         else:
-            course_list = StudentCourse.objects.filter(student_id__user_id=user_instance).order_by(
-                'course_id__title').values_list('course_id__title', flat=True).distinct()
+            course_list = []
+            enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id')
+            [course_list.append(course.course_id) for course in enrolled_in]
 
         return render(request, self.template_name, {'course_list': course_list})
 
 class ScheduleView(ListView):
     template_name = 'epita/schedule_list.html'
 
-    def get(self, request, **kwargs):
-        course_instance = request.GET.get('course_name', )
-        schedule_list = Schedule.objects.filter(course_id__title=course_instance)
-        return render(request, self.template_name, {'schedule_list': schedule_list})
+    def get(self, request, slug, **kwargs):
+        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
+        return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
@@ -142,7 +139,7 @@ class OverrideStudentAttendanceData(View):
     def get(self, request, **kwargs):
         return HttpResponseBadRequest
 
-    def post(self, request):
+    def post(self, request, slug):
         schedule_id = QueryDict(request.body).get('schedule_id')
         attendance_payload = QueryDict(request.body).get('students')
         attendance_json = json.loads(attendance_payload)
@@ -151,7 +148,7 @@ class OverrideStudentAttendanceData(View):
             Attendance.objects.filter(schedule_id=schedule_id, student_id=student['id']).update(status=student['status'])
             print("Updated status: " + student['name'] + " --> " + str(student['status']))
 
-        response = redirect('update_attendance')
+        response = redirect('update_attendance', slug=slug)
         response['Location'] += '?schedule_id=' + schedule_id
         return response
 
@@ -160,7 +157,7 @@ class ToggleAttendanceLock(View):
     def get(self, request):
         return HttpResponseBadRequest
 
-    def post(self, request,):
+    def post(self, request, slug):
         # Only professors and admin can change this
         if not (request.user.is_staff or request.user.is_superuser):
             return HttpResponseBadRequest

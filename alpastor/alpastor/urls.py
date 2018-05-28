@@ -30,14 +30,14 @@ urlpatterns = [
 
     # Professor/superuser view Attendance
     path('attendance/', login_required(CourseView.as_view()), name='course_list'),
-    path('attendance/course/', login_required(ScheduleView.as_view()), name='schedule_list'),
-    path('attendance/course/schedule/', login_required(AttendanceView.as_view()), name='attendance_list'),
+    path('attendance/course/<slug:slug>', login_required(ScheduleView.as_view()), name='schedule_list'),
+    path('attendance/course/<slug:slug>/schedule/', login_required(AttendanceView.as_view()), name='attendance_list'),
 
     # Student view Attendance
-    path('attendance/course/schedule/', login_required(AttendanceView.as_view()), name='attendance'),
-    path('attendance/course/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
-    path('attendance/course/schedule/manualoverride', login_required(OverrideStudentAttendanceData.as_view()), name='override_attendance'),
-    path('attendance/course/schedule/togglelock', login_required(ToggleAttendanceLock.as_view()), name='toggle_attendance_lock'),
+    path('attendance/course/<slug:slug>/schedule/', login_required(AttendanceView.as_view()), name='attendance'),
+    path('attendance/course/<slug:slug>/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
+    path('attendance/course/<slug:slug>/schedule/manualoverride', login_required(OverrideStudentAttendanceData.as_view()), name='override_attendance'),
+    path('attendance/course/<slug:slug>/schedule/togglelock', login_required(ToggleAttendanceLock.as_view()), name='toggle_attendance_lock'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
