@@ -141,7 +141,17 @@ class OverrideStudentAttendanceData(View):
 
     def post(self, request, slug):
         schedule_id = QueryDict(request.body).get('schedule_id')
+
+        # This is because testing comes in from a different way, django doesn't support ajax that well
+        if schedule_id == None:
+            schedule_id = request.POST.get('schedule_id')
+
         attendance_payload = QueryDict(request.body).get('students')
+
+        # This is because testing comes in from a different way, django doesn't support ajax that well
+        if attendance_payload == None:
+            attendance_payload = request.POST.get('students')
+
         attendance_json = json.loads(attendance_payload)
 
         for student in attendance_json:
