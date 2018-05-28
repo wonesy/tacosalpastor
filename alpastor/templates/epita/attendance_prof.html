@@ -55,16 +55,16 @@
 
     <script>
         window.onload = getAttendanceData()();
-        let attendanceInterval = setInterval(getAttendanceData(), 10000);
+
+        let attendanceInterval = 0;
+
+        {% if not schedule.attendance_closed %}
+        attendanceInterval = setInterval(getAttendanceData(), 10000);
+        {% endif %}
 
         function toggleAttendanceLock() {
             let locked = true;
 
-            /*
-             We have to clear the interval here because there is an issue if we already start locked, and unlock
-             and then we would otherwise have 2 separate setInterval calls, with the ability to clear only one that
-             we saved. This keeps only one interval.
-             */
             clearInterval(attendanceInterval);
 
             button = $('.lock-attendance');
