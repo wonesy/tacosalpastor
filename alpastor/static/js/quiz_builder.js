@@ -58,6 +58,8 @@ function _getNewOptionMap() {
 
 // Total questions added to the entire quiz
 QuizData.totalQuestions = 0;
+QuizData.tabIndexValue = 2;     // starting on 2 because the quiz title is always the first
+QuizData.tabIndexMCQuestion = {};
 
 function insertError(element, msg, clean) {
     let item = "<p class='form-error-msg'>" + msg + "</p>";
@@ -177,6 +179,19 @@ function getNewID() {
     return newID;
 }
 
+function nextTabIndex(id) {
+    let newTabIndex = String(QuizData.tabIndexValue);
+    QuizData.tabIndexValue+=25;     // leave a buffer of 25 options... any more than that and we'll have a bug with tab indices... kinda hacky
+    QuizData.tabIndexMCQuestion[id] = newTabIndex;
+    return newTabIndex
+}
+
+function nextMultipleChoiceOptionTabIndex(mc_id) {
+    let newTabIndex = QuizData.tabIndexMCQuestion[mc_id];
+    QuizData.tabIndexMCQuestion[mc_id]++;
+    return newTabIndex;
+}
+
 /*
 Deletes a multiple choice option
 
@@ -253,7 +268,7 @@ function refreshBlankQuestionRadio() {
 }
 
 
-// HTML template for a dyanmically-added "existing question" result
+// HTML template for a dynamically-added "existing question" result
 let resultsRowTemplate =
     "<div class='q-result row'>" +
         "<div class='col-sm-1 col-md-1 col-lg-1'>" +
@@ -351,9 +366,9 @@ let multipleChoiceTemplate =
         "<div class='card question'>" +
             "<span class='question-label'>Question Content</span>" +
             "<div class='form-error-msg'></div>" +
-            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+            "<input tabindex='{4}' type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
             "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
-            "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
+            "<input tabindex='{5}' type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
             "<span class='question-label'>Randomize Options</span>" +
             "<input type='checkbox' name='randomize' id='id_randomize' '{3}'>" +
             "<input type='hidden' name='type' value='1' id='id_type'>" +
@@ -387,7 +402,7 @@ function addMultipleChoiceQuestion(existingQuestion) {
     }
 
     let canvasID = getNewID();
-    questionCanvas.insertAdjacentHTML("beforeend", multipleChoiceTemplate.format(canvasID, content, explanation, randomize));
+    questionCanvas.insertAdjacentHTML("beforeend", multipleChoiceTemplate.format(canvasID, content, explanation, randomize, nextTabIndex(canvasID), nextTabIndex(canvasID)));
 
     // loop through and all all options
     for (let i = 0; i < optionLength; i++) {
@@ -403,7 +418,7 @@ let multipleChoiceOptionTemplate =
             "</button>" +
         "</div>" +
         "<div class='mc-opt-content col'>" +
-            "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{2}'>" +
+            "<input  tabindex='{5}'type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{2}'>" +
         "</div>" +
         "<div class='col col-sm mc-opt-correct-sidebar'>" +
             "<button class='btn btn-block h-100 w-100 {3}' type='button' onclick='isCorrectToggle(this);'>" +
@@ -429,7 +444,7 @@ function addMultipleChoiceOption(optCanvasId, existingOption) {
         }
     }
 
-    optCanvas.insertAdjacentHTML("beforeend", multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect));
+    optCanvas.insertAdjacentHTML("beforeend", multipleChoiceOptionTemplate.format(getNewID(), optCanvasId, content, activeClass, isCorrect, nextMultipleChoiceOptionTabIndex(optCanvasId)));
 }
 
 function addEssayQuestion(existingQuestion) {
@@ -437,9 +452,9 @@ function addEssayQuestion(existingQuestion) {
         "<div class='question-wrapper essay-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
-                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+                "<input tabindex='{3}' type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
                 "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
-                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
+                "<input tabindex='{3}' type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
                 "<input type='hidden' name='type' value='0' id='id_type'>" +
                 "<button class='btn btn-danger question-delete' onclick='deleteQuestion(\"question{0}\");'>Delete Question</button>" +
             "</div>" +
@@ -456,7 +471,7 @@ function addEssayQuestion(existingQuestion) {
     }
 
     let canvasID = getNewID();
-    questionCanvas.insertAdjacentHTML("beforeend", essayQuestionTemplate.format(canvasID, content, explanation));
+    questionCanvas.insertAdjacentHTML("beforeend", essayQuestionTemplate.format(canvasID, content, explanation, nextTabIndex(canvasID), nextTabIndex(canvasID)));
 }
 
 function addCheckboxQuestion() {
@@ -468,26 +483,26 @@ function addNumericScaleQuestion(existingQuestion) {
         "<div class='question-wrapper numeric-scale-question' id='question{0}'>" +
             "<div class='card question'>" +
                 "<span class='question-label'>Question Content</span>" +
-                "<input type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
+                "<input tabindex='{7}' type='text' name='content' class='form-control' maxlength='1024' required='true' id='id_content' value='{1}' placeholder='What do you want to ask?'>" +
                 "<span class='question-label'>Explanation to be shown after submission (optional)</span>" +
-                "<input type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
+                "<input tabindex='{8}' type='text' name='explanation' class='form-control' maxlength='1023' id='id_explanation' value='{2}' placeholder='Explanation'>" +
                 "<input type='hidden' name='type' value='3' id='id_type'>" +
                 "<div class='row'>" +
                     "<div class='col-sm-3 col-md-3 col-lg-3>'" +
                         "<span class='question-label'>Min</span>" +
-                        "<input type='number scale-value' class='form-control' maxlength='300' name='min' value='{3}' id='id_min'>" +
+                        "<input tabindex='{9}' type='number scale-value' class='form-control' maxlength='300' name='min' value='{3}' id='id_min'>" +
                     "</div>" +
                     "<div class='col-sm-3 col-md-3 col-lg-3>'" +
                         "<span class='question-label'>Max</span>" +
-                        "<input type='number scale-value' class='form-control' maxlength='300' name='max' value='{4}' id='id_max'>" +
+                        "<input tabindex='{10}' type='number scale-value' class='form-control' maxlength='300' name='max' value='{4}' id='id_max'>" +
                     "</div>" +
                     "<div class='col-sm-3 col-md-3 col-lg-3>'" +
                         "<span class='question-label'>Step</span>" +
-                        "<input type='number scale-value' class='form-control' maxlength='300' name='step' value='{5}' id='id_step'>" +
+                        "<input tabindex='{11}' type='number scale-value' class='form-control' maxlength='300' name='step' value='{5}' id='id_step'>" +
                     "</div>" +
                     "<div class='col-sm-3 col-md-3 col-lg-3>'" +
                         "<span class='question-label'>Answer</span>" +
-                        "<input type='number scale-value' class='form-control' maxlength='300' name='step' value='{6}' id='id_correct_value'>" +
+                        "<input tabindex='{12}' type='number scale-value' class='form-control' maxlength='300' name='step' value='{6}' id='id_correct_value'>" +
                     "</div>" +
                 "</div>" +
                 "<div id='preview{0}' class='scale-preview'><span class='question-label'>Preview</span></div>" +
@@ -509,7 +524,8 @@ function addNumericScaleQuestion(existingQuestion) {
     }
 
     let questionID = getNewID();
-    questionCanvas.insertAdjacentHTML("beforeend", numericScaleQuestionTemplate.format(questionID, content, explanation, min, max, step, correct_value));
+    questionCanvas.insertAdjacentHTML("beforeend", numericScaleQuestionTemplate.format(questionID, content, explanation, min, max, step, correct_value,
+        nextTabIndex(questionID), nextTabIndex(questionID), nextTabIndex(questionID), nextTabIndex(questionID), nextTabIndex(questionID), nextTabIndex(questionID)));
 
     updateNumericScalePreview("preview{0}".format(questionID), min, max, step, correct_value);
     console.log("Adding numeric scale question");
