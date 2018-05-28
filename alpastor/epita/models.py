@@ -217,6 +217,7 @@ class Schedule(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    attendance_closed = models.BooleanField(blank=False, default=True)
 
     def __repr__(self):
         return "Schedule(course_id={}, date={}, start_time={}, end_time={}, room_id={})".format(self.course_id,

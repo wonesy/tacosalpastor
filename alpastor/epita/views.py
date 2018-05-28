@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, View
 from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm
@@ -48,39 +49,47 @@ class AttendanceView(ListView):
     def get(self, request, *args, **kwargs):
         schedule_id = request.GET.get('schedule_id', )
         logged_in_user = request.user
+        data = {}
 
         # Error immediately if no such schedule_id exists
         _ = get_object_or_404(Schedule, pk=schedule_id)
 
         if logged_in_user.is_staff or logged_in_user.is_superuser:
             self.template_name = 'epita/attendance_prof.html'
-            attendance_objects = Attendance.objects.filter(schedule_id=schedule_id).order_by(
-                'student_id__user__first_name')
-            form_list = []
-            for i in attendance_objects:
-                form = self.form_class(instance=i)
-                form_list.append(form)
-            form = form_list
+            schedule_instance = Schedule.objects.get(pk=schedule_id)
+            data['schedule'] = schedule_instance
+
         else:
+            self.template_name = 'epita/attendance_student.html'
             student_instance = Student.objects.get(user_id=logged_in_user.id)
             schedule_instance = Schedule.objects.get(pk=schedule_id)
-            self.template_name = 'epita/attendance_student.html'
             attendance_instance, created = Attendance.objects.get_or_create(
                 student_id=student_instance,
                 schedule_id=schedule_instance
             )
 
             form = self.form_class(instance=attendance_instance)
+            data['form'] = form
 
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, data)
 
     def post(self, request):
+        schedule_id = request.GET.get('schedule_id', )
+        schedule_instance = Schedule.objects.get(pk=schedule_id)
+
         instance = get_object_or_404(Attendance, pk=request.POST['id'])
         form = self.form_class(request.POST, request.FILES, instance=instance)
-        schedule_instance = request.GET.get('schedule_id', )
+        file = ""
+
         if form.is_valid():
-            form.save()
-            file = form.cleaned_data['file_upload']
+
+            # Do not let the user update attendance information if the schedule instance is marked as closed
+            if schedule_instance.attendance_closed and not request.user.is_staff:
+                if form.cleaned_data['status'] != Attendance.EXCUSED:
+                    print("Cannot update attendance")
+            else:
+                form.save()
+                file = form.cleaned_data['file_upload']
         args = {'form': form, 'file': file}
         return render(request, self.template_name, args)
 
@@ -131,7 +140,7 @@ class GetStudentAttendanceData(generics.ListCreateAPIView):
 
 class OverrideStudentAttendanceData(View):
     def get(self, request, **kwargs):
-        pass
+        return HttpResponseBadRequest
 
     def post(self, request):
         schedule_id = QueryDict(request.body).get('schedule_id')
@@ -145,3 +154,27 @@ class OverrideStudentAttendanceData(View):
         response = redirect('update_attendance')
         response['Location'] += '?schedule_id=' + schedule_id
         return response
+
+class ToggleAttendanceLock(View):
+
+    def get(self, request):
+        return HttpResponseBadRequest
+
+    def post(self, request,):
+        # Only professors and admin can change this
+        if not (request.user.is_staff or request.user.is_superuser):
+            return HttpResponseBadRequest
+
+        # Grab POST data
+        schedule_id = QueryDict(request.body).get('schedule_id')
+        lock_status_payload = QueryDict(request.body).get('lock_status')
+        lock_status_json = json.loads(lock_status_payload)
+
+        # Find particular schedule
+        schedule = Schedule.objects.filter(id=schedule_id)
+
+        # Update lock status
+        if schedule.count() > 0:
+            schedule.update(attendance_closed=lock_status_json)
+
+        return HttpResponse(200)

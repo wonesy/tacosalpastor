@@ -18,7 +18,7 @@ from django.urls import path
 from accounts import views as accounts_views
 from quiz import views as quiz_views
 from epita import views
-from epita.views import CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData, OverrideStudentAttendanceData
+from epita.views import CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData, OverrideStudentAttendanceData, ToggleAttendanceLock
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -37,6 +37,7 @@ urlpatterns = [
     path('attendance/course/schedule/', login_required(AttendanceView.as_view()), name='attendance'),
     path('attendance/course/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
     path('attendance/course/schedule/manualoverride', login_required(OverrideStudentAttendanceData.as_view()), name='override_attendance'),
+    path('attendance/course/schedule/togglelock', login_required(ToggleAttendanceLock.as_view()), name='toggle_attendance_lock'),
 
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),

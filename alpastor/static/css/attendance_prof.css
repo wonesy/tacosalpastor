@@ -27,3 +27,16 @@
 .status-container {
     margin: 50px 20px 50px 20px;
 }
+
+.lock-attendance {
+    min-width: 120px;
+}
+
+.locked {
+    background: #1e1e1e;
+    border: #1e1e1e;
+}
+
+.locked:hover {
+    background: #000000;
+}

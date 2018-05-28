@@ -13,6 +13,18 @@
 
     <div class="attendance-container text-center">
 
+        <div class="title-container">
+            <h1>{{ schedule.course_id }}</h1>
+            <h3>{{ schedule.date }}</h3>
+            <h5>{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</h5>
+        </div>
+
+        {% if schedule.attendance_closed %}
+            <button class="lock-attendance locked btn btn-info" onclick="toggleAttendanceLock();">Locked <i class="lock-icon fa fa-lock"></i></button>
+        {% else %}
+            <button class="lock-attendance unlocked btn btn-info" onclick="toggleAttendanceLock();">Unlocked <i class="lock-icon fa fa-unlock"></i></button>
+        {% endif %}
+
         <div class="status-container">
             <div class="progress">
                 <div id="progress-present" class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuemin="0" ></div>
@@ -27,8 +39,8 @@
             </div>
         </div>
 
-        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes
-        </button>
+
+        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>
 
         <!-- These divs will be filled via ajax calls -->
         <div class="present-container row">
@@ -42,7 +54,57 @@
     </div>
 
     <script>
-        window.onload = getAttendanceData()(); setInterval(getAttendanceData(), 10000);
+        window.onload = getAttendanceData()();
+        let attendanceInterval = setInterval(getAttendanceData(), 10000);
+
+        function toggleAttendanceLock() {
+            let locked = true;
+
+            /*
+             We have to clear the interval here because there is an issue if we already start locked, and unlock
+             and then we would otherwise have 2 separate setInterval calls, with the ability to clear only one that
+             we saved. This keeps only one interval.
+             */
+            clearInterval(attendanceInterval);
+
+            button = $('.lock-attendance');
+
+            if (button.hasClass('unlocked')) {
+                // change to locked
+                button.html("Locked <i class=\"lock-icon fa fa-lock\"></i>");
+                locked = true;
+            } else {
+                // change to unlocked
+                button.html("Unlocked <i class=\"lock-icon fa fa-unlock\"></i>");
+
+                // Restart interval
+                attendanceInterval = setInterval(getAttendanceData(), 10000);
+                locked = false;
+            }
+
+            button.toggleClass('locked unlocked');
+
+            let baseUrl = window.location.origin + window.location.pathname + "togglelock";
+
+            $.ajax({
+                type: "POST",
+                url: baseUrl,
+
+                data: {
+                    schedule_id: parseGET()['schedule_id'],
+                    lock_status: locked
+                },
+
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    console.log("success");
+                },
+                failure: function(errMsg) {
+                    console.log(errMsg);
+                }
+            });
+        }
     </script>
 
 {% endblock %}
