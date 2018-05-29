@@ -23,7 +23,7 @@
     <h5>{{ quiz.title }}</h5>
    <ol>
        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"><span class="fa fa-trash" data-toggle="tool-tip" data-placement="top" title="Delete quiz"></span></button>
-       <a href="/quiz/edit"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
+       <a href="/quiz/quiz_builder/?quiz_id={{ quiz.id }}"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
        <button type="button" class="btn btn-success" onclick="myFunction()" data-toggle="tool-tip" data-placement="top" title="Open quiz"><span class="fa fa-lock" id="openCloseSpan"></span></button>
 
 

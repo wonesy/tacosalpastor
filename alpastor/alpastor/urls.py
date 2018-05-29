@@ -44,8 +44,8 @@ urlpatterns = [
 
     # Quiz paths
     path('quiz/quiz_builder/', login_required(quiz_views.QuizBuilderView.as_view()), name='quizbuilder'),
-    path('quiz/quizbuilder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
-    path('quiz/quizbuilder/existingquestion/', login_required(quiz_views.AddExistingQuestionView.as_view()), name='existingquestion'),
+    path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
+    path('quiz/quiz_builder/getquiz/', login_required(quiz_views.GetQuizData.as_view()), name='existingquestion'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/edit', login_required(quiz_views.EditQuizPage.as_view()), name='editquiz'),
 

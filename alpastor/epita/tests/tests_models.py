@@ -27,7 +27,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="USA",
+                                                                     intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
@@ -35,7 +35,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="France",
+                                                                     intakeSemester="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
 
         User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
@@ -43,7 +43,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="USA",
+                                                                     intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",

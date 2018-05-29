@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from epita.models import Course
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-import decimal
 
 """
 General Quiz Section
@@ -83,12 +82,10 @@ class Quiz(models.Model):
 class Question(models.Model):
     ESSAY = 0
     MULTIPLE_CHOICE = 1
-    CHECKBOX = 2
-    NUMERIC_SCALE = 3
+    NUMERIC_SCALE = 2
     QUESTION_TYPES = (
         (ESSAY, "Essay Question"),
         (MULTIPLE_CHOICE, "Multiple Choice Question"),
-        (CHECKBOX, "Checkbox Question"),
         (NUMERIC_SCALE, "Numeric Scale Question")
     )
     quiz = models.ManyToManyField(Quiz, verbose_name=_('Quiz'), blank=True)
@@ -98,7 +95,7 @@ class Question(models.Model):
                                    help_text="Explanation of correct answer to be shown after user submits response")
     type = models.IntegerField(null=False, verbose_name=_("Question Type"), choices=QUESTION_TYPES, default=ESSAY)
 
-    def _str__(self):
+    def __str__(self):
         return self.content
 
 
@@ -128,6 +125,7 @@ class MultipleChoiceQuestion(Question):
     def __str__(self):
         return "{}".format(self.content)
 
+# Keeping this class just for the get_score implementation, if we need it in the future
 class CheckboxQuestion(MultipleChoiceQuestion):
     multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))
     partial_credit = models.BooleanField(default=False, verbose_name=_("Partial Credit"),
@@ -138,7 +136,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
     missed_choice_points_lost = models.DecimalField(max_digits=4, decimal_places=2, default=0, verbose_name=_("Missed Choice Points Lost"),
                                                     help_text="the number of points lost for a correct choice that's missed")
     allow_negative_score = models.BooleanField(default=False, verbose_name=_("Allow Negative Scores"), help_text="allow negative scores")
-    type = Question.CHECKBOX
+    #type = Question.CHECKBOX
 
     def clean(self):
         super(CheckboxQuestion, self).clean()
