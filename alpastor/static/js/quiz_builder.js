@@ -9,8 +9,7 @@ Translates integer question-type data into a compact string form
 let questionTypesI2A = {
     0: "Essay",
     1: "M.C.",
-    2: "C.B.",
-    3: "N.S."
+    2: "N.S."
 };
 
 /*
@@ -19,8 +18,7 @@ Translates string form type into the corresponding integer type
 let questionTypesA2I = {
     "Essay": 0,
     "M.C.": 1,
-    "Checkbox": 2,
-    "Numeric": 3
+    "Numeric": 2
 };
 
 /*
@@ -29,8 +27,7 @@ Translates an integer type to it's corresponding addTypeQuestion() function
 let questionTypesI2Function = {
     0: addEssayQuestion,
     1: addMultipleChoiceQuestion,
-    2: addCheckboxQuestion,
-    3: addNumericScaleQuestion
+    2: addNumericScaleQuestion
 };
 
 /*
@@ -79,7 +76,7 @@ General algorithm:
     1) get quiz title
     2) forall questions:
     3) .... fill out _getNewQuestionMap()
-    4) .... if multiple choice or checkbox:
+    4) .... if multiple choice:
     5) .... .... forall options:
     6) .... .... .... fill out _getNewOptionMap()
     7) ssubmit all acquired data as stringified JSON
@@ -87,6 +84,7 @@ General algorithm:
 function mapAllQuestions() {
     let quizMap = {
         "title": "",
+        "id": "",
         "questions": []
     };
 
@@ -97,6 +95,8 @@ function mapAllQuestions() {
         return null;
     }
 
+    quizMap.id = parseGET()['quiz_id'];
+
     /* Loop through all question elements */
     let questionElems = document.getElementsByClassName('question');
     for (let i = 0; i < questionElems.length; i++) {
@@ -106,8 +106,13 @@ function mapAllQuestions() {
         /* Collect salient information about each question */
         let questionContent = curQuestion.querySelector("#id_content").value;
         let questionExplanation = curQuestion.querySelector("#id_explanation").value;
-        let questionRandomize = curQuestion.querySelector("#id_randomize").checked;
         let questionType = curQuestion.querySelector('#id_type').value;
+        let questionRandomize = null;
+
+        if (questionType === '1') {
+            questionRandomize = curQuestion.querySelector("#id_randomize").checked;
+        }
+
 
         /* Error check */
         if (questionContent === "") {
@@ -294,30 +299,54 @@ and from a question-type dropdown menu
 Returns: a function that does everything described
  */
 function getExistingQuestionQueryset() {
-    return function () {
-        let baseUrl = window.location.origin + window.location.pathname + "existingquestion";
-
+    return function (quizId) {
+        let baseUrl = window.location.origin + window.location.pathname + "getquiz";
         let typeElem = document.getElementById('dropdownMenuButton');               // the question type dropdown
         let searchElem = document.getElementById("searchExistingQuestion");         // the search bar
         let resultsCanvas = document.getElementById("existingQuestionsResults");    // where the results will be displayed
         let typeURL = "";
 
-        resultsCanvas.innerHTML = "";
+        if (quizId !== undefined) {
+            // This will construct the API call to get an entire quiz
+            baseUrl += "?quiz_id=" + quizId;
+        } else {
+            // This will construct the API call to search questions according to content/type
+            resultsCanvas.innerHTML = "";
 
-        if (searchElem.value === "") {
-            return;
+            if (searchElem.value === "") {
+                return;
+            }
+
+            if (typeElem.innerHTML !== "Any") {
+                let type = questionTypesA2I[typeElem.innerHTML];
+                typeURL = "&type={0}".format(type);
+            }
+
+            // construct full web API URI
+             baseUrl += "?content=" + searchElem.value + typeURL;
         }
-
-        if (typeElem.innerHTML !== "Any") {
-            let type = questionTypesA2I[typeElem.innerHTML];
-            typeURL = "&type={0}".format(type);
-        }
-
-        // construct full web API URI
-        let fullAPIURL = baseUrl + "?content=" + searchElem.value + typeURL;
 
         // execute the web API call and handle data accordingly
-        $.getJSON(fullAPIURL, null, function (data) {
+        $.getJSON(baseUrl, null, function (data) {
+            // If the goal was to populate a quiz, immediately write them to the page and return
+            if (quizId !== undefined) {
+
+                // It always returns an array, even though we know there will only be one quiz returned
+                quiz = data[0];
+
+                // Add the title
+                document.getElementById('quizTitle').value = quiz['title'];
+
+                // Add each question
+                for (let i = 0; i < quiz['question_set'].length; i++) {
+                    let question = quiz['question_set'][i];
+
+                    let addQuestionFunc = questionTypesI2Function[question.type];
+                    addQuestionFunc(question);
+                }
+
+                return;
+            }
 
             // add results to global quiz namespace
             QuizData.existingResults = data;
@@ -329,7 +358,7 @@ function getExistingQuestionQueryset() {
                 let canvasId = "optionsCanvas{0}".format(i);
                 let optionsCanvas = document.getElementById(canvasId);
 
-                // loop through all of the options (multiple choice and checkbox questions)
+                // loop through all of the options (multiple choice questions)
                 for (let j = 0; j < data[i]['multiplechoiceoption_set'].length; j++) {
 
                     let isCorrectClass = "";
@@ -474,10 +503,6 @@ function addEssayQuestion(existingQuestion) {
     questionCanvas.insertAdjacentHTML("beforeend", essayQuestionTemplate.format(canvasID, content, explanation, nextTabIndex(canvasID), nextTabIndex(canvasID)));
 }
 
-function addCheckboxQuestion() {
-    console.log("Adding checkbox question");
-}
-
 function addNumericScaleQuestion(existingQuestion) {
     let numericScaleQuestionTemplate =
         "<div class='question-wrapper numeric-scale-question' id='question{0}'>" +
@@ -547,4 +572,14 @@ function updateSliderValue(elemID, slider) {
     let valueDiv = document.getElementById(elemID).querySelector('.slider-value');
 
     valueDiv.innerHTML = slider.value;
+}
+
+function editExistingQuiz() {
+    getvars = parseGET();
+
+    quizId = getvars['quiz_id'];
+
+    if (quizId) {
+        getExistingQuestionQueryset()(quizId);
+    }
 }
