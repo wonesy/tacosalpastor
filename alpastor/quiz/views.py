@@ -30,7 +30,7 @@ class SaveNewQuiz(View):
     def post(self, request):
         quiz_payload = json.loads(request.POST['json_quiz'])
 
-        if self.processQuizJSON(quiz_payload):
+        if self.processQuizJSON(quiz_payload) != QuizStatusCodes.SUCCESS:
             return redirect('quizbuilder')
 
         return redirect('quiz_home_page')
@@ -67,7 +67,10 @@ class SaveNewQuiz(View):
         question_type = question_json['type']
         question_content = question_json['content']
         question_explanation = question_json['explanation']
-        question_randomize = question_json['randomize']
+        question_randomize = ""
+
+        if question_type == Question.MULTIPLE_CHOICE:
+            question_randomize = question_json['randomize']
 
         defaults = {
             'explanation': question_explanation,
@@ -80,17 +83,18 @@ class SaveNewQuiz(View):
         the old one will instead just be updated.
         '''
 
-        if question_type == str(Question.MULTIPLE_CHOICE):
+        if question_type == Question.MULTIPLE_CHOICE:
             (question, created) = MultipleChoiceQuestion.objects.update_or_create(content=question_content, type=question_type, defaults=defaults)
 
             # Process every option for this question
             for option in question_json['options']:
                 self.processOptionJSON(question, option)
 
-        elif question_type == str(Question.ESSAY):
+        elif question_type == Question.ESSAY:
             (question, created) = Question.objects.update_or_create(content=question_content, type=question_type, defaults={'explanation': question_explanation})
 
-        elif question_type == str(Question.NUMERIC_SCALE):
+        elif question_type == Question.NUMERIC_SCALE:
+            print("here")
             (question, created) = NumericScaleQuestion.objects.update_or_create(content=question_content, type=question_type,defaults={'explanation': question_explanation})
 
         else:

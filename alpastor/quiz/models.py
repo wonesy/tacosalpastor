@@ -35,7 +35,7 @@ class Quiz(models.Model):
 
     title = models.CharField(verbose_name=_("Title"), max_length=80, blank=False)
     description = models.TextField(verbose_name=_("Description"), blank=True, help_text="description of the quiz")
-    url = models.SlugField(max_length=80, blank=False, help_text="a user friendly url", verbose_name=_("User-friendly URL"))
+    url = models.SlugField(max_length=100, blank=True, help_text="a user friendly url", verbose_name=_("User-friendly URL"))
     course = models.ForeignKey(Course, verbose_name=_("Associated Course"), blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=DRAFT,
                               help_text="the quiz can either be ready to take, completed, or a draft", verbose_name=_("Status"))
@@ -52,6 +52,7 @@ class Quiz(models.Model):
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
+        '''
         if self.url == "":
             tmp = self.title
         else:
@@ -66,6 +67,7 @@ class Quiz(models.Model):
                                             re.sub('\s+', '-', tmp).lower())
 
         self.url = ''.join(letter for letter in self.url if letter.isalnum() or letter == '-')
+        '''
 
         if (self.status is not self.READY) and self.open:
             self.open = False
