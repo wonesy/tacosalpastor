@@ -46,7 +46,11 @@ class SaveNewQuiz(View):
 
         # Create the new quiz object in the database, or update title if already exists
         try:
-            (quiz, created) = Quiz.objects.update_or_create(id=int(quiz_id), defaults={'title': quiz_title})
+            created = false;
+            if quiz_id < 0:
+                quiz = Quiz.objects.create(title=quiz_title)
+            else:
+                (quiz, created) = Quiz.objects.update_or_create(id=int(quiz_id), defaults={'title': quiz_title})
         except ValueError:
             print("Invalid Quiz Id: {}".format(quiz_id))
             return QuizStatusCodes.BADID
