@@ -51,6 +51,17 @@ urlpatterns = [
 
 path('admin/', admin.site.urls),
    # path('quiz/', views.SearchCourse, name='SearchCourse'),
+    path('quizbuilder/', quiz_views.QuizBuilderView.as_view(), name='quizbuilder'),
+    path('quizbuilder/savenewquiz/', quiz_views.SaveNewQuiz.as_view(), name='savenewquiz'),
+    path('admin/', admin.site.urls),
+    # path('api/data/', get_data, name='api-data'),
+    # path('api/chart/data/', ChartData.as_view()),
+    # url(r'^dashboard$', ChartView.from_chart(dashboard), name='dashboard'),
+    # url(r'^api/data/$', get_data, name='api-data'),
+    # url(r'^api/chart/data/$', ChartData.as_view()),
+    path('dashboardex/', views.dashboard, name='dashboardex'),
+    # url(r'^export/$', 'export_to_excel', name='export_to_excel'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

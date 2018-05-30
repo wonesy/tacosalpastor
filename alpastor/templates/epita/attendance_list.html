@@ -5,15 +5,15 @@
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th class="text-center">Photo</th>
-            <th class="text-center">Student Name</th>
-            <th class="text-center">Status</th>
-            <th class="text-center">Supporting Documents</th>
-            <link href="{% static 'css/attendance.css' %}" rel="stylesheet">
+        <th class="text-center">Photo</th>
+        <th class="text-center">Student Name</th>
+        <th class="text-center">Status</th>
+        <th class="text-center">Supporting Documents</th>
+        <link href="{% static 'css/attendance.css' %}" rel="stylesheet">
         </thead>
         <tbody>
-            {% for form_item in form %}
-                <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
+        {% for form_item in form %}
+            <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
                     <tr>
                         <td>
                             {% if form_item.student_id.photo_location != None %}
@@ -21,7 +21,8 @@
                                     <img src="{% static image_static %}" alt={{ form_item.student_id.user }}>
                                 {% endwith %}
                             {% else %}
-                                <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar" class="people-img">
+                                <img src="{% static 'image/portraits/generic_avatar.jpg' %}" alt="Default Avatar"
+                                     class="people-img">
                             {% endif %}
                         </td>
                         <td>
@@ -38,8 +39,8 @@
                             <input type="submit">
                         </td>
                     </tr>
-                </form>
-            {% endfor %}
+            </form>
+        {% endfor %}
         </tbody>
     </table>
     <script>

@@ -11,6 +11,21 @@ from .serializers import AttendanceSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 import json
+from django.http import HttpResponse
+from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
+from django.http import JsonResponse
+from jchart import Chart
+from random import randint
+from django.views.generic import TemplateView
+from chartjs.views.lines import BaseLineChartView
+from django.contrib.auth import get_user_model
+from django.views.generic import View
+from rest_framework.views import APIView
+from rest_framework.response import Response
+import csv
+from chartit import DataPool, Chart
+from django.db.models import Count
+from django.db.models import Count
 
 @login_required()
 def home(request):
@@ -203,3 +218,45 @@ class ToggleAttendanceLock(View):
             schedule.update(attendance_closed=lock_status_json)
 
         return HttpResponse(200)
+
+# def export_to_excel(request):
+#
+#     lists = Student.objects.all()
+#
+#     # your excel html format
+#     template_name = "people.html"
+#
+#     response = render(template_name, {'lists': lists})
+#
+#     # this is the output file
+#     filename = "model.csv"
+#
+#     response['Content-Disposition'] = 'attachment; filename='+filename
+#     response['Content-Type'] = 'application/vnd.ms-excel; charset=utf-16'
+#     return response
+
+
+def dashboard(request):
+    people_dict = {}
+
+    active_students = Student.objects.all()
+
+    people_dict['students'] = active_students
+    # bar graph by country
+    country = Student.objects.order_by('country').values_list('country', flat=True).distinct()
+    print(country)
+
+    vaar2 = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+    print(vaar2)
+    # bar graph by program
+    program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
+    print(program)
+
+    # bar graph by specialization
+    splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
+        'specialization')
+
+    # bar graph by year
+    return render(request, 'dashboardex.html',
+                  {'country': country, 'vaar2': vaar2, 'program': program, 'splgraph': splgraph})
+

@@ -1,31 +1,46 @@
 from django.shortcuts import render, redirect
 from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion
+from epita.models import Course
 from django.views import View
-from quiz.serializers import QuestionSerializer, QuizSerializer
+from quiz.forms import MultipleChoiceForm, MultipleChoiceOptionForm
+from quiz.serializers import QuestionSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 import json
 import enum
 
-class QuizStatusCodes(enum.Enum):
-    SUCCESS = 0,
-    NOTITLE = 1,
-    BADID = 2
 
+class QuizErrors(enum.Enum):
+    NOTITLE = 1
+
+
+# Create your views here.
+# @login_required()
 class QuizBuilderView(View):
     template_name = "quiz_builder.html"
-    model = Quiz
+    model = Course
 
     def post(self, request):
-        return render(request, self.template_name)
+        pass
 
     def get(self, request):
-        quiz_id = request.GET.get('quiz_id', '')
-        return render(request, self.template_name)
+        mcform = MultipleChoiceForm()
+        mcoptform = MultipleChoiceOptionForm()
+
+        dict = {
+            'mcform': mcform,
+            'mcoptform': mcoptform
+        }
+
+        return render(request, self.template_name, dict)
+
+    def get_queryset(self):
+        return Course.objects.all()
+
 
 class SaveNewQuiz(View):
     def get(self, request):
-        return redirect('quiz_home_page')
+        return redirect('quizbuilder')
 
     def post(self, request):
         quiz_payload = json.loads(request.POST['json_quiz'])
@@ -33,34 +48,24 @@ class SaveNewQuiz(View):
         if self.processQuizJSON(quiz_payload):
             return redirect('quizbuilder')
 
-        return redirect('quiz_home_page')
-
+        # TODO redirect to quiz list that dodo is working on
+        return redirect('quizbuilder')
 
     def processQuizJSON(self, quiz_json):
-        quiz_id = quiz_json['id']
         quiz_title = quiz_json['title']
 
         if quiz_title == "":
             print("[FAIL] quiz must have a title")
-            return QuizStatusCodes.NOTITLE
+            return QuizErrors.NOTITLE
 
-        # Create the new quiz object in the database, or update title if already exists
-        try:
-            (quiz, created) = Quiz.objects.update_or_create(id=int(quiz_id), defaults={'title': quiz_title})
-        except ValueError:
-            print("Invalid Quiz Id: {}".format(quiz_id))
-            return QuizStatusCodes.BADID
-
-        if created:
-            print("Created new quiz with title: " + quiz.title)
-        else:
-            print("Accessed existing quiz with title: " + quiz.title)
+        # Create the new quiz object in the database
+        (quiz, created) = Quiz.objects.get_or_create(title=quiz_title)
 
         # Process every question for this quiz
         for question in quiz_json['questions']:
             self.processQuestionJSON(quiz, question)
 
-        return QuizStatusCodes.SUCCESS
+        return 0
 
     def processQuestionJSON(self, quiz, question_json):
 
@@ -83,30 +88,14 @@ class SaveNewQuiz(View):
         if question_type == str(Question.MULTIPLE_CHOICE):
             (question, created) = MultipleChoiceQuestion.objects.update_or_create(content=question_content, type=question_type, defaults=defaults)
 
+            if created:
+                print("Created new question: {}".format(question))
+            else:
+                print("Updated existing question: {}".format(question))
+
             # Process every option for this question
             for option in question_json['options']:
                 self.processOptionJSON(question, option)
-
-        elif question_type == str(Question.ESSAY):
-            (question, created) = Question.objects.update_or_create(content=question_content, type=question_type, defaults={'explanation': question_explanation})
-
-        elif question_type == str(Question.NUMERIC_SCALE):
-            (question, created) = NumericScaleQuestion.objects.update_or_create(content=question_content, type=question_type,defaults={'explanation': question_explanation})
-
-        else:
-            created = False
-            question = None
-
-        if question:
-            question.quiz.add(quiz)
-
-        if created:
-            print("Created new question: {}".format(question))
-        elif question:
-            print("Updated existing question: {}".format(question))
-        else:
-            print("No question was created, something went wrong")
-
 
     def processOptionJSON(self, question, option_json):
         opt_content = option_json['content']
@@ -131,29 +120,18 @@ class SaveNewQuiz(View):
         else:
             print("Accessed existing option: {}".format(option))
 
-class GetQuizData(generics.ListCreateAPIView):
+class AddExistingQuestionView(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
     queryset = MultipleChoiceOption.objects.all()
 
     def get(self, request, **kwargs):
-        quiz_filter = self.request.query_params.get('quiz_id', None)
-        qs = self.get_queryset()
-
-        if quiz_filter:
-            serializers = QuizSerializer(qs, many=True)
-        else:
-            serializers = QuestionSerializer(qs, many=True)
+        questions = self.get_queryset()
+        serializers = QuestionSerializer(questions, many=True)
         return Response(serializers.data)
 
     def get_queryset(self):
-        quiz_filter = self.request.query_params.get('quiz_id', None)
         content_filter = self.request.query_params.get('content', None)
         type_filter = self.request.query_params.get('type', None)
-
-        # If this is an attempt to get all questions for a quiz, return immediately
-        if quiz_filter:
-            queryset = Quiz.objects.filter(pk=quiz_filter)
-            return queryset
 
         if content_filter == None:
             return None

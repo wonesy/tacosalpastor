@@ -10,11 +10,11 @@
         </tr>
         </thead>
         <tbody>
-        {% for course in course_list %}
+        {% for schedule in schedule_list %}
             <tr>
                 <th>
                     <a class="btn btn-primary"
-                       href="/attendance/course?course_name={{ course.title }}">{{ course.title }}</a>
+                       href="/attendance/course/schedule/?schedule_id={{ schedule.id }}">{{ schedule.date }}</a>
                 </th>
             </tr>
         {% endfor %}

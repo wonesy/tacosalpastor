@@ -3,36 +3,181 @@
 {% load static %}
 
 {% block content %}
-    <div class="row">
-        {%  for student in students %}
-            <div class="col-sm-12 col-md-4 col-lg-3 people-block">
-                <div class="people-top">
-                    <div class="people-img">
-                        <!-- Show student image, if exists, otherwise show default image -->
-                        {%  if student.photo_location != "" %}
-                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                <img class="center-block" src="{% static image_static %}" alt={{ student.first_name }}>
-                            {% endwith %}
-                        {% else %}
-                            <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco" class="people-img">
-                        {% endif %}
-                    </div>
+    <div class="col-md-12">
+        <div class="people-canvas">
+            <form class="search">
+                <input id="searcher" placeholder="Search" class="sbar" type="text">
+            </form>
 
-                    <div class="people-names">
-                        {{ student.user.get_full_name }} <br>
-                        {{ student.country }} <br>
-                        {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                            <img src="{% static image_static %}" alt={{ student.first_name }}>
-                        {% endwith %}
-                    </div>
-                </div>
-                <div class="people-bot">
-                    <div class="people-info">
-                        {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
-                        {{ student.program }}: {{ student.specialization }}<br>[{{ student.intakeSemester }}]
-                    </div>
+
+            <div class="dropdownn" style="float:right">
+                <button class="dropbtn">Sort</button>
+                <div class="dropdownn-content">
+                    <button id="sort">By name</button>
+                    <button id="numBnt">By year</button>
                 </div>
             </div>
-        {% endfor %}
+
+            {#            <button id="sort" class="btnalpha">Alphabetical</button>#}
+            {#            <button id="numBnt">Numerical</button>#}
+
+
+            <br>
+
+            <button class="accordion">Filter</button>
+
+
+            <div class="panel">
+
+                <br>
+                <label class="container">ME
+                    <input type="checkbox" id="ME" value="ME">
+                    <span class="checkmark"></span>
+                </label>
+
+
+                <label class="container">Msc
+                    <input type="checkbox" id="MSc" value="Msc">
+                    <span class="checkmark"></span>
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <div class="row wrapper stdfilter">
+            {% for student in students %}
+                <div class="secondDiv" data-category="{{ student.program }}">
+
+                    <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv newDiv">
+                        <div class="people-top">
+                            <div class="people-img">
+                                <!-- Show student image, if exists, otherwise show default image -->
+                                {% if student.photo_location != "" %}
+                                    {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                        <img class="center-block" src="{% static image_static %}"
+                                             alt={{ student.first_name }}>
+                                    {% endwith %}
+                                {% else %}
+                                    <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
+                                         class="people-img">
+                                {% endif %}
+                            </div>
+
+                            <div class="people-names" id="demo">
+
+                                <input hidden
+                                       value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.intakeYear }} {{ student.user.email }}">
+                                <div class="text-block"> {{ student.user.first_name }} {{ student.user.last_name }}</div>
+
+                                {{ student.country }} <br>
+                                {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                                    <img src="{% static image_static %}" alt={{ student.first_name }}>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="people-bot">
+
+                            <div class="people-info">
+                                {{ student.user.email }}<br>{{ student.user.external_email }}<br>{{ student.phone }}<br>
+                                <!-- <input hidden value="{{ student.program }} {{ student.specialization }}"> -->
+                                {{ student.program }}: {{ student.specialization }}<br>
+                                <div class="text-block2"> [{{ student.intakeYear }}]</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
     </div>
+
+
+    <script>
+        // search everything
+        $("#searcher").on("keyup click input", function () {
+            var val = $(this).val();
+            $('.prod >div').show();
+
+            if (val.length) {
+                $(".secondDiv .entryDiv").hide().filter(function () {
+                    return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
+                }).show();
+            }
+            else {
+                $(".secondDiv .entryDiv").show();
+            }
+        });
+
+        // filter by option 2
+
+        $('input[type="checkbox"]').click(function () {
+            console.log("hii");
+            if ($('input[type="checkbox"]:checked').length > 0) {
+                console.log("hi")
+
+                $('.stdfilter > div').hide();
+                $('input[type="checkbox"]:checked').each(function () {
+                    $('.stdfilter >div[data-category=' + this.id + ']').show();
+                });
+            } else {
+                $('.stdfilter >div').show();
+
+            }
+        });
+
+
+
+
+
+
+
+
+
+        // accordion
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
+        }
+
+
+        // sort names
+        var $divs = $(".secondDiv");
+        $("#sort").on("click", function () {
+
+            var alpha = $divs.sort(function (a, b) {
+
+                    return $(a).find(".text-block").text() > $(b).find(".text-block").text();
+                }
+            );
+
+            $(".row").html(alpha);
+
+        });
+
+        $('#numBnt').on('click', function () {
+            var numericallyOrderedDivs = $divs.sort(function (a, b) {
+                return $(a).find(".text-block2").text() > $(b).find(".text-block2").text();
+            });
+            $(".row").html(numericallyOrderedDivs);
+        });
+
+
+    </script>
 {% endblock %}
