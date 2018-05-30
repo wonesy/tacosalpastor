@@ -4,7 +4,7 @@
 
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/quiz_builder.css' %}">
-    <script src="{% static 'js/quiz_builder.js' %}"></script>
+    <script src="{% static 'js/quizbuilder.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -74,7 +74,6 @@
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Any');">Any</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Essay');">Essay</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('M.C.');">Multiple Choice</a>
-                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Checkbox');">Checkbox</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Numeric');">Numeric Scale</a>
                                     </div>
                                 </div>
@@ -99,7 +98,7 @@
     </div>
 
     <script type="application/javascript">
-        window.onload = editExistingQuiz();
+        window.onload = initialize();
 
         $(".existing-questions-wrapper").focus(function () {
             refreshBlankQuestionRadio();
