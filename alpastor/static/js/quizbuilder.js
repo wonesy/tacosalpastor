@@ -206,7 +206,7 @@ class MultipleChoiceQuestion extends Question {
                 return results;
             }
 
-            if (results.json.is_correct === "True") {
+            if (results.json.is_correct === "true") {
                 hasCorrectAnswer = true;
             }
 
@@ -535,7 +535,7 @@ function addMultipleChoiceOption(optCanvasId, existingOption=null) {
 
     let id = GlobalQuizData.getNextId();
     let content = "";
-    let isCorrect = false;
+    let isCorrect = "false";
     let activeClass = "";
 
     // If there is already an existing question we're pulling from, grab its data
@@ -632,10 +632,10 @@ function isCorrectToggle(element) {
     let checkbox = element.querySelector("#id_is_correct");
     if (element.classList.contains('active')) {
         element.classList.remove('active');
-        checkbox.value = "False";
+        checkbox.value = "false";
     } else {
         element.classList.add('active');
-        checkbox.value = "True";
+        checkbox.value = "true";
     }
 }
 
