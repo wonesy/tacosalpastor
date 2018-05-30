@@ -2,29 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
 from django.views.generic import ListView, View
-from django.core.exceptions import PermissionDenied
+
 from rest_framework.exceptions import bad_request
 
-from .models import Student, Course, Attendance, Schedule, StudentCourse
 from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
-from rest_framework.response import Response
+
 import json
 from django.http import HttpResponse
 from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
-from django.http import JsonResponse
-from jchart import Chart
-from random import randint
-from django.views.generic import TemplateView
-from chartjs.views.lines import BaseLineChartView
-from django.contrib.auth import get_user_model
+
 from django.views.generic import View
-from rest_framework.views import APIView
+
 from rest_framework.response import Response
-import csv
-from chartit import DataPool, Chart
-from django.db.models import Count
 from django.db.models import Count
 
 @login_required()
