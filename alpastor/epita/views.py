@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.exceptions import bad_request
 
 from .models import Student, Course, Attendance, Schedule, StudentCourse
-from .forms import AttendanceForm
+from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 from rest_framework.response import Response
@@ -36,11 +36,21 @@ class CourseView(ListView):
         return render(request, self.template_name, {'course_list': course_list})
 
 class ScheduleView(ListView):
-    template_name = 'epita/schedule_list.html'
+    template_name = 'epita/schedule_student.html'
+    form_class = ScheduleForm
 
     def get(self, request, slug, **kwargs):
+        logged_in_user = request.user
         schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
-        return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+        if not logged_in_user.is_staff and not logged_in_user.is_superuser:
+            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+
+        else:
+            self.template_name = 'epita/schedule_prof.html'
+            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+
+    def post(self, request, slug, **kwargs):
+        pass
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'

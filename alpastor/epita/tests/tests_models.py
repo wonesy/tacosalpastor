@@ -159,7 +159,7 @@ class AttendanceTest(TestCase):
         schedule_list = Schedule.objects.filter(course_id=course)
         self.response = self.client.get(url, {'schedule_list': schedule_list})
         self.assertEqual(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
+        self.assertTemplateUsed(self.response, 'epita/schedule_prof.html')
 
     def test_attendance_view_as_student_status_code_and_template(self):
         self.client.logout()

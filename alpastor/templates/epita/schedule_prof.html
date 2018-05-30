@@ -1,0 +1,48 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <table class="table text-center">
+                    <thead class="thead-inverse">
+                    <tr>
+                        <th>Active Courses</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for schedule in schedule_list %}
+                        <tr>
+                            <th>
+                                <a class="btn btn-primary"
+                                   href="/attendance/course/{{ course }}/schedule/?schedule_id={{ schedule.id }}"
+                                   style="min-width: 220px;">
+                                    {{ schedule.date }} - {{ schedule.start_time|time:"H:i" }}
+
+                                    {% if schedule.attendance_closed %}
+                                        <i class="fa fa-lock" style="margin-left: 10px"></i>
+                                    {% else %}
+                                        <i class="fa fa-unlock" style="margin-left: 10px"></i>
+                                    {% endif %}
+                                </a>
+                            </th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 text-center">
+                <div class="card">
+                    <h5 class="card-header">Add a new class</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <button class="btn btn-primary" type="submit">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
