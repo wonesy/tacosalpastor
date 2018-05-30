@@ -317,7 +317,7 @@ class Quiz {
 }
 
 let GlobalQuizData = {
-    'quiz': new Quiz(null, ""),                         // quiz instance for this page
+    'quiz': new Quiz(-1, ""),                           // quiz instance for this page
     'totalQuestions': 0,                                // total questions registered for this quiz
     'totalMCQuestions': 0,                              // total number of multiple choice questions
     'totalEssayQuestions': 0,                           // total number of essay questions
@@ -805,6 +805,8 @@ function getExistingQuiz(quizId) {
             let addQuestionFunc = QuestionTypeEnum.properties[question.type].addFunction;
             addQuestionFunc(question);
         }
+
+        GlobalQuizData.quiz.id = quizId;
     });
 }
 
