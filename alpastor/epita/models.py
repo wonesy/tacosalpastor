@@ -3,6 +3,8 @@ from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import re
+import datetime
+from django.utils.timezone import now
 
 
 @receiver(post_save, sender=User)
@@ -224,9 +226,9 @@ class Schedule(models.Model):
         room_id = FK to the room where the course will be held
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date = models.DateField(blank=True)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    date = models.DateField(default=now)
+    start_time = models.TimeField(default=now)
+    end_time = models.TimeField(default=now() + datetime.timedelta(hours=2))
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
     attendance_closed = models.BooleanField(blank=False, default=True)
 
