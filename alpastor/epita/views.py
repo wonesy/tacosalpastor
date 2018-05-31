@@ -53,10 +53,18 @@ class ScheduleView(ListView):
 
         else:
             self.template_name = 'epita/schedule_prof.html'
-            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+            form = self.form_class()
+            args = {'course': slug, 'schedule_list': schedule_list, 'form': form}
+            return render(request, self.template_name, args)
 
-    def post(self, request, slug, **kwargs):
-        pass
+    def post(self, request, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+
+        return render(request, self.template_name, {'form': form})
+
+
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'

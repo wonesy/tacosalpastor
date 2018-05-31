@@ -1,3 +1,6 @@
+from django.utils import timezone
+from datetime import datetime
+
 from django import forms
 from .models import Attendance, Schedule
 
@@ -16,3 +19,9 @@ class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
         fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'room_id', 'attendance_closed']
+        widgets = {
+            # 'date': forms.DateField(initial=timezone.now() + timezone.timedelta(hours=2)),
+            # 'start_time': datetime.now(),
+            # 'start_time': forms.TimeField(initial=timezone.now()),
+            'attendance_closed': forms.HiddenInput()
+        }
