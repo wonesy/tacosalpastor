@@ -2,7 +2,7 @@ import re
 
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
-from django.db.models import CommaSeparatedIntegerField
+from django.contrib.auth.hashers import get_hasher
 from django.utils.translation import ugettext as _
 from epita.models import Course
 from django.utils import timezone
@@ -56,22 +56,10 @@ class Quiz(models.Model):
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
-        '''
-        if self.url == "":
-            tmp = self.title
-        else:
-            tmp = self.url
-
-        self.url = "{}{}{}{}{}{}-{}".format(self.created_on.microsecond,
-                                            self.created_on.second,
-                                            self.created_on.minute,
-                                            self.created_on.day,
-                                            self.created_on.month,
-                                            self.created_on.year,
-                                            re.sub('\s+', '-', tmp).lower())
-
-        self.url = ''.join(letter for letter in self.url if letter.isalnum() or letter == '-')
-        '''
+        self.url = get_hasher().encode(self.__repr__(), "salt")
+        bad_chars = ['$', '/', '\\', '=', '_']
+        for c in bad_chars:
+            self.url.replace(c, '')
 
         if (self.status is not self.READY) and self.open:
             self.open = False
@@ -80,6 +68,10 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
+
+    def __repr__(self):
+        return "title={}, description={}, course={}, status={}, open={}, time_lime={}, randomize={}, created_on={}".format(
+            self.title, self.description, self.course, self.status, self.open, self.time_limit, self.randomize, self.created_on)
 
     def get_created_date(self):
         return "{}-{}-{}".format(self.created_on.day, self.created_on.month, self.created_on.year)
