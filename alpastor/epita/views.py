@@ -36,22 +36,22 @@ class CourseView(ListView):
         return render(request, self.template_name, {'course_list': course_list})
 
 class ScheduleView(ListView):
-    template_name = 'epita/schedule_student.html'
+    template_name = 'epita/schedule_prof.html'
     form_class = ScheduleForm
 
-    def get(self, request, slug, **kwargs):
+    def get(self, request, slug):
         logged_in_user = request.user
         schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
+            self.template_name = 'epita/schedule_student.html'
             return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
 
         else:
-            self.template_name = 'epita/schedule_prof.html'
             form = self.form_class()
             args = {'course': slug, 'schedule_list': schedule_list, 'form': form}
             return render(request, self.template_name, args)
 
-    def post(self, request, slug, **kwargs):
+    def post(self, request, slug):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
@@ -61,7 +61,6 @@ class ScheduleView(ListView):
             'schedule_list': schedule_list,
             'form': form
         }
-        redirect('schedule_list', slug=slug)
         return render(request, self.template_name, args)
 
 
