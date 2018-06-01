@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion, Course
 from django.views import View
 from quiz.serializers import QuestionSerializer, QuizSerializer
 from rest_framework import generics
@@ -17,11 +18,18 @@ class QuizBuilderView(View):
     model = Quiz
 
     def post(self, request):
-        return render(request, self.template_name)
+        return HttpResponseBadRequest
 
     def get(self, request):
-        quiz_id = request.GET.get('quiz_id', '')
-        return render(request, self.template_name)
+        if request.user.is_staff:
+            course_list = Course.objects.filter(professor_id__user=request.user)
+        elif request.user.is_superuser:
+            print("Here")
+            course_list = Course.objects.all()
+        else:
+            return HttpResponseForbidden
+
+        return render(request, self.template_name, {'course_list': course_list})
 
 class SaveNewQuiz(View):
     def get(self, request):
@@ -37,7 +45,14 @@ class SaveNewQuiz(View):
 
 
     def processQuizJSON(self, quiz_json):
-        quiz_id = quiz_json['id']
+        print(quiz_json)
+        try:
+            quiz_id = int(quiz_json['id'])
+            quiz_course_id = int(quiz_json['courseId'])
+        except ValueError:
+            print("Invalid Quiz/Course Id")
+            return QuizStatusCodes.BADID
+
         quiz_title = quiz_json['title']
 
         if quiz_title == "":
@@ -45,15 +60,16 @@ class SaveNewQuiz(View):
             return QuizStatusCodes.NOTITLE
 
         # Create the new quiz object in the database, or update title if already exists
-        try:
-            created = false;
-            if quiz_id < 0:
-                quiz = Quiz.objects.create(title=quiz_title)
-            else:
-                (quiz, created) = Quiz.objects.update_or_create(id=int(quiz_id), defaults={'title': quiz_title})
-        except ValueError:
-            print("Invalid Quiz Id: {}".format(quiz_id))
-            return QuizStatusCodes.BADID
+
+        created = False
+        if quiz_id < 0:
+            quiz = Quiz.objects.create(title=quiz_title, course_id=quiz_course_id)
+        else:
+            (quiz, created) = Quiz.objects.update_or_create(
+                id=quiz_id,
+                defaults={'title': quiz_title, 'course_id': quiz_course_id}
+            )
+
 
         if created:
             print("Created new quiz with title: " + quiz.title)
@@ -180,18 +196,6 @@ class GetQuizData(generics.ListCreateAPIView):
         """ Save the POST data """
         serializer.save()
 
-
-class EditQuizPage(View):
-    template_name = "edit_quiz.html"
-
-    def post(self, request):
-        pass
-
-    def get(self, request):
-        return render(request, "edit_quiz.html")
-
-    def get_queryset(self):
-        return Quiz.objects.all()
 
 def quizHomePage(request):
     quizzes = Quiz.objects.all()
