@@ -1,14 +1,18 @@
 import re
 
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
+from django.contrib.auth.hashers import get_hasher
 from django.utils.translation import ugettext as _
 from epita.models import Course
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from epita.models import Student
 
 """
 General Quiz Section
 """
+
 
 class Quiz(models.Model):
     """
@@ -52,22 +56,10 @@ class Quiz(models.Model):
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
-        '''
-        if self.url == "":
-            tmp = self.title
-        else:
-            tmp = self.url
-
-        self.url = "{}{}{}{}{}{}-{}".format(self.created_on.microsecond,
-                                            self.created_on.second,
-                                            self.created_on.minute,
-                                            self.created_on.day,
-                                            self.created_on.month,
-                                            self.created_on.year,
-                                            re.sub('\s+', '-', tmp).lower())
-
-        self.url = ''.join(letter for letter in self.url if letter.isalnum() or letter == '-')
-        '''
+        self.url = get_hasher().encode(self.__repr__(), "salt")
+        bad_chars = ['$', '/', '\\', '=', '_']
+        for c in bad_chars:
+            self.url.replace(c, '')
 
         if (self.status is not self.READY) and self.open:
             self.open = False
@@ -76,6 +68,10 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
+
+    def __repr__(self):
+        return "title={}, description={}, course={}, status={}, open={}, time_lime={}, randomize={}, created_on={}".format(
+            self.title, self.description, self.course, self.status, self.open, self.time_limit, self.randomize, self.created_on)
 
     def get_created_date(self):
         return "{}-{}-{}".format(self.created_on.day, self.created_on.month, self.created_on.year)
@@ -127,6 +123,7 @@ class MultipleChoiceQuestion(Question):
     def __str__(self):
         return "{}".format(self.content)
 
+
 # Keeping this class just for the get_score implementation, if we need it in the future
 class CheckboxQuestion(MultipleChoiceQuestion):
     multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))
@@ -169,6 +166,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
 
         return score
 
+
 class MultipleChoiceOption(models.Model):
 
     question = models.ForeignKey(Question, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
@@ -182,6 +180,7 @@ class MultipleChoiceOption(models.Model):
         verbose_name = _("Option")
         verbose_name_plural = _("Options")
 
+
 """
 
 Numeric Scale Question
@@ -189,6 +188,8 @@ Numeric Scale Question
 [1] [2] [3] [4] [5]
 
 """
+
+
 class NumericScaleQuestion(Question):
     min = models.IntegerField(verbose_name=_("Minimum Scale Value"), blank=False)
     max = models.IntegerField(verbose_name=_("Maximum Scale Value"), blank=False)
@@ -211,3 +212,31 @@ class NumericScaleQuestion(Question):
 
         if self.min >= self.max:
             raise ValidationError(_("Min cannot be greater-than or equal to max"))
+
+
+"""
+
+Quiz Progression Section
+
+"""
+
+
+class QuizProgression(models.Model):
+    # Keep the records even if the quiz is deleted by Teachers
+    quiz = models.ForeignKey(Quiz, on_delete=models.DO_NOTHING, blank=True, null=True)
+    questions_order = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_answered = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_correct = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_incorrect = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    quiz_timestamp = models.DateTimeField(auto_now=True)
+    score_obtained = models.IntegerField(blank=True, null=True)
+    score_possible_points = models.IntegerField(blank=True, null=True)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+    # Metadata
+    class Meta:
+        ordering = ["quiz_timestamp"]
+
+    # TODO: implement correct.count() , incorrec.count(), score average()
+    # TODO: for each QuizProgress with student_id == xxxxx , call methods
+

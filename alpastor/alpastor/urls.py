@@ -51,6 +51,7 @@ urlpatterns = [
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/', quiz_views.delete, name='delete_view'),
     path('admin/', admin.site.urls),
+
 ]
 
 

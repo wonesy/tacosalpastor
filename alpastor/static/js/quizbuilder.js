@@ -236,11 +236,12 @@ class NumericScaleQuestion extends Question {
 
 class Quiz {
 
-    constructor(id, title) {
+    constructor(id, title, courseId) {
         this.id = id;
         this.title = title;
         this.questions = [];
         this.domElement = null;
+        this.courseId = courseId;
     }
 
     addQuestion(question) {
@@ -275,6 +276,7 @@ class Quiz {
 
     captureValues() {
         this.title = this.domElement.value;
+        this.courseId = document.getElementById('course-id').innerText;
     }
 
     toJSON() {
@@ -282,6 +284,7 @@ class Quiz {
 
         let json = {
             id: this.id,
+            courseId: this.courseId,
             title: this.title,
             questions: []
         };
@@ -317,7 +320,7 @@ class Quiz {
 }
 
 let GlobalQuizData = {
-    'quiz': new Quiz(-1, ""),                           // quiz instance for this page
+    'quiz': new Quiz("-1", "", "-1"),                       // quiz instance for this page
     'totalQuestions': 0,                                // total questions registered for this quiz
     'totalMCQuestions': 0,                              // total number of multiple choice questions
     'totalEssayQuestions': 0,                           // total number of essay questions
@@ -794,9 +797,16 @@ function getExistingQuiz(quizId) {
     $.getJSON(baseUrl, null, function (data) {
         // It always returns an array, even though we know there will only be one quiz returned
         quiz = data[0];
+        let course_title = "--";
 
         // Add the title
         document.getElementById('quizTitle').value = quiz['title'];
+        if (quiz['course_title'] !== null) {
+            course_title = quiz['course_title'];
+        }
+
+        document.getElementById('course-title').innerText = course_title;
+        document.getElementById('course-id').innerText = quiz['course'];
 
         // Add each question
         for (let i = 0; i < quiz['question_set'].length; i++) {
