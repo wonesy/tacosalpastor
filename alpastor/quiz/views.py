@@ -21,11 +21,10 @@ class QuizBuilderView(View):
         return HttpResponseBadRequest
 
     def get(self, request):
-        if request.user.is_staff:
-            course_list = Course.objects.filter(professor_id__user=request.user)
-        elif request.user.is_superuser:
-            print("Here")
-            course_list = Course.objects.all()
+        if request.user.is_superuser:
+            course_list = Course.objects.all().order_by('title')
+        elif request.user.is_staff:
+            course_list = Course.objects.filter(professor_id__user=request.user).order_by('title')
         else:
             return HttpResponseForbidden
 
@@ -45,7 +44,6 @@ class SaveNewQuiz(View):
 
 
     def processQuizJSON(self, quiz_json):
-        print(quiz_json)
         try:
             quiz_id = int(quiz_json['id'])
             quiz_course_id = int(quiz_json['courseId'])
@@ -83,7 +81,8 @@ class SaveNewQuiz(View):
         return QuizStatusCodes.SUCCESS
 
     def processQuestionJSON(self, quiz, question_json):
-
+        created = False
+        question = None
         question_type = question_json['type']
         question_content = question_json['content']
         question_explanation = question_json['explanation']
@@ -104,22 +103,29 @@ class SaveNewQuiz(View):
         '''
 
         if question_type == Question.MULTIPLE_CHOICE:
-            (question, created) = MultipleChoiceQuestion.objects.update_or_create(content=question_content, type=question_type, defaults=defaults)
+            (question, created) = MultipleChoiceQuestion.objects.update_or_create(
+                content=question_content,
+                type=question_type,
+                defaults=defaults
+            )
 
             # Process every option for this question
             for option in question_json['options']:
                 self.processOptionJSON(question, option)
 
         elif question_type == Question.ESSAY:
-            (question, created) = Question.objects.update_or_create(content=question_content, type=question_type, defaults={'explanation': question_explanation})
+            (question, created) = Question.objects.update_or_create(
+                content=question_content,
+                type=question_type,
+                defaults={'explanation': question_explanation}
+            )
 
         elif question_type == Question.NUMERIC_SCALE:
-            print("here")
-            (question, created) = NumericScaleQuestion.objects.update_or_create(content=question_content, type=question_type,defaults={'explanation': question_explanation})
-
-        else:
-            created = False
-            question = None
+            (question, created) = NumericScaleQuestion.objects.update_or_create(
+                content=question_content,
+                type=question_type,
+                defaults={'explanation': question_explanation}
+            )
 
         if question:
             question.quiz.add(quiz)
