@@ -51,12 +51,18 @@ class ScheduleView(ListView):
             args = {'course': slug, 'schedule_list': schedule_list, 'form': form}
             return render(request, self.template_name, args)
 
-    def post(self, request, **kwargs):
+    def post(self, request, slug, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-
-        return render(request, self.template_name, {'form': form})
+        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
+        args = {
+            'course': slug,
+            'schedule_list': schedule_list,
+            'form': form
+        }
+        redirect('schedule_list', slug=slug)
+        return render(request, self.template_name, args)
 
 
 
