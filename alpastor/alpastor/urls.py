@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
@@ -42,16 +43,16 @@ urlpatterns = [
     path('people/', views.people, name='people'),
     path('login/', accounts_views.login, name='login'),
 
+
     # Quiz paths
     path('quiz/quiz_builder/', login_required(quiz_views.QuizBuilderView.as_view()), name='quizbuilder'),
     path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
     path('quiz/quiz_builder/getquiz/', login_required(quiz_views.GetQuizData.as_view()), name='existingquestion'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
-    path('quiz/edit', login_required(quiz_views.EditQuizPage.as_view()), name='editquiz'),
-
-path('admin/', admin.site.urls),
-   # path('quiz/', views.SearchCourse, name='SearchCourse'),
+    path('quiz/', quiz_views.delete, name='delete_view'),
+    path('admin/', admin.site.urls),
 ]
+
 
 urlpatterns = format_suffix_patterns(urlpatterns)
 

@@ -104,6 +104,7 @@ def people(request):
 
     return render(request, 'people.html', people_dict)
 
+
 class GetStudentAttendanceData(generics.ListCreateAPIView):
     '''
     This class view is solely responsible for delivering JSON-formatted data on the updated attendance information

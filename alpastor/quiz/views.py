@@ -177,34 +177,17 @@ class GetQuizData(generics.ListCreateAPIView):
         serializer.save()
 
 
-class EditQuizPage(View):
-    template_name = "edit_quiz.html"
+def quizHomePage(request):
+    quizzes = Quiz.objects.all()
+    return render(request, "quiz.html", {'quizzes': quizzes})
 
-    def post(self, request):
-        pass
-
-    def get(self, request):
-        return render(request, "edit_quiz.html")
-
-    def get_queryset(self):
-        return Quiz.objects.all()
 
 def quizHomePage(request):
     quizzes = Quiz.objects.all()
     return render(request, "quiz.html", {'quizzes': quizzes})
-"""
-class SearchCourse:
 
-    def get_queryset(self):
-        result = super(SearchCourse, self).get_queryset()
 
-        query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = result.filter(
-                reduce(operator.and_(Quiz(title_icontains=q) for q in query_list)) |
-                reduce(operator.and_(Quiz(course_icontains=q) for q in query_list))
-            )
-
-            return result
-"""
+def delete(request,quiz_id =None):
+    object = Quiz.objects.get(id=quiz_id)
+    object.delete()
+    return render(request,'quiz.html')
