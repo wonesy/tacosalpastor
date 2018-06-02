@@ -228,7 +228,7 @@ class QuizProgression(models.Model):
     questions_answered = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
     questions_correct = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
     questions_incorrect = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
-    quiz_timestamp = models.DateTimeField(auto_now=True)
+    quiz_timestamp = models.DateTimeField(auto_now=True, default=timezone.now)
     score_obtained = models.IntegerField(blank=True, null=True)
     score_possible_points = models.IntegerField(blank=True, null=True)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -237,6 +237,30 @@ class QuizProgression(models.Model):
     class Meta:
         ordering = ["quiz_timestamp"]
 
-    # TODO: implement correct.count() , incorrec.count(), score average()
-    # TODO: for each QuizProgress with student_id == xxxxx , call methods
+    def questions_count(self, q_type: str):
+        # counts number of commas to know how many elements are in the comma separated field
+        if q_type == "questions_correct":
+            question_list = map(int, self.questions_correct.split(','))
+            # questions_type_count = self.questions_correct.count(",") + 1
+        elif q_type == "questions_incorrect":
+            question_list = map(int, self.questions_incorrect.split(','))
+        elif q_type == "questions_answered":
+            question_list = map(int, self.questions_answered.split(','))
+
+        questions_type_count = len(question_list)
+        return questions_type_count
+
+    # Given that an unmarked question is an incorrect question
+    @property
+    def quiz_score(self):
+        numerator: int = self.questions_count('questions_correct')
+        denominator = self.questions_count('questions_correct')+self.questions_count('questions_correct')
+        score = numerator / denominator
+        return score
+
+    # Overrides __repr__ method
+
+    def __repr__(self):
+        return "title={}, questions_correct={}, questions_incorrect={}, questions_answered={}, score={}, timestamp={}".format(
+            self.quiz.title, self.questions_correct, self.questions_incorrect, self.questions_answered, self.quiz_score, self.quiz_timestamp)
 
