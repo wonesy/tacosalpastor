@@ -228,7 +228,7 @@ class QuizProgression(models.Model):
     questions_answered = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
     questions_correct = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
     questions_incorrect = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
-    quiz_timestamp = models.DateTimeField(auto_now=True, default=timezone.now)
+    quiz_timestamp = models.DateTimeField(auto_now=True)
     score_obtained = models.IntegerField(blank=True, null=True)
     score_possible_points = models.IntegerField(blank=True, null=True)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
