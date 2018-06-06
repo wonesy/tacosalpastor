@@ -1,0 +1,18 @@
+branch-defaults:
+  quiz:
+    environment: django-env
+    group_suffix: null
+global:
+  application_name: tacosalpastor
+  branch: null
+  default_ec2_keyname: aws-eb
+  default_platform: python-3.6
+  default_region: eu-west-3
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: git
+  workspace_type: Application
