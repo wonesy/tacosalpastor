@@ -106,3 +106,4 @@ alpastor/.idea/*
 migrations/
 
 secrets.env
+

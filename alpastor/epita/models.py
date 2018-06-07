@@ -51,7 +51,7 @@ class Student(models.Model):
         phone = phone number, in string form, to allow international + symbols
         program = student's overall program (ME, MSc)
         specialization = student's sub specialty (Software Engineering, ISM, etc.)
-        classof = class that student joined, form of Season Year (Fall 2017, Spring 2016)
+        intakeSemester = class that student joined, form of Season Year (Fall 2017, Spring 2016)
         country = country of origin for the student
         city = city of origin for the student
         languages = which languages the student speaks, comma separated (English,French)
@@ -61,7 +61,7 @@ class Student(models.Model):
     phone = models.CharField(max_length=31)
     program = models.CharField(max_length=6)
     specialization = models.CharField(max_length=63)
-    classof = models.CharField(max_length=31)
+    intakeSemester = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
     country_code = models.CharField(max_length=2)
     city = models.CharField(max_length=127)
@@ -70,9 +70,9 @@ class Student(models.Model):
 
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
-               "specialization={}, classof={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               "specialization={}, intakeSemester={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
-                          self.program, self.specialization, self.classof, self.country, self.country_code, self.city,
+                          self.program, self.specialization, self.intakeSemester, self.country, self.country_code, self.city,
                           self.languages, self.photo_location)
 
     def __str__(self):
@@ -139,7 +139,7 @@ class Course(models.Model):
             self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
 
     def __str__(self):
-        return "{}".format(self.title)
+        return "{} ({})".format(self.title, self.semester)
 
 
 class StudentCourse(models.Model):

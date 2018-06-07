@@ -6,6 +6,7 @@ from accounts.models import User
 from django.utils import timezone
 from django.urls import reverse
 import random
+import json
 
 import datetime
 
@@ -96,4 +97,56 @@ class StaffAttendanceTest(TestCase):
             num_attendance = Attendance.objects.filter(schedule_id__course_id=course).count()
             self.assertEqual(num_attendance, (num_sched_instances * num_students))
 
+    def test_prof_manual_update(self):
+        self.client.login(email="professor0@epita.fr", password="pass")
 
+        url = reverse('override_attendance', kwargs={'slug': self.course0.slug})
+
+        schedule = Schedule.objects.all()[0]
+
+        data = {
+            'schedule_id': str(schedule.id),
+            'students': []
+        }
+
+        absent_students = Attendance.objects.filter(status=Attendance.ABSENT, schedule_id=schedule).select_related('student_id')
+        present_students = Attendance.objects.filter(status=Attendance.PRESENT, schedule_id=schedule)
+
+        self.assertNotEqual(absent_students.count(), present_students.count())
+
+        tmpStudents = []
+        for student in absent_students:
+            attendance_data = {}
+            attendance_data['id'] = student.student_id.id
+            attendance_data['status'] = Attendance.PRESENT
+            attendance_data['file_upload'] = ""
+            attendance_data['name'] = student.student_id.user.get_full_name()
+            attendance_data['image'] = ""
+
+            tmpStudents.append(attendance_data)
+
+        data['students'] = json.dumps(tmpStudents)
+
+        response = self.client.post(url, data, kwargs={'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+
+        present_students = Attendance.objects.filter(status=Attendance.PRESENT, schedule_id=schedule)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(present_students.count(), absent_students.count())
+
+        self.client.logout()
+
+    def test_prof_manual_update_as_student_fail(self):
+        self.client.login(email="student1@epita.fr", password="pass")
+
+        data = {
+            'schedule_id': str(1),
+            'students': []
+        }
+
+        url = reverse('override_attendance', kwargs={'slug': self.course0.slug})
+        response = self.client.post(url, data, kwargs={'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+
+        self.assertEqual(400, response.status_code)
+
+        self.client.logout()

@@ -19,10 +19,13 @@ class CustomUserAdmin(UserAdmin):
     exclude = ('username',)
     add_fieldsets = (
         (None, {
-            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'external_email', 'is_staff', 'is_superuser')}
+            'fields': (
+                'email', 'password1', 'password2', 'first_name', 'last_name', 'external_email', 'is_staff',
+                'is_superuser')}
          ),
     )
     search_fields = ('email',)
     filter_horizontal = ()
+
 
 admin.site.register(User, CustomUserAdmin)

@@ -27,7 +27,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="USA",
+                                                                     intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
@@ -35,7 +35,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="France",
+                                                                     intakeSemester="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
 
         User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
@@ -43,7 +43,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program="ME",
                                                                      specialization="Software Engineering",
-                                                                     classof="Fall 2017", country="USA",
+                                                                     intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
@@ -153,13 +153,30 @@ class AttendanceTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
 
-    def test_schedule_view_status_code_and_template(self):
+    def test_schedule_view_as_student_status_code_and_template(self):
+        self.client.logout()
+        student_instance = User.objects.get(first_name="first0")
+        self.client.login(email=student_instance.email, password="abc")
+
         course = Course.objects.get(title="Sample Course 0")
         url = reverse('schedule_list', kwargs={'slug': course.slug})
+
         schedule_list = Schedule.objects.filter(course_id=course)
         self.response = self.client.get(url, {'schedule_list': schedule_list})
         self.assertEqual(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
+        self.assertTemplateUsed(self.response, 'epita/schedule_student.html')
+
+    def test_schedule_view_as_professor_status_code_and_template(self):
+        self.client.logout()
+        self.client.login(email=self.professor1.user.email, password="abc")
+
+        course = Course.objects.get(title="Sample Course 0")
+        url = reverse('schedule_list', kwargs={'slug': course.slug})
+
+        schedule_list = Schedule.objects.filter(course_id=course)
+        self.response = self.client.get(url, {'schedule_list': schedule_list})
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/schedule_prof.html')
 
     def test_attendance_view_as_student_status_code_and_template(self):
         self.client.logout()
@@ -175,7 +192,7 @@ class AttendanceTest(TestCase):
 
     def test_attendance_view_as_professor_status_code_and_template(self):
         self.client.logout()
-        res = self.client.login(email=self.professor1.user.email, password="abc")
+        self.client.login(email=self.professor1.user.email, password="abc")
 
         course = Course.objects.get(title="Sample Course 0")
         url = reverse('attendance', kwargs={'slug': course.slug})

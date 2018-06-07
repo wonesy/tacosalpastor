@@ -16,7 +16,7 @@
             <div class="form-group">
                 <label for="quizTitle">Quiz Title</label>
                 <div id="titleErrorCanvas"></div>
-                <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title">
+                <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title" tabindex="1">
             </div>
 
             <div id="question-canvas">
@@ -99,6 +99,8 @@
     </div>
 
     <script type="application/javascript">
+        window.onload = editExistingQuiz();
+
         $(".existing-questions-wrapper").focus(function () {
             refreshBlankQuestionRadio();
         });
