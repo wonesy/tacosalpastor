@@ -1,4 +1,6 @@
 branch-defaults:
+  master:
+    environment: django-env
   quiz:
     environment: django-env
     group_suffix: null
