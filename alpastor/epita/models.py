@@ -139,7 +139,7 @@ class Course(models.Model):
             self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
 
     def __str__(self):
-        return "{} ({})".format(self.title, self.semester)
+        return "{}".format(self.title)
 
     def verbose_title(self):
         return "{} ({})".format(self.title, self.semester)

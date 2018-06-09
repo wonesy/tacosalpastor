@@ -7,6 +7,41 @@
     width: 100%;
 }
 
+.button-thumbnail {
+    max-width: 10rem;
+    min-width: 10rem;
+    max-height: 85px;
+    min-height: 85px;
+    margin-bottom: 5px;
+}
+
+.name-absent-thumbnail.active {
+    border: #28a745 solid !important;
+}
+
+.name-present-thumbnail.active {
+    border: #dc3545 solid !important;
+}
+
+.button-thumbnail label {
+    max-width: 8rem;
+    min-width: 8rem;
+    min-height: 4rem;
+    max-height: 4rem;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.btn-portraits, .btn-names {
+    background: #AAAAAA;
+    min-width: 95px;
+}
+
+.btn-portraits.active, .btn-names.active {
+    color: white;
+    background: #17a2b8;
+}
+
 .btn-present, .btn-absent {
     background: #AAAAAA;
 }
@@ -26,6 +61,10 @@
 
 .status-container {
     margin: 50px 20px 50px 20px;
+}
+
+.student-view-container {
+    width: 100%;
 }
 
 .lock-attendance {
