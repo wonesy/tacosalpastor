@@ -134,9 +134,9 @@ class Course(models.Model):
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE)
     title = models.CharField(max_length=127)
-    description = models.TextField(max_length=1000)
+    description = models.TextField(max_length=1000, blank=True)
     semester = models.CharField(max_length=31)
-    module = models.CharField(max_length=63)
+    module = models.CharField(max_length=63, blank=True)
     credits = models.IntegerField()
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
 
@@ -148,6 +148,10 @@ class Course(models.Model):
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
         self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
+
+    def save(self, **kwargs):
+        self.full_clean()
+        super(Course, self).save()
 
     def __repr__(self):
         return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
