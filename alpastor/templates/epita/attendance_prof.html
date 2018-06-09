@@ -20,14 +20,17 @@
         </div>
 
         {% if schedule.attendance_closed %}
-            <button class="lock-attendance locked btn btn-info" onclick="toggleAttendanceLock();">Locked <i class="lock-icon fa fa-lock"></i></button>
+            <button class="lock-attendance locked btn btn-info" onclick="toggleAttendanceLock();">Locked <i
+                    class="lock-icon fa fa-lock"></i></button>
         {% else %}
-            <button class="lock-attendance unlocked btn btn-info" onclick="toggleAttendanceLock();">Unlocked <i class="lock-icon fa fa-unlock"></i></button>
+            <button class="lock-attendance unlocked btn btn-info" onclick="toggleAttendanceLock();">Unlocked <i
+                    class="lock-icon fa fa-unlock"></i></button>
         {% endif %}
 
         <div class="btn-group btn-group-toggle btn-group-view" data-toggle="buttons">
             <label class="btn btn-portraits active">
-                <input type="radio" name="options" autocomplete="off" onchange='changeView(ViewEnum.portraits);'> Portraits
+                <input type="radio" name="options" autocomplete="off" onchange='changeView(ViewEnum.portraits);'>
+                Portraits
             </label>
             <label class="btn btn-names">
                 <input type="radio" name="options" autocomplete="off" onchange='changeView(ViewEnum.names);'> Names
@@ -38,9 +41,12 @@
 
         <div class="status-container">
             <div class="progress">
-                <div id="progress-present" class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuemin="0" ></div>
-                <div id="progress-excused" class="progress-bar progress-bar-striped bg-warning" role="progressbar" aria-valuemin="0" ></div>
-                <div id="progress-absent"  class="progress-bar progress-bar-striped bg-danger" role="progressbar" aria-valuemin="0" ></div>
+                <div id="progress-present" class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                     aria-valuemin="0"></div>
+                <div id="progress-excused" class="progress-bar progress-bar-striped bg-warning" role="progressbar"
+                     aria-valuemin="0"></div>
+                <div id="progress-absent" class="progress-bar progress-bar-striped bg-danger" role="progressbar"
+                     aria-valuemin="0"></div>
             </div>
             <div class="row">
                 <div id="stats-present" class="col-3"></div>
@@ -51,7 +57,7 @@
         </div>
 
 
-{#        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>#}
+        {#        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>#}
 
         <div class="student-view-container container-fluid">
             <!-- These divs will be filled via ajax calls -->
@@ -110,10 +116,10 @@
 
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function(data) {
+                success: function (data) {
                     console.log("success");
                 },
-                failure: function(errMsg) {
+                failure: function (errMsg) {
                     console.log(errMsg);
                 }
             });
