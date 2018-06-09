@@ -4,7 +4,7 @@
 
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/quiz_builder.css' %}">
-    <script src="{% static 'js/quiz_builder.js' %}"></script>
+    <script src="{% static 'js/quizbuilder.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -13,13 +13,34 @@
         <div class="quiz">
             <h1 class="quiz-title">Quiz Builder</h1>
 
-            <div class="form-group">
-                <label for="quizTitle">Quiz Title</label>
-                <div id="titleErrorCanvas"></div>
-                <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title" tabindex="1">
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="quizTitle">Quiz Title</label>
+                    <div id="titleErrorCanvas"></div>
+                    <input type="text" class="form-control" id="quizTitle" aria-describedby="quizTitleHelp" placeholder="Enter quiz title" tabindex="1">
+                </div>
             </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="courseTitle">Course</label>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-default dropdown-toggle course-dropdown" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span id="course-title" class="course-dropdown-text">--</span>
+                            <span class="course-dropdown-caret caret"></span>
+                            <span id="course-id" class="course-dropdown-value" hidden></span>
+                        </button>
+                        <ul class="dropdown-menu" style="width: 100%;" aria-labelledby="dropdownMenu1">
+                            {% for course in course_list %}
+                                <li><a href="#question-start" data-value="{{ course.id }}">{{ course.title }} ({{ course.semester }})</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <a name="question-start"></a>
 
             <div id="question-canvas">
+                <label>Questions</label>
                 <!-- This is to be filled in via javascript functions -->
             </div>
 
@@ -74,7 +95,6 @@
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Any');">Any</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Essay');">Essay</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('M.C.');">Multiple Choice</a>
-                                        <a class="dropdown-item" href="#" onclick="updateDropdownValue('Checkbox');">Checkbox</a>
                                         <a class="dropdown-item" href="#" onclick="updateDropdownValue('Numeric');">Numeric Scale</a>
                                     </div>
                                 </div>
@@ -99,7 +119,7 @@
     </div>
 
     <script type="application/javascript">
-        window.onload = editExistingQuiz();
+        window.onload = initialize();
 
         $(".existing-questions-wrapper").focus(function () {
             refreshBlankQuestionRadio();
@@ -108,5 +128,16 @@
         $('#searchExistingQuestion').keyup(function() {
             delay(getExistingQuestionQueryset(), 1000);
         });
+
+        // Function to change the value of the course dropdown menu
+        $(function(){
+            $(".dropdown").on('click', 'li a', function(){
+                let elem = $(".course-dropdown-text");
+                let valElem = $('.course-dropdown-value');
+                elem.text($(this).text());
+                valElem.text($(this).data('value'))
+        });
+
+});
     </script>
 {% endblock %}

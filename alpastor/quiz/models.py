@@ -1,14 +1,18 @@
 import re
 
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
+from django.contrib.auth.hashers import get_hasher
 from django.utils.translation import ugettext as _
 from epita.models import Course
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from epita.models import Student
 
 """
 General Quiz Section
 """
+
 
 class Quiz(models.Model):
     """
@@ -35,7 +39,7 @@ class Quiz(models.Model):
 
     title = models.CharField(verbose_name=_("Title"), max_length=80, blank=False)
     description = models.TextField(verbose_name=_("Description"), blank=True, help_text="description of the quiz")
-    url = models.SlugField(max_length=80, blank=False, help_text="a user friendly url", verbose_name=_("User-friendly URL"))
+    url = models.SlugField(max_length=100, blank=True, help_text="a user friendly url", verbose_name=_("User-friendly URL"))
     course = models.ForeignKey(Course, verbose_name=_("Associated Course"), blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=DRAFT,
                               help_text="the quiz can either be ready to take, completed, or a draft", verbose_name=_("Status"))
@@ -52,20 +56,10 @@ class Quiz(models.Model):
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
-        if self.url == "":
-            tmp = self.title
-        else:
-            tmp = self.url
-
-        self.url = "{}{}{}{}{}{}-{}".format(self.created_on.microsecond,
-                                            self.created_on.second,
-                                            self.created_on.minute,
-                                            self.created_on.day,
-                                            self.created_on.month,
-                                            self.created_on.year,
-                                            re.sub('\s+', '-', tmp).lower())
-
-        self.url = ''.join(letter for letter in self.url if letter.isalnum() or letter == '-')
+        self.url = get_hasher().encode(self.__repr__(), "salt")
+        bad_chars = ['$', '/', '\\', '=', '_']
+        for c in bad_chars:
+            self.url.replace(c, '')
 
         if (self.status is not self.READY) and self.open:
             self.open = False
@@ -74,6 +68,10 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
+
+    def __repr__(self):
+        return "title={}, description={}, course={}, status={}, open={}, time_lime={}, randomize={}, created_on={}".format(
+            self.title, self.description, self.course, self.status, self.open, self.time_limit, self.randomize, self.created_on)
 
     def get_created_date(self):
         return "{}-{}-{}".format(self.created_on.day, self.created_on.month, self.created_on.year)
@@ -125,6 +123,7 @@ class MultipleChoiceQuestion(Question):
     def __str__(self):
         return "{}".format(self.content)
 
+
 # Keeping this class just for the get_score implementation, if we need it in the future
 class CheckboxQuestion(MultipleChoiceQuestion):
     multiple_answers = models.BooleanField(default=True, verbose_name=_("Multiple Correct Answers"))
@@ -167,6 +166,7 @@ class CheckboxQuestion(MultipleChoiceQuestion):
 
         return score
 
+
 class MultipleChoiceOption(models.Model):
 
     question = models.ForeignKey(Question, verbose_name=_("Multiple Choice Question"), on_delete=models.CASCADE, null=False, blank=False)
@@ -180,6 +180,7 @@ class MultipleChoiceOption(models.Model):
         verbose_name = _("Option")
         verbose_name_plural = _("Options")
 
+
 """
 
 Numeric Scale Question
@@ -187,6 +188,8 @@ Numeric Scale Question
 [1] [2] [3] [4] [5]
 
 """
+
+
 class NumericScaleQuestion(Question):
     min = models.IntegerField(verbose_name=_("Minimum Scale Value"), blank=False)
     max = models.IntegerField(verbose_name=_("Maximum Scale Value"), blank=False)
@@ -209,3 +212,55 @@ class NumericScaleQuestion(Question):
 
         if self.min >= self.max:
             raise ValidationError(_("Min cannot be greater-than or equal to max"))
+
+
+"""
+
+Quiz Progression Section
+
+"""
+
+
+class QuizProgression(models.Model):
+    # Keep the records even if the quiz is deleted by Teachers
+    quiz = models.ForeignKey(Quiz, on_delete=models.DO_NOTHING, blank=True, null=True)
+    questions_order = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_answered = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_correct = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    questions_incorrect = models.CharField(validators=[validate_comma_separated_integer_list], blank=True, null=True, max_length=255)
+    quiz_timestamp = models.DateTimeField(auto_now=True)
+    score_obtained = models.IntegerField(blank=True, null=True)
+    score_possible_points = models.IntegerField(blank=True, null=True)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+    # Metadata
+    class Meta:
+        ordering = ["quiz_timestamp"]
+
+    def questions_count(self, q_type: str):
+        # counts number of commas to know how many elements are in the comma separated field
+        if q_type == "questions_correct":
+            question_list = map(int, self.questions_correct.split(','))
+            # questions_type_count = self.questions_correct.count(",") + 1
+        elif q_type == "questions_incorrect":
+            question_list = map(int, self.questions_incorrect.split(','))
+        elif q_type == "questions_answered":
+            question_list = map(int, self.questions_answered.split(','))
+
+        questions_type_count = len(question_list)
+        return questions_type_count
+
+    # Given that an unmarked question is an incorrect question
+    @property
+    def quiz_score(self):
+        numerator: int = self.questions_count('questions_correct')
+        denominator = self.questions_count('questions_correct')+self.questions_count('questions_correct')
+        score = numerator / denominator
+        return score
+
+    # Overrides __repr__ method
+
+    def __repr__(self):
+        return "title={}, questions_correct={}, questions_incorrect={}, questions_answered={}, score={}, timestamp={}".format(
+            self.quiz.title, self.questions_correct, self.questions_incorrect, self.questions_answered, self.quiz_score, self.quiz_timestamp)
+
