@@ -49,7 +49,8 @@ urlpatterns = [
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/edit', login_required(quiz_views.EditQuizPage.as_view()), name='editquiz'),
 
-path('admin/', admin.site.urls),
+    path('dashboardex/', views.dashboard, name='dashboardex'),
+    path('admin/', admin.site.urls),
    # path('quiz/', views.SearchCourse, name='SearchCourse'),
 ]
 
