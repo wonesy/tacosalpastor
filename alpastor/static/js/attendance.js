@@ -2,8 +2,35 @@
 let allStudents = [];
 
 // Enumeration for attendance statuses
-let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3};
+let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3, "toggle":4};
 Object.freeze(StatusEnum);
+
+let ViewEnum = {"portraits": 0, "names": 1};
+Object.freeze(ViewEnum);
+
+let GlobalView = ViewEnum.portraits;
+
+function clearAttendanceContainers() {
+    document.getElementsByClassName('present-container')[0].innerHTML = "";
+    document.getElementsByClassName('absent-container')[0].innerHTML = "";
+    document.getElementsByClassName('excused-container')[0].innerHTML = "";
+}
+
+function changeView(newView) {
+    // Do nothing if the view change is the same... should never arrive here
+    if (GlobalView === newView) {
+        return;
+    }
+
+    GlobalView = newView;
+    clearAttendanceContainers();
+
+    getAttendanceData()();
+
+    for (let i = 0; i < allStudents.length; i++) {
+        reorganizeStudent(allStudents[i], -1);
+    }
+}
 
 /*
 Keep track of counts
@@ -48,6 +75,7 @@ function redrawProgressBar() {
         absentPct += difference;
     }
 
+    // Update "present" progress bar and stats
     $("#progress-present")
         .attr('aria-valuenow', counts[StatusEnum.present])
         .attr('aria-valuemax', counts[StatusEnum.total])
@@ -55,6 +83,7 @@ function redrawProgressBar() {
 
     $("#stats-present").html(statisticsTemplate.format("present-stats", "Present", counts[StatusEnum.present]));
 
+    // Update "excused" progress bar and stats
     $("#progress-excused")
         .attr('aria-valuenow', counts[StatusEnum.excused])
         .attr('aria-valuemax', counts[StatusEnum.total])
@@ -62,6 +91,7 @@ function redrawProgressBar() {
 
     $("#stats-excused").html(statisticsTemplate.format("excused-stats", "Excused", counts[StatusEnum.excused]));
 
+    // Update "absent" progress bar and stats
     $("#progress-absent")
         .attr('aria-valuenow', counts[StatusEnum.absent])
         .attr('aria-valuemax', counts[StatusEnum.total])
@@ -69,6 +99,7 @@ function redrawProgressBar() {
 
     $("#stats-absent").html(statisticsTemplate.format("absent-stats", "Absent", counts[StatusEnum.absent]));
 
+    // Update total stats
     $("#stats-total").html(statisticsTemplate.format("total-stats", "Total", counts[StatusEnum.total]));
 }
 
@@ -143,11 +174,11 @@ class StudentAttendance {
     static getHTMLTemplate(status) {
         switch (status) {
             case StatusEnum.present:
-                return studentStatusPresentTemplate;
+                return (GlobalView === ViewEnum.portraits) ? studentStatusPresentTemplateCard : studentStatusPresentTemplateThumbnail;
             case StatusEnum.absent:
-                return studentStatusAbsentTemplate;
+                return (GlobalView === ViewEnum.portraits) ? studentStatusAbsentTemplateCard : studentStatusAbsentTemplateThumbnail;
             case StatusEnum.excused:
-                return studentStatusExcusedTemplate;
+                return (GlobalView === ViewEnum.portraits) ? studentStatusExcusedTemplateCard : studentStatusExcusedTemplateThumbnail;
             default:
                 return null;
         }
@@ -205,12 +236,10 @@ function processStudentStatus(student) {
     }
 }
 
-// Template to display a student' information
-// let studentStatusTemplate =
-//     "<div id='{0}' class='row student-status'>{1}:{2}</div>";
-
-
-let studentStatusPresentTemplate =
+/*
+    The card/portrait view templates for the students
+ */
+let studentStatusPresentTemplateCard =
     "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-success\">{1}</div>" +
@@ -233,7 +262,7 @@ let studentStatusPresentTemplate =
         "</div>" +
     "</div>";
 
-let studentStatusAbsentTemplate =
+let studentStatusAbsentTemplateCard =
     "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-danger\">{1}</div>" +
@@ -256,7 +285,7 @@ let studentStatusAbsentTemplate =
         "</div>" +
     "</div>";
 
-let studentStatusExcusedTemplate =
+let studentStatusExcusedTemplateCard =
     "<div id=\"{0}\" class=\"col-lg-2 col-md-6 col-sm-12 status-card\">" +
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-warning\">{1}</div>" +
@@ -280,6 +309,35 @@ let studentStatusExcusedTemplate =
     "</div>";
 
 /*
+    The thumbnail view for the templates
+ */
+
+let studentStatusPresentTemplateThumbnail =
+    "<div id='{0}' class=\"col-1 button-thumbnail btn-group-toggle\" data-toggle=\"buttons\">" +
+        "<label class=\"btn btn-success name-present-thumbnail\">" +
+            "<input type=\"checkbox\" checked autocomplete=\"off\" onchange='markForStatusChange({0}, StatusEnum.toggle);'> {1}" +
+        "</label>" +
+        "<label class='status-thumbnail white-text'>{2}</label>" +
+    "</div>";
+
+let studentStatusExcusedTemplateThumbnail =
+    "<div id='{0}' class=\"col-1 button-thumbnail btn-group-toggle\" data-toggle=\"buttons\">" +
+        "<label class=\"btn btn-warning name-excused-thumbnail\">" +
+            "<input type=\"checkbox\" checked autocomplete=\"off\" onchange='markForStatusChange({0}, StatusEnum.toggle);'> {1}" +
+        "</label>" +
+        "<label class='status-thumbnail white-text'>{2}</label>" +
+    "</div>";
+
+let studentStatusAbsentTemplateThumbnail =
+    "<div id='{0}' class=\"col-1 button-thumbnail btn-group-toggle\" data-toggle=\"buttons\">" +
+        "<label class=\"btn btn-danger name-absent-thumbnail\">" +
+            "<input type=\"checkbox\" checked autocomplete=\"off\" onchange='markForStatusChange({0}, StatusEnum.toggle);'> {1}" +
+        "</label>" +
+        "<label class='status-thumbnail white-text'>{2}</label>" +
+    "</div>";
+
+
+/*
 This function will mark the statusOverride field for the student, indicating that the professor has manually
 changed the status of their attendance
 
@@ -294,9 +352,24 @@ function markForStatusChange(student_id, status) {
         return;
     }
 
-    console.log("Marking change on student[" + student_id + "]: " + student.status + "--> " + status);
+    // Toggle the status between present/absent
+    if (status === StatusEnum.toggle) {
 
-    student.statusOverride = status;
+        // Fixing a bug unforeseen before toggle feature where override isn't established before getting here
+        if (student.statusOverride === null) {
+            student.statusOverride = student.status;
+        }
+
+        if (student.statusOverride === StatusEnum.present) {
+            student.statusOverride = StatusEnum.absent;
+        } else if (student.statusOverride === StatusEnum.absent) {
+            student.statusOverride = StatusEnum.present;
+        }
+    } else {
+        student.statusOverride = status;
+    }
+
+    console.log("Changing status on student[" + student_id + "]: " + student.status + "--> " + student.statusOverride);
 }
 
 function dispatchStatusChangesToDatabase() {

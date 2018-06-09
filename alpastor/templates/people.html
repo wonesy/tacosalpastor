@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/people.css' %}">
+{% endblock %}
+
 {% block content %}
     <div class="col-md-12">
         <div class="people-canvas">
@@ -66,7 +70,7 @@
                             <div class="people-top">
                             <div class="people-names" id="demo">
                                 <input hidden
-                                       value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.intakeYear }} {{ student.user.email }}">
+                                       value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.intakeSemester }} {{ student.user.email }}">
 {#                                <div class="text-block"><strong> Name#}
 {#                                    : </strong> {{ student.user.first_name }} {{ student.user.last_name }}<br></div>#}
                                 <strong> Country : </strong>{{ student.country }} <br>
@@ -82,7 +86,7 @@
                                 <strong> Phone :</strong> {{ student.phone }}<br>
                                 <strong> Program :</strong> {{ student.program }}<br>
                                 <strong> Specialization : </strong> {{ student.specialization }}<br>
-                                <div class="text-block2"><strong> Year : </strong> [{{ student.intakeYear }}]</div>
+                                <div class="text-block2"><strong> Year : </strong> [{{ student.intakeSemester }}]</div>
                             </div>
                         </div>
                     </div>

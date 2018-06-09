@@ -59,9 +59,22 @@ class Student(models.Model):
         languages = which languages the student speaks, comma separated (English,French)
         photo_location = path on server to the stored location of the student's photo
     """
+
+    NONE = 0
+    ME = 1
+    MSc = 2
+    GITM = 3
+
+    PROGRAM_CHOICES = [
+        (NONE, 'None'),
+        (ME, 'Master of Engineering'),
+        (MSc, 'Master of Science'),
+        (GITM, 'Global IT Management'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
-    program = models.CharField(max_length=6)
+    program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
     specialization = models.CharField(max_length=63)
     intakeSemester = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
@@ -121,9 +134,9 @@ class Course(models.Model):
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE)
     title = models.CharField(max_length=127)
-    description = models.TextField(max_length=1000)
+    description = models.TextField(max_length=1000, blank=True)
     semester = models.CharField(max_length=31)
-    module = models.CharField(max_length=63)
+    module = models.CharField(max_length=63, blank=True)
     credits = models.IntegerField()
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
 
@@ -136,11 +149,18 @@ class Course(models.Model):
         # Save slug field (e.g. fall-2019-advanced-c-programming
         self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
 
+    def save(self, **kwargs):
+        self.full_clean()
+        super(Course, self).save()
+
     def __repr__(self):
         return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
             self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
 
     def __str__(self):
+        return "{}".format(self.title)
+
+    def verbose_title(self):
         return "{} ({})".format(self.title, self.semester)
 
 
@@ -189,31 +209,6 @@ class Grades(models.Model):
         return "{} Scored {} out of {}".format(self.assignment, self.points_earned, self.points_possible)
 
 
-class Room(models.Model):
-    """
-    Defines the Room database table
-
-    Args:
-        building = building code that this room is in (Voltaire, Kremlin, etc.)
-        has_whiteboard = boolean, based on presence of whiteboard in room
-        has_chalkboard = boolean, based on presence of chalkboard in room
-        has_projector = boolean, based on presence of projector in room
-        size = number of people/students that the room can accommodate
-    """
-    building = models.CharField(max_length=63)
-    has_whiteboard = models.BooleanField(blank=True, default=False)
-    has_chalkboard = models.BooleanField(blank=True, default=False)
-    has_projector = models.BooleanField(blank=True, default=False)
-    size = models.IntegerField()
-
-    def __repr__(self):
-        return "Room(building={}, has_whiteboard={}, has_chalkboard={}, has_projector={}, size={})".format(
-            self.building, self.has_whiteboard, self.has_chalkboard, self.has_projector, self.size)
-
-    def __str__(self):
-        return "{}".format(self.building)
-
-
 class Schedule(models.Model):
     """
     Defines the Schedule database table
@@ -223,18 +218,16 @@ class Schedule(models.Model):
         date = date that a course will take place
         start_time = starting time for this course
         end_time = ending time for this course
-        room_id = FK to the room where the course will be held
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     date = models.DateField(default=now)
     start_time = models.TimeField(default=now)
     end_time = models.TimeField(default=now() + datetime.timedelta(hours=2))
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
     attendance_closed = models.BooleanField(blank=False, default=True)
 
     def __repr__(self):
-        return "Schedule(course_id={}, date={}, start_time={}, end_time={}, room_id={})".format(self.course_id,
-            self.date, self.start_time, self.end_time, self.room_id)
+        return "Schedule(course_id={}, date={}, start_time={}, end_time={})".format(self.course_id,
+            self.date, self.start_time, self.end_time)
 
     def __str__(self):
         return "{} {}".format(self.course_id, self.date)

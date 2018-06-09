@@ -1,5 +1,5 @@
 from django.test import TestCase, Client, RequestFactory
-from epita.models import Student, Professor, Course, Room, Schedule, Attendance, StudentCourse
+from epita.models import Student, Professor, Course, Schedule, Attendance, StudentCourse
 from epita.forms import AttendanceForm
 from epita.views import CourseView
 from accounts.models import User
@@ -25,7 +25,7 @@ class AttendanceTest(TestCase):
         # login for all things that don't require a login
         self.client.login(email="epita0@epita.fr", password="abc")
 
-        Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program="ME",
+        Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program=Student.ME,
                                                                      specialization="Software Engineering",
                                                                      intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
@@ -33,7 +33,7 @@ class AttendanceTest(TestCase):
         User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
                             email="epita1@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
-        Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program="ME",
+        Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program=Student.ME,
                                                                      specialization="Software Engineering",
                                                                      intakeSemester="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
@@ -41,7 +41,7 @@ class AttendanceTest(TestCase):
         User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
                             email="epita2@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
-        Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program="ME",
+        Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program=Student.ME,
                                                                      specialization="Software Engineering",
                                                                      intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
@@ -65,13 +65,6 @@ class AttendanceTest(TestCase):
         course2 = Course.objects.create(professor_id=self.professor1, title="Sample Course 2", description="Sample Description",
                                    semester="Spring 2018", module="Java", credits=3)
 
-        room0 = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
-                                    has_whiteboard=False, size=50)
-
-        room1 = Room.objects.create(building="kremlin", has_chalkboard=True, has_projector=True,
-                                   has_whiteboard=True, size=20)
-
-
         # Give student0 both courses
         StudentCourse.objects.create(student_id=student0, course_id=course0)
         StudentCourse.objects.create(student_id=student0, course_id=course1)
@@ -86,21 +79,21 @@ class AttendanceTest(TestCase):
         # Create 20 instances of a class schedule for course0
         for i in range(0,20):
             Schedule.objects.create(course_id=course0, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00", end_time="11:00", room_id=room0)
+                                    start_time="10:00", end_time="11:00")
 
         # Create 10 instances of a class schedule for course1
         for i in range(0,10):
             Schedule.objects.create(course_id=course1, date=datetime.date.today()+datetime.timedelta(days=i),
-                                    start_time="10:00", end_time="11:00", room_id=room1)
+                                    start_time="10:00", end_time="11:00")
 
         self.schedule0 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="10:00",
-                                            end_time="13:00", room_id=room0)
+                                            end_time="13:00")
 
         schedule1 = Schedule.objects.create(course_id=course1, date=datetime.date.today(), start_time="14:00",
-                                            end_time="16:00", room_id=room1)
+                                            end_time="16:00")
 
         schedule2 = Schedule.objects.create(course_id=course2, date=datetime.date.today(), start_time="18:30",
-                                            end_time="20:30", room_id=room1)
+                                            end_time="20:30")
 
         # These are now created automatically whenever a schedule is created
         # Attendance.objects.create(student_id=student0, schedule_id=schedule0, status=1)

@@ -1,5 +1,5 @@
 from django.test import TestCase, Client, RequestFactory
-from epita.models import Student, Professor, Course, Room, Schedule, Attendance, StudentCourse
+from epita.models import Student, Professor, Course, Schedule, Attendance, StudentCourse
 from epita.forms import AttendanceForm
 from epita.views import CourseView
 from accounts.models import User
@@ -30,8 +30,6 @@ class StaffAttendanceTest(TestCase):
         self.course2 = Course.objects.create(professor_id=self.prof1, title="Advanced C", credits=3, semester="Fall 2020")
         self.course3 = Course.objects.create(professor_id=self.prof1, title="Advanced D", credits=3, semester="Fall 2020")
 
-        # Create 1 room
-        self.room = Room.objects.create(building="The White house", size=100)
 
         # Create 50 students
         for i in range(0,50):
@@ -57,16 +55,16 @@ class StaffAttendanceTest(TestCase):
 
         # Create X scheduled classes for each course
         for i in range(0,random.randint(1,10)):
-            Schedule.objects.create(course_id=self.course0, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now(), room_id=self.room)
+            Schedule.objects.create(course_id=self.course0, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now())
 
         for i in range(0,random.randint(1,10)):
-            Schedule.objects.create(course_id=self.course1, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now(), room_id=self.room)
+            Schedule.objects.create(course_id=self.course1, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now())
 
         for i in range(0, random.randint(1,10)):
-            Schedule.objects.create(course_id=self.course2, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now(), room_id=self.room)
+            Schedule.objects.create(course_id=self.course2, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now())
 
         for i in range(0, random.randint(1,10)):
-            Schedule.objects.create(course_id=self.course3, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now(), room_id=self.room)
+            Schedule.objects.create(course_id=self.course3, date=timezone.now(), start_time=timezone.now(), end_time=timezone.now())
 
 
     def test_prof_attendance_profs2course(self):
