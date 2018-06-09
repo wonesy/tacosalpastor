@@ -15,4 +15,4 @@ class ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = Schedule
-        fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'room_id', 'attendance_closed']
+        fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'attendance_closed']
