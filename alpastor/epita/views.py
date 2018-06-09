@@ -50,10 +50,25 @@ class ScheduleView(ListView):
         course = get_object_or_404(Course, slug=slug)
         print(course.professor_id)
         schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
+
+        # Student view
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
             self.template_name = 'epita/schedule_student.html'
-            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
 
+            schedule_data = []
+
+            for schedule in schedule_list:
+                attendance = Attendance.objects.get(schedule_id=schedule, student_id__user=request.user)
+                schedule_data.append({'schedule': schedule, 'attendance': attendance})
+
+            return render(request, self.template_name, {
+                'course': course,
+                'schedule_data': schedule_data,
+                'total': schedule_list.count(),
+                'numPresent': Attendance.objects.filter(schedule_id__course_id=course, student_id__user=request.user, status=Attendance.PRESENT).count()
+            })
+
+        # Professor/Admin View
         else:
             if request.user.is_superuser:
                 course_queryset = Course.objects.all()

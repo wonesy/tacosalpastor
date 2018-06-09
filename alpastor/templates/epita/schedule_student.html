@@ -2,29 +2,75 @@
 
 {% load static %}
 
-{% block content %}
-    <table class="table text-center">
-        <thead class="thead-inverse">
-            <tr>
-                <th>Active Courses</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for schedule in schedule_list %}
-                <tr>
-                    <th>
-                        <a class="btn btn-primary" href="/attendance/course/{{ course }}/schedule/?schedule_id={{ schedule.id }}" style="min-width: 220px;">
-                            {{ schedule.date }} - {{ schedule.start_time|time:"H:i" }}
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/schedule_student.css' %}">
+    <link rel="stylesheet" href="{% static 'css/circle.css' %}">
+{% endblock %}
 
-                            {% if schedule.attendance_closed %}
+{% block content %}
+    <h5 style="text-align: center;">{{ course.title }}</h5>
+    <div id="circle-chart"></div>
+    <div class="center-container container-fluid">
+        {% for item in schedule_data %}
+
+            <div class="attendance-container row">
+                <div class="attendance-button">
+                    <a class="btn btn-primary" href="/attendance/course/{{ course.slug }}/schedule/?schedule_id={{ item.schedule.id }}" style="min-width: 220px;">
+                        {{ item.schedule.date }} - {{ item.schedule.start_time|time:"H:i" }}
+
+                        {{ item.key }}
+                        {% if item.schedule.attendance_closed %}
                             <i class="fa fa-lock" style="margin-left: 10px"></i>
-                            {% else %}
+                        {% else %}
                             <i class="fa fa-unlock" style="margin-left: 10px"></i>
-                            {% endif %}
-                        </a>
-                    </th>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="attendance-icon col-1">
+                    {%  if item.attendance.status == 1 %}
+                        {# PRESENT #}
+
+                        <i style="color: #28a745;" class="fa fa-check-circle"></i>
+
+                    {% elif item.attendance.status == 2 %}
+                        {# ABSENT #}
+
+                        <i style="color: #dc3545;" class="fa fa-times-circle"></i>
+
+                    {% elif item.attendance.status == 3 %}
+                        {# EXCUSED #}
+
+                        <i style="color: #ffc107;" class="fa fa-exclamation-circle"></i>
+
+                    {%  else %}
+                        {# UNKNOWN #}
+                        <i class="fa fa-question-circle"></i>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script type="application/javascript">
+        window.onload = function() {
+            let chartElem =
+                "<div class='c100 p{0} center green'>" +
+                    "<span>{0}%</span>" +
+                    "<div class='slice'>" +
+                    "<div class='bar'></div>" +
+                    "<div class='fill'></div>" +
+                    "</div>" +
+                "</div>" +
+                "<p>{1}/{2}</p>";
+
+            let chartContainer = document.getElementById('circle-chart');
+
+            let total = {{ total }};
+            let numPresent = {{ numPresent }};
+            let percentage = 100 * ( numPresent / total );
+
+            chartContainer.innerHTML = chartElem.format(Math.round(percentage), numPresent, total);
+
+        };
+    </script>
 {% endblock %}

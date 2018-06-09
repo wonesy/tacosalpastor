@@ -1,0 +1,42 @@
+.center-container {
+    margin: auto;
+    max-width: 250px;
+}
+
+.attendance-container {
+    margin-bottom: 15px;
+}
+
+.present-box .absent-box .unknown-box .excused-box {
+    vertical-align: middle;
+}
+
+.attendance-button {
+    min-width: 220px;
+    float: left;
+    margin: 0;
+    padding: 0;
+}
+
+.attendance-button a {
+    min-width: 220px;
+}
+
+.attendance-icon {
+    display: inline-block;
+}
+
+.attendance-icon i {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: 10px;
+}
+
+#circle-chart {
+    margin: 20px;
+}
+
+#circle-chart p {
+    text-align: center;
+    color: #cccccc;
+}
