@@ -25,6 +25,17 @@
             <button class="lock-attendance unlocked btn btn-info" onclick="toggleAttendanceLock();">Unlocked <i class="lock-icon fa fa-unlock"></i></button>
         {% endif %}
 
+        <div class="btn-group btn-group-toggle btn-group-view" data-toggle="buttons">
+            <label class="btn btn-portraits active">
+                <input type="radio" name="options" autocomplete="off" onchange='changeView(ViewEnum.portraits);'> Portraits
+            </label>
+            <label class="btn btn-names">
+                <input type="radio" name="options" autocomplete="off" onchange='changeView(ViewEnum.names);'> Names
+            </label>
+        </div>
+
+        <button class="btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>
+
         <div class="status-container">
             <div class="progress">
                 <div id="progress-present" class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuemin="0" ></div>
@@ -40,16 +51,18 @@
         </div>
 
 
-        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>
+{#        <button class="override-submit btn btn-info" onclick="dispatchStatusChangesToDatabase();">Submit all changes</button>#}
 
-        <!-- These divs will be filled via ajax calls -->
-        <div class="present-container row">
-        </div>
+        <div class="student-view-container container-fluid">
+            <!-- These divs will be filled via ajax calls -->
+            <div class="present-container row">
+            </div>
 
-        <div class="excused-container row">
-        </div>
+            <div class="excused-container row">
+            </div>
 
-        <div class="absent-container row">
+            <div class="absent-container row">
+            </div>
         </div>
     </div>
 
@@ -59,7 +72,7 @@
         let attendanceInterval = 0;
 
         {% if not schedule.attendance_closed %}
-        attendanceInterval = setInterval(getAttendanceData(), 10000);
+            attendanceInterval = setInterval(getAttendanceData(), 10000);
         {% endif %}
 
         function toggleAttendanceLock() {

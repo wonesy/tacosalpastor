@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from epita.models import Attendance, Student
+from epita.models import Attendance
 
 
 class AttendanceSerializer(serializers.ModelSerializer):

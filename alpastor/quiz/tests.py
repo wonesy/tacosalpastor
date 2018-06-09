@@ -1,6 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
-import re
-from .models import *
+from quiz.models import Quiz, MultipleChoiceQuestion, MultipleChoiceOption, NumericScaleQuestion, Question
 
 # Create your tests here.
 class MultipleChoiceTest(TestCase):
@@ -32,26 +32,8 @@ class MultipleChoiceTest(TestCase):
         self.assertEqual(2, MultipleChoiceOption.objects.filter(question=self.mcquestion).count())
 
     def test_mcquiz_unique_url(self):
-        url1 = "{}{}{}{}{}{}-{}".format(self.quiz1.created_on.microsecond,
-                                        self.quiz1.created_on.second,
-                                        self.quiz1.created_on.minute,
-                                        self.quiz1.created_on.day,
-                                        self.quiz1.created_on.month,
-                                        self.quiz1.created_on.year,
-                                        re.sub('\s+', '-', self.quiz1.title).lower())
-
-        url2 = "{}{}{}{}{}{}-{}".format(self.quiz2.created_on.microsecond,
-                                        self.quiz2.created_on.second,
-                                        self.quiz2.created_on.minute,
-                                        self.quiz2.created_on.day,
-                                        self.quiz2.created_on.month,
-                                        self.quiz2.created_on.year,
-                                        re.sub('\s+', '-', self.quiz2.title).lower())
-
         self.assertNotEqual(self.quiz1.url, self.quiz2.url)
 
-        self.assertEqual(self.quiz1.url, url1)
-        self.assertEqual(self.quiz2.url, url2)
 
     def test_mcquiz_manytomany(self):
         mcq1 = Question.objects.filter(quiz=self.quiz1)

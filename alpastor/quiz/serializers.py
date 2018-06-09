@@ -14,6 +14,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuizSerializer(serializers.ModelSerializer):
     question_set = QuestionSerializer(many=True, read_only=True)
+    course_title = serializers.SerializerMethodField()
     class Meta:
         model = Quiz
-        fields = ['title', 'description', 'course', 'question_set']
+        fields = ['title', 'course', 'course_title', 'description', 'question_set']
+
+    def get_course_title(self, obj):
+        if obj.course != None:
+            return obj.course.verbose_title()
+

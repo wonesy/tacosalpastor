@@ -145,6 +145,23 @@
     color: red;
 }
 
+.course-dropdown {
+    min-width: 100%;
+    text-align: left;
+}
+
+.course-dropdown-text {
+    width: 98%;
+    float: left;
+}
+.course-dropdown-caret {
+    margin-right: 5px;
+    float: right;
+}
+
+.btn-default:hover {
+    background: #AAAAAA;
+}
 /******************************************************/
 /************          MODAL           ****************/
 /******************************************************/
