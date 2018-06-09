@@ -1,9 +1,6 @@
 branch-defaults:
   master:
-    environment: django-env
-  quiz:
-    environment: django-env
-    group_suffix: null
+    environment: tacosalpastor-dev
 global:
   application_name: tacosalpastor
   branch: null
