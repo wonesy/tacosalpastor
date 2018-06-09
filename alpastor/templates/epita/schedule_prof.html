@@ -9,7 +9,7 @@
                 <table class="table text-center">
                     <thead class="thead-inverse">
                     <tr>
-                        <th>Active Courses</th>
+                        <th style="color: black;">{{ course.title }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -17,7 +17,7 @@
                         <tr>
                             <th>
                                 <a class="btn btn-primary"
-                                   href="/attendance/course/{{ course }}/schedule/?schedule_id={{ schedule.id }}"
+                                   href="/attendance/course/{{ course.slug }}/schedule/?schedule_id={{ schedule.id }}"
                                    style="min-width: 220px;">
                                     {{ schedule.date }} - {{ schedule.start_time|time:"H:i" }}
 
@@ -35,14 +35,46 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 text-center">
                 <div class="card">
-                    <h5 class="card-header">Add a new class</h5>
+                    <h5 class="card-header">Add Class</h5>
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <button class="btn btn-primary" type="submit">Create</button>
+                        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+                            {#                        <h5 class="card-title">{{ form.course_id }}</h5>#}
+                            {#                        <p class="card-text">{{ form.date }}</p>#}
+                            {#                        <p class="card-text">{{ form.start_time }}</p>#}
+                            {#                        <p class="card-text">{{ form.end_time }}</p>#}
+                            {#                        <p class="card-text">{{ form.room_id }}</p>#}
+                            {#                        <p class="card-text">{{ form.attendance_closed }}</p>#}
+                            {{ form.as_p }}
+                            <button id="submitBtn" class="btn btn-primary" type="submit">Create</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{#    <script>#}
+{#        $("#submitBtn").on('submit', function (event) {#}
+{#            event.preventDefault();#}
+{##}
+{#            console.log("form submitted!");#}
+{#            create_post();#}
+{#        });#}
+{##}
+{#        function create_post() {#}
+{#            $.ajax({#}
+{#                type: "POST",#}
+{#                url: baseUrl,#}
+{#                data: {#}
+{#                    course_id: parseGET()['course_id'],#}
+{#                    date: parseGET()['date'],#}
+{#                    start_time: parseGET()['start_time'],#}
+{#                    end_time: parseGET()['end_time'],#}
+{#                    room_id: parseGET()['room_id'],#}
+{#                    attendance_closed: parseGET()['attendance_closed']#}
+{#                },#}
+{#                contentType: "application/json; charset=utf-8",#}
+{#                dataType: "json"#}
+{#            });#}
+{#        }#}
+{#    </script>#}
 {% endblock %}

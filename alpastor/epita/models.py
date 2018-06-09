@@ -3,6 +3,8 @@ from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import re
+import datetime
+from django.utils.timezone import now
 
 
 @receiver(post_save, sender=User)
@@ -132,9 +134,9 @@ class Course(models.Model):
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE)
     title = models.CharField(max_length=127)
-    description = models.TextField(max_length=1000)
+    description = models.TextField(max_length=1000, blank=True)
     semester = models.CharField(max_length=31)
-    module = models.CharField(max_length=63)
+    module = models.CharField(max_length=63, blank=True)
     credits = models.IntegerField()
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
 
@@ -146,6 +148,10 @@ class Course(models.Model):
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
         self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
+
+    def save(self, **kwargs):
+        self.full_clean()
+        super(Course, self).save()
 
     def __repr__(self):
         return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
@@ -214,9 +220,9 @@ class Schedule(models.Model):
         end_time = ending time for this course
     """
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date = models.DateField(blank=True)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    date = models.DateField(default=now)
+    start_time = models.TimeField(default=now)
+    end_time = models.TimeField(default=now() + datetime.timedelta(hours=2))
     attendance_closed = models.BooleanField(blank=False, default=True)
 
     def __repr__(self):

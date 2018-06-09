@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/people.css' %}">
+{% endblock %}
+
 {% block content %}
     <div class="col-md-12">
         <div class="people-canvas">

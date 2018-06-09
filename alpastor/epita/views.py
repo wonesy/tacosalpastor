@@ -42,21 +42,45 @@ class CourseView(ListView):
         return render(request, self.template_name, {'course_list': course_list})
 
 class ScheduleView(ListView):
-    template_name = 'epita/schedule_student.html'
+    template_name = 'epita/schedule_prof.html'
     form_class = ScheduleForm
 
-    def get(self, request, slug, **kwargs):
+    def get(self, request, slug):
         logged_in_user = request.user
-        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
+        course = get_object_or_404(Course, slug=slug)
+        print(course.professor_id)
+        schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
+            self.template_name = 'epita/schedule_student.html'
             return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
 
         else:
-            self.template_name = 'epita/schedule_prof.html'
-            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+            if request.user.is_superuser:
+                course_queryset = Course.objects.all()
+            else:
+                course_queryset = Course.objects.filter(professor_id__user=request.user)
 
-    def post(self, request, slug, **kwargs):
-        pass
+            form = self.form_class()
+            form.fields['course_id'].queryset = course_queryset
+            form.fields['course_id'].initial = course
+
+            args = {'course': course, 'schedule_list': schedule_list, 'form': form}
+            return render(request, self.template_name, args)
+
+    def post(self, request, slug):
+        course = get_object_or_404(Course, slug=slug)
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
+        args = {
+            'course': course,
+            'schedule_list': schedule_list,
+            'form': form
+        }
+        return render(request, self.template_name, args)
+
+
 
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
@@ -89,7 +113,7 @@ class AttendanceView(ListView):
 
         return render(request, self.template_name, data)
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         schedule_id = request.GET.get('schedule_id', )
         schedule_instance = Schedule.objects.get(pk=schedule_id)
 
@@ -98,11 +122,11 @@ class AttendanceView(ListView):
         file = ""
 
         if form.is_valid():
+            print("student posting here")
 
             # Do not let the user update attendance information if the schedule instance is marked as closed
-            if schedule_instance.attendance_closed and not request.user.is_staff:
-                if form.cleaned_data['status'] != Attendance.EXCUSED:
-                    print("Cannot update attendance")
+            if (schedule_instance.attendance_closed) and (not request.user.is_staff) and (form.cleaned_data['status'] != Attendance.EXCUSED):
+                print("Cannot update attendance")
             else:
                 form.save()
                 file = form.cleaned_data['file_upload']
