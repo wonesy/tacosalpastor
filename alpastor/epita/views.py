@@ -47,14 +47,16 @@ class ScheduleView(ListView):
 
     def get(self, request, slug, **kwargs):
         logged_in_user = request.user
-        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
+        course = get_object_or_404(Course, slug=slug)
+        print(course.professor_id)
+        schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
-            return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
+            return render(request, self.template_name, {'course': course, 'schedule_list': schedule_list})
 
         else:
             self.template_name = 'epita/schedule_prof.html'
             form = self.form_class()
-            args = {'course': slug, 'schedule_list': schedule_list, 'form': form}
+            args = {'course': course, 'schedule_list': schedule_list, 'form': form}
             return render(request, self.template_name, args)
 
     def post(self, request, **kwargs):
