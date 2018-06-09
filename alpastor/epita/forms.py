@@ -2,7 +2,7 @@ from django.utils import timezone
 from datetime import datetime
 
 from django import forms
-from .models import Attendance, Schedule
+from .models import Attendance, Schedule, Course
 
 class AttendanceForm(forms.ModelForm):
 

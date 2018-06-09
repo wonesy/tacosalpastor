@@ -55,7 +55,15 @@ class ScheduleView(ListView):
             return render(request, self.template_name, {'course': slug, 'schedule_list': schedule_list})
 
         else:
+            if request.user.is_superuser:
+                course_queryset = Course.objects.all()
+            else:
+                course_queryset = Course.objects.filter(professor_id__user=request.user)
+
             form = self.form_class()
+            form.fields['course_id'].queryset = course_queryset
+            form.fields['course_id'].initial = course
+
             args = {'course': course, 'schedule_list': schedule_list, 'form': form}
             return render(request, self.template_name, args)
 
