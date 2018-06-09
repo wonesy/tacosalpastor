@@ -50,8 +50,6 @@ urlpatterns = [
     path('quiz/quiz_builder/getquiz/', login_required(quiz_views.GetQuizData.as_view()), name='existingquestion'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/', quiz_views.delete, name='delete_view'),
-    path('admin/', admin.site.urls),
-
     path('dashboardex/', views.dashboard, name='dashboardex'),
     path('admin/', admin.site.urls),
 
