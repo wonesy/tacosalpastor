@@ -1,20 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
-from django.views.generic import ListView, View
-
+from django.http import QueryDict
+from django.views.generic import ListView
 from rest_framework.exceptions import bad_request
-
 from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
-
 import json
 from django.http import HttpResponse
-from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
-
+from .models import Student, StudentCourse, Course, Attendance, Schedule
 from django.views.generic import View
-
 from rest_framework.response import Response
 from django.db.models import Count
 

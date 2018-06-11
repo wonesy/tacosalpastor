@@ -87,8 +87,10 @@
                         <div class="add-users-csv col-4">
                             <p>Add users via CSV</p>
                             <div class="container" style="overflow: hidden;">
-                                <label for="user-csv">CSV/Excel File:</label><br>
-                                <input id="csv-file" type="file" name="user-csv" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"><br>
+                                <form id="csv-file-form">
+                                <label for="user-csv">CSV (Excel unsupported):</label><br>
+                                <input id="csv-file" type="file" name="user-csv" accept=".csv"><br>
+                                </form>
                             </div>
                         </div>
                     </div>

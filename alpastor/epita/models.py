@@ -120,14 +120,6 @@ class Student(models.Model):
                 tmp.append((val, name))
         return tmp
 
-    def get_non_none_specialization_choices(self):
-        tmp = []
-        for val,name in Student.SPECIALIZATION_CHOICES:
-            if val != Student.NONE:
-                tmp.append((val, name))
-        return tmp
-
-
 class Professor(models.Model):
     """
     Defines the Professor database table

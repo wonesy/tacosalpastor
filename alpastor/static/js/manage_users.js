@@ -82,12 +82,52 @@ function populateModalUserPreview() {
             (u.isProfessor) ? "n/a" : u.country
         ));
     }
+
+    $("#verify-modal").modal();
+}
+
+function processUserCSVFile(csvFileElem) {
+
+    let data = new FormData();
+    data.append('file', csvFileElem.files[0]);
+
+    console.log(window.location.origin + window.location.pathname + "processusercsv/");
+
+    $.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            url: window.location.origin + window.location.pathname + "processusercsv/",
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                console.log("SUCCESS : ", data);
+
+                for (let i = 0; i < data.length; i++) {
+                    let student = new Student(data[i].first_name, data[i].last_name, data[i].email);
+                    student.program = data[i].program;
+                    student.country = data[i].country;
+                    GlobalPotentialUsers.push(student);
+                }
+                populateModalUserPreview();
+
+            },
+            error: function (e) {
+
+                $("#result").text(e.responseText);
+                console.log("ERROR : ", e);
+                $("#btnSubmit").prop("disabled", false);
+
+            }
+        });
 }
 
 function collectNewUserInfo() {
     let csvFile = document.getElementById('csv-file');
     if (csvFile.files.length !== 0) {
-        // TODO process the csv file
+        processUserCSVFile(csvFile);
         return;
     }
 
@@ -168,8 +208,6 @@ function collectNewUserInfo() {
     GlobalPotentialUsers.push(newUser);
 
     populateModalUserPreview();
-
-    $("#verify-modal").modal();
 
     return true;
 }
