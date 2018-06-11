@@ -9,6 +9,22 @@
 
 {% block content %}
     <div class="container">
+
+        <div class="card actions-card manage-card">
+            {# Actions #}
+            <a data-toggle="collapse" href="#actions-card-body" aria-expanded="true" aria-controls="actions-card-body">
+                <div class="card-header">
+                    Actions performed
+                </div>
+            </a>
+
+            {# Add users body #}
+            <div id="actions-card-body" class="collapse">
+                <div class="card-body container-fluid" id="actions-messages"></div>
+            </div>
+        </div>
+
+
         {# Add users card #}
         <div class="card add-users-card manage-card">
 
@@ -149,8 +165,8 @@
                         <table id="modal-preview-table" style="width:100%;" align="left"></table>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save instances</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="savePotentialUsers();">Save instances</button>
                     </div>
                 </div>
             </div>

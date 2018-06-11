@@ -1,15 +1,26 @@
+from django.core.exceptions import MultipleObjectsReturned
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
 from accounts.forms import LoginForm
-from epita.models import Student
+from accounts.models import User
+from epita.models import Student, Professor
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, QueryDict, HttpResponse
+from django.views.generic import View
+import json
+import enum
 import logging
 
 logger = logging.getLogger(__name__)
+
+class ReturnCodes(enum.Enum):
+    OK = 0
+    ERR_USER_EXISTS = 1
+    ERR_INVALID_FIELD =2
 
 # Create your views here.
 def login(request):
@@ -33,15 +44,6 @@ def manageusers(request):
     })
 
 class ProcessUserCSVData(generics.ListCreateAPIView):
-    '''
-    This class view is solely responsible for delivering JSON-formatted data on the updated attendance information
-    for a particular schedule instance
-
-    Serializers are simply fancy names for turning python model data (database queries) into JSON serialized data
-    '''
-    # serializer_class = AttendanceSerializer
-    # queryset = Attendance.objects.all()
-
     first_name_opts = ["prenom", "first", "first_name", "firstname", "first name"]
     last_name_opts = ["nom", "last", "last_name", "lastname", "surname", "sur_name", "last name", "sur name"]
     program_opts = ["maj", "prog", "program", "major", "majeur"]
@@ -126,25 +128,157 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
 
             all_users.append(user)
 
-            print(user)
-
         logger.info("Processing CSV user file with {} potential users".format(len(all_users)))
 
         return JsonResponse(all_users, safe=False)
 
+class SaveNewUsers(View):
+    def get(self, request, *args, **kwargs):
+        return bad_request(request, exception="Forbidden")
+
+    def post(self, request, *args, **kwargs):
+        users_json = QueryDict(request.body).get('users')
+        users = json.loads(users_json)
+
+        response_code = 200
+        response_messages = []
+
+        for user in users:
+            print(user)
+
+            if user['isProfessor'] == True:
+                (rc, msg) = self.processNewProfessor(user)
+            else:
+                (rc, msg) = self.processNewStudent(user)
+
+            response_messages.append(msg)
+            if rc != ReturnCodes.OK:
+                response_code = 400
+
+        return JsonResponse(status=response_code, data={'messages': response_messages})
+
+    def processNewProfessor(self, professor):
+        return (ReturnCodes.OK, "OK")
+
+    def processNewStudent(self, student):
+        err_msg_template = "[FAIL] {} - [first_name={}, last_name={}, email_login={}]"
+        success_msg_template = "[PASS] Created student - [first_name={}, last_name={}, email_login={}]"
+
+        first_name = (student['firstName'])
+        last_name = student['lastName']
+        email_login = student['emailLogin']
+        program = self.programStringToValue(student['program'])
+        external_email = student['externalEmail']
+        phone = student['phone']
+        pic = student['pic']
+        specialization = self.specializationStringToValue(student['specialization'])
+        intake_semester = student['intakeSemester']
+        country = student['country']
+
+        # Ensure all required data is there first
+        if first_name == "" or last_name == "":
+            logger.error("Attempted to add student with no name")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Name empty", first_name, last_name, email_login))
+
+        if email_login == "":
+            logger.error("Attempted to add student with no primary email")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Email empty", first_name, last_name, email_login))
+
+        if program == "":
+            logger.error("Attempted to add student with no program")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Program empty", first_name, last_name, email_login))
+
+        if specialization == Student.NONE and not program == Student.GITM:
+            logger.error("Attempted to add student with no specialization")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Specialization empty", first_name, last_name, email_login))
+
+        try:
+            newUser = User.objects.create_user(
+                email=email_login,
+                password="epita",
+                first_name=first_name,
+                last_name=last_name,
+                external_email=external_email
+            )
+        except IntegrityError:
+            logger.warning("Attempted to create new user that appears to already exist: {}".format(email_login))
+            return (ReturnCodes.ERR_USER_EXISTS, err_msg_template.format(
+                "User exists already", first_name, last_name, email_login))
+
+        try:
+            Student.objects.filter(user=newUser).update(
+                phone=phone,
+                country=country,
+                program=program,
+                specialization=specialization,
+                intakeSemester=intake_semester
+            )
+        except MultipleObjectsReturned:
+            logger.warning("Found multiple students for the same user={}".format(newUser))
+            Student.objects.filter(user=newUser)[0].update(
+                phone=phone,
+                country=country,
+                program=int(program),
+                specialization=specialization,
+                intakeSemester=intake_semester
+            )
+
+        logger.info("Created new student with email={}".format(email_login))
+
+        return (ReturnCodes.OK, success_msg_template.format(first_name, last_name, email_login))
+
+    def programStringToValue(self, program):
+        programLower = program.lower()
+        gitm_options = [str(Student.GITM), "gitm", "global it management"]
+        me_options = [str(Student.ME), "me", "master of engineering", "masters of engineering"]
+        msc_options = [str(Student.MSc), "msc", "master of science", "masters of science"]
+
+        if programLower in gitm_options:
+            return Student.GITM
+
+        if programLower in me_options:
+            return Student.ME
+
+        if programLower in msc_options:
+            return Student.MSc
+
+        return Student.NONE
+
+    def specializationStringToValue(self, specialization):
+        specializationLower = specialization.lower()
+
+        none_options = [str(Student.NONE), "", "none"]
+        se_options = [str(Student.SE), "se", "software", "software engineering"]
+        ism_options = [str(Student.ISM), "ism", "information systems management"]
+        dsa_options = [str(Student.DSA), "dsa", "data science", "data science and analytics", "data science & analytics"]
+        cs_options = [str(Student.CS), "cs", "security", "computer security"]
+        sdm_options = [str(Student.SDM), "sdm", "software development and multimedia", "software development & multimedia"]
+        sds_options = [str(Student.SDS), "sds", "software networks & security", "software networks and security"]
+
+        if specializationLower in none_options:
+            return Student.NONE
+
+        if specializationLower in se_options:
+            return Student.SE
+
+        if specializationLower in ism_options:
+            return Student.ISM
+
+        if specializationLower in dsa_options:
+            return Student.DSA
+
+        if specializationLower in cs_options:
+            return Student.CS
+
+        if specializationLower in sdm_options:
+            return Student.SDM
+
+        if specializationLower in sds_options:
+            return Student.SDS
 
 
-    def get_queryset(self):
-        '''
-        Queries database for all attendance records for a given schedule ID
-
-        :return: queryset of all attendance records for a particular schedule_id, received from HTTP GET
-        '''
-        schedule_filter = self.request.query_params.get('schedule_id', )
-
-        if schedule_filter == None:
-            return None
-
-        queryset = Attendance.objects.filter(schedule_id=schedule_filter)
-
-        return queryset
+        return Student.NONE

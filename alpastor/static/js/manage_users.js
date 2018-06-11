@@ -28,35 +28,73 @@ class Student extends User {
     }
 }
 
+function writeActions(actions) {
+    console.log(actions);
+    msgTemplate = "<p>{0}</p>";
+    actionsElem = document.getElementById('actions-messages');
+    actionsElem.innerText = "";
+    for (let i = 0; i < actions.length; i++) {
+        console.log(actions[i]);
+        actionsElem.insertAdjacentHTML("beforeend", msgTemplate.format(actions[i]));
+    }
+}
+
+function savePotentialUsers() {
+    $.ajax({
+        type: "POST",
+        url: window.location.origin + window.location.pathname + "savenewusers/",
+        data: {
+            users: JSON.stringify(GlobalPotentialUsers),
+        },
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            console.log("SUCCESS");
+            writeActions(data.messages);
+        },
+        error: function (e, data) {
+            console.log("ERROR : ", e);
+            writeActions(e.responseJSON.messages);
+        }
+    });
+
+    // Show the actions display
+    $("#actions-card-body").toggleClass("show");
+
+    // Remove csv file
+    $('#csv-file').val("");
+}
+
 function populateModalUserPreview() {
     let tableHeading =
         "<tr>" +
-            "<th>First Name</th>" +
-            "<th>Last Name</th>" +
-            "<th>Email</th>" +
-            "<th>External Email</th>" +
-            "<th>Type</th>" +
-            "<th>Phone</th>" +
-            "<th>Picture</th>" +
-            "<th>Program</th>" +
-            "<th>Specialization</th>" +
-            "<th>Intake Semester</th>" +
-            "<th>Country</th>" +
+        "<th>First Name</th>" +
+        "<th>Last Name</th>" +
+        "<th>Email</th>" +
+        "<th>External Email</th>" +
+        "<th>Type</th>" +
+        "<th>Phone</th>" +
+        "<th>Picture</th>" +
+        "<th>Program</th>" +
+        "<th>Specialization</th>" +
+        "<th>Intake Semester</th>" +
+        "<th>Country</th>" +
         "</tr>";
 
     let tableRowTemplate =
         "<tr>" +
-            "<td>{0}</td>" +
-            "<td>{1}</td>" +
-            "<td>{2}</td>" +
-            "<td>{3}</td>" +
-            "<td>{4}</td>" +
-            "<td>{5}</td>" +
-            "<td>{6}</td>" +
-            "<td>{7}</td>" +
-            "<td>{8}</td>" +
-            "<td>{9}</td>" +
-            "<td>{10}</td>" +
+        "<td>{0}</td>" +
+        "<td>{1}</td>" +
+        "<td>{2}</td>" +
+        "<td>{3}</td>" +
+        "<td>{4}</td>" +
+        "<td>{5}</td>" +
+        "<td>{6}</td>" +
+        "<td>{7}</td>" +
+        "<td>{8}</td>" +
+        "<td>{9}</td>" +
+        "<td>{10}</td>" +
         "</tr>";
 
     let modalPreviewElem = document.getElementById('modal-preview-table');
@@ -94,34 +132,28 @@ function processUserCSVFile(csvFileElem) {
     // Collect override information
 
     $.ajax({
-            type: "POST",
-            enctype: 'multipart/form-data',
-            url: window.location.origin + window.location.pathname + "processusercsv/",
-            data: data,
-            processData: false,
-            contentType: false,
-            cache: false,
-            timeout: 600000,
-            success: function (data) {
-                console.log("SUCCESS : ", data);
-
-                for (let i = 0; i < data.length; i++) {
-                    let student = new Student(data[i].first_name, data[i].last_name, data[i].email);
-                    student.program = data[i].program;
-                    student.country = data[i].country;
-                    GlobalPotentialUsers.push(student);
-                }
-                populateModalUserPreview();
-
-            },
-            error: function (e) {
-
-                $("#result").text(e.responseText);
-                console.log("ERROR : ", e);
-                $("#btnSubmit").prop("disabled", false);
-
+        type: "POST",
+        enctype: 'multipart/form-data',
+        url: window.location.origin + window.location.pathname + "processusercsv/",
+        data: data,
+        processData: false,
+        contentType: false,
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            for (let i = 0; i < data.length; i++) {
+                let student = new Student(data[i].first_name, data[i].last_name, data[i].email);
+                student.program = data[i].program;
+                student.country = data[i].country;
+                GlobalPotentialUsers.push(student);
             }
-        });
+            populateModalUserPreview();
+
+        },
+        error: function (e) {
+            console.log("ERROR : ", e);
+        }
+    });
 }
 
 function collectNewUserInfo() {

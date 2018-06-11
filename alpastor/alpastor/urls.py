@@ -50,6 +50,7 @@ urlpatterns = [
     # Admin/Superuser
     path('login/', accounts_views.login, name='login'),
     path('manageusers/processusercsv/', login_required(accounts_views.ProcessUserCSVData.as_view()), name='processusercsv'),
+    path('manageusers/savenewusers/', login_required(accounts_views.SaveNewUsers.as_view()), name='savenewusers'),
     path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
     path('dashboardex/', views.dashboard, name='dashboardex'),
     path('admin/', admin.site.urls),
