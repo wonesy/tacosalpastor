@@ -26,7 +26,7 @@ class AttendanceTest(TestCase):
         self.client.login(email="epita0@epita.fr", password="abc")
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program=Student.ME,
-                                                                     specialization="Software Engineering",
+                                                                     specialization=1,
                                                                      intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
@@ -34,7 +34,7 @@ class AttendanceTest(TestCase):
                             email="epita1@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program=Student.ME,
-                                                                     specialization="Software Engineering",
+                                                                     specialization=1,
                                                                      intakeSemester="Fall 2017", country="France",
                                                                      languages="English,French", photo_location="")
 
@@ -42,7 +42,7 @@ class AttendanceTest(TestCase):
                             email="epita2@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program=Student.ME,
-                                                                     specialization="Software Engineering",
+                                                                     specialization=1,
                                                                      intakeSemester="Fall 2017", country="USA",
                                                                      languages="English", photo_location="")
 
@@ -177,7 +177,7 @@ class AttendanceTest(TestCase):
         self.client.login(email=student_instance.email, password="abc")
 
         course = Course.objects.get(title="Sample Course 0")
-        url = reverse('attendance', kwargs={'slug': course.slug})
+        url = reverse('attendance_list', kwargs={'slug': course.slug})
 
         self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
         self.assertEqual(self.response.status_code, 200)
@@ -188,7 +188,7 @@ class AttendanceTest(TestCase):
         self.client.login(email=self.professor1.user.email, password="abc")
 
         course = Course.objects.get(title="Sample Course 0")
-        url = reverse('attendance', kwargs={'slug': course.slug})
+        url = reverse('attendance_list', kwargs={'slug': course.slug})
 
         self.response = self.client.get(url, {'schedule_id': self.schedule0.id})
         self.assertEqual(self.response.status_code, 200)

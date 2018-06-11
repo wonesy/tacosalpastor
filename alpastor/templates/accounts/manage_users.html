@@ -58,7 +58,7 @@
                                 </div>
 
                                 <div id="student-specific-data" class="student-form-container collapse">
-                                    <label for="program"><span class="required-field">*</span>Program</label><br>
+                                    <label for="program"><span class="required-field">*</span>Program:</label><br>
                                     <select id="program" name="program" class="input-group" required>
                                         <option value="" selected>--------</option>
                                         {% for value, name in programs %}
@@ -66,7 +66,7 @@
                                         {% endfor %}
                                     </select>
 
-                                    <label for="specialization"><span class="required-field">*</span>Specialization</label><br>
+                                    <label for="specialization"><span class="required-field">*</span>Specialization:</label><br>
                                     <select id="specialization" name="specialization" class="input-group" required>
                                         <option value="" selected>--------</option>
                                         {% for value, name in specializations %}
@@ -74,7 +74,7 @@
                                         {% endfor %}
                                     </select>
 
-                                    <label for="country"><span class="required-field">*</span>Intake Semester:</label>
+                                    <label for="intake-semester"><span class="required-field">*</span>Intake Semester:</label>
                                     <input class="input-group" type="text" id="intake-semester" name="intake-semester" pattern="(Fall|Spring|Summer|Winter) \d{4}" placeholder="Season Year" required>
 
                                     <label for="country">Country:</label>
@@ -88,8 +88,23 @@
                             <p>Add users via CSV</p>
                             <div class="container" style="overflow: hidden;">
                                 <form id="csv-file-form">
-                                <label for="user-csv">CSV (Excel unsupported):</label><br>
-                                <input id="csv-file" type="file" name="user-csv" accept=".csv"><br>
+                                    <label for="user-csv">CSV (Excel unsupported):</label><br>
+                                    <input id="csv-file" type="file" name="user-csv" accept=".csv"><br><br>
+
+                                    <p>Use the fields below to override CSV fields</p>
+                                    <label for="override-specialization">Specialization:</label><br>
+                                    <select id="override-specialization" name="override-specialization" class="input-group">
+                                        <option value="" selected>--------</option>
+                                        {% for value, name in specializations %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="override-intake-semester">Intake Semester:</label>
+                                    <input class="input-group" type="text" id="override-intake-semester" name="override-intake-semester" pattern="(Fall|Spring|Summer|Winter) \d{4}" placeholder="Season Year">
+
+                                    <label for="country">Country:</label>
+                                    <input class="input-group" type="text" id="country" name="country" placeholder="France">
                                 </form>
                             </div>
                         </div>

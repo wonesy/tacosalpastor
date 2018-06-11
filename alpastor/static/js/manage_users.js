@@ -91,7 +91,7 @@ function processUserCSVFile(csvFileElem) {
     let data = new FormData();
     data.append('file', csvFileElem.files[0]);
 
-    console.log(window.location.origin + window.location.pathname + "processusercsv/");
+    // Collect override information
 
     $.ajax({
             type: "POST",
