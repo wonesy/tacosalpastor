@@ -161,7 +161,7 @@ MEDIA_URL = '/media/'
 
 if 'RDS_DB_NAME' in os.environ:
     logfile = "/var/log/tacosalpastor-logs/tacos.log"
-else
+else:
     logfile = "logfile"
 
 LOGGING = {
