@@ -159,6 +159,11 @@ TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+if 'RDS_DB_NAME' in os.environ:
+    logfile = "/var/log/tacosalpastor-logs/tacos.log"
+else
+    logfile = "logfile"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -176,7 +181,7 @@ LOGGING = {
         'logfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': "/var/log/tacosalpastor-logs/tacos.log",
+            'filename': logfile,
             'maxBytes': 50000,
             'backupCount': 2,
             'formatter': 'standard',
