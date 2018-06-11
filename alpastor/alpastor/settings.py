@@ -176,7 +176,7 @@ LOGGING = {
         'logfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': "/var/log/tacosalpastor-logs",
+            'filename': "/var/log/tacosalpastor-logs/tacos.log",
             'maxBytes': 50000,
             'backupCount': 2,
             'formatter': 'standard',
