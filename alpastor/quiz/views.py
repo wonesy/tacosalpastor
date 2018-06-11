@@ -7,6 +7,9 @@ from rest_framework import generics
 from rest_framework.response import Response
 import json
 import enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 class QuizStatusCodes(enum.Enum):
     SUCCESS = 0,
@@ -14,11 +17,12 @@ class QuizStatusCodes(enum.Enum):
     BADID = 2
 
 class QuizBuilderView(View):
-    template_name = "quiz_builder.html"
+    template_name = "quiz/quiz_builder.html"
     model = Quiz
 
     def post(self, request):
-        return HttpResponseBadRequest
+        logger.error("Attempted POST into quiz builder view")
+        return HttpResponseBadRequest()
 
     def get(self, request):
         if request.user.is_superuser:
@@ -26,7 +30,8 @@ class QuizBuilderView(View):
         elif request.user.is_staff:
             course_list = Course.objects.filter(professor_id__user=request.user).order_by('title')
         else:
-            return HttpResponseForbidden
+            logger.error("Attempted access to quiz builder by non staff/admin")
+            return HttpResponseForbidden()
 
         return render(request, self.template_name, {'course_list': course_list})
 
@@ -48,31 +53,27 @@ class SaveNewQuiz(View):
             quiz_id = int(quiz_json['id'])
             quiz_course_id = int(quiz_json['courseId'])
         except ValueError:
-            print("Invalid Quiz/Course Id")
+            logger.error("Invalid Quiz/Course Id with attempting to save a quiz")
             return QuizStatusCodes.BADID
 
         quiz_title = quiz_json['title']
 
         if quiz_title == "":
-            print("[FAIL] quiz must have a title")
+            logger.error("Attempted to save a quiz with no title")
             return QuizStatusCodes.NOTITLE
 
         # Create the new quiz object in the database, or update title if already exists
 
         created = False
         if quiz_id < 0:
+            logger.debug("Creating new quiz with title={}".format(quiz_title))
             quiz = Quiz.objects.create(title=quiz_title, course_id=quiz_course_id)
         else:
+            logger.debug("Updating existing quiz with title={}".format(quiz_title))
             (quiz, created) = Quiz.objects.update_or_create(
                 id=quiz_id,
                 defaults={'title': quiz_title, 'course_id': quiz_course_id}
             )
-
-
-        if created:
-            print("Created new quiz with title: " + quiz.title)
-        else:
-            print("Accessed existing quiz with title: " + quiz.title)
 
         # Process every question for this quiz
         for question in quiz_json['questions']:
@@ -131,11 +132,11 @@ class SaveNewQuiz(View):
             question.quiz.add(quiz)
 
         if created:
-            print("Created new question: {}".format(question))
+            logger.debug("Created new question: {}".format(question))
         elif question:
-            print("Updated existing question: {}".format(question))
+            logger.debug("Updated existing question: {}".format(question))
         else:
-            print("No question was created, something went wrong")
+            logger.error("No question was created, something went wrong")
 
 
     def processOptionJSON(self, question, option_json):
@@ -157,9 +158,9 @@ class SaveNewQuiz(View):
                                                                        is_correct=opt_is_correct)
 
         if created:
-            print("Created new option: {}".format(option))
+            logger.debug("Created new option: {}".format(option))
         else:
-            print("Accessed existing option: {}".format(option))
+            logger.debug("Accessed existing option: {}".format(option))
 
 class GetQuizData(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
@@ -205,10 +206,10 @@ class GetQuizData(generics.ListCreateAPIView):
 
 def quizHomePage(request):
     quizzes = Quiz.objects.all()
-    return render(request, "quiz.html", {'quizzes': quizzes})
+    return render(request, "quiz/quiz.html", {'quizzes': quizzes})
 
 
 def delete(request,quiz_id =None):
     object = Quiz.objects.get(id=quiz_id)
     object.delete()
-    return render(request,'quiz.html')
+    return render(request, 'quiz/quiz.html')

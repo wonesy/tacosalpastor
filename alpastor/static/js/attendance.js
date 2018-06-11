@@ -437,6 +437,16 @@ function reorganizeStudent(student, oldStatus) {
         oldContainer.removeChild(document.getElementById(student.id));
     }
 
+    /*
+        Fixes a cosmetic bug where changing views with a pending status override would keep the pending change, but
+        it wouldn't be accounted for visually in the view switch.
+
+        This will remove the pending change, so a "Submit all changes" will not affect that student any longer
+     */
+    if (oldStatus === -1) {
+        student.statusOverride = student.status;
+    }
+
     let template = StudentAttendance.getHTMLTemplate(student.status);
 
     newContainer.insertAdjacentHTML("beforeend", template.format(

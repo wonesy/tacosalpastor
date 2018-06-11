@@ -18,8 +18,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css' %}">
     <script src="{% static 'js/utils.js' %}"></script>
     <link rel="icon" type="image/png" href="{% static 'image/favicon.ico' %}" />
     <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="{% static 'image/favicon.ico' %}" /><![endif]-->
@@ -63,16 +63,19 @@
             </li>
             <li class="active hover-left-brdr">
                 <a href="/attendance">
-                    <img src="{% static 'image/attendance_icon.png' %}" id="attendance_icon"/>
+                    <i class="fa fa-user-check"></i>
                     <span class="base-generic-lmargin">Attendance</span>
                 </a>
             </li>
-{#            <li class="active hover-left-brdr">#}
-{#                <a href="/attendance-student">#}
-{#                    <i class="fa fa-pencil-alt"></i>#}
-{#                    <span class="base-generic-lmargin">Attendance-Student</span>#}
-{#                </a>#}
-{#            </li>#}
+
+            {% if request.user.is_superuser %}
+            <li class="active hover-left-brdr">
+                <a href="/manageusers">
+                    <i class="fa fa-users"></i>
+                    <span class="base-generic-lmargin">Manage Users</span>
+                </a>
+            </li>
+            {% endif %}
         </ul>
     </nav>
 

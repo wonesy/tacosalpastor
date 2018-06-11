@@ -61,6 +61,8 @@ class Student(models.Model):
     """
 
     NONE = 0
+
+    # Programs
     ME = 1
     MSc = 2
     GITM = 3
@@ -72,15 +74,33 @@ class Student(models.Model):
         (GITM, 'Global IT Management'),
     ]
 
+    # Specializations
+    SE = 1
+    ISM = 2
+    DSA = 3
+    CS = 4
+    SDM = 5
+    SDS = 6
+
+    SPECIALIZATION_CHOICES = [
+        (NONE, 'None'),
+        (SE, 'Software Engineering'),
+        (ISM, 'Information Systems Management'),
+        (DSA, 'Data Science & Analytics'),
+        (CS, 'Computer Security'),
+        (SDM, 'Software Development & Multimedia'),
+        (SDS, 'Systems Networks & Security'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
     program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
-    specialization = models.CharField(max_length=63)
+    specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intakeSemester = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
-    country_code = models.CharField(max_length=2)
-    city = models.CharField(max_length=127)
-    languages = models.CharField(max_length=127)
+    country_code = models.CharField(max_length=2, blank=True)
+    city = models.CharField(max_length=127, blank=True)
+    languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, blank=True)
 
     def __repr__(self):
@@ -93,6 +113,20 @@ class Student(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
+    def get_non_none_program_choices(self):
+        tmp = []
+        for val,name in Student.PROGRAM_CHOICES:
+            if val != Student.NONE:
+                tmp.append((val, name))
+        return tmp
+
+    def get_non_none_specialization_choices(self):
+        tmp = []
+        for val,name in Student.SPECIALIZATION_CHOICES:
+            if val != Student.NONE:
+                tmp.append((val, name))
+        return tmp
+
 
 class Professor(models.Model):
     """
@@ -104,6 +138,7 @@ class Professor(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
+    photo_location = models.CharField(max_length=511, blank=True)
 
     def __repr__(self):
         return "Professor(first_name={}, last_name={}, external_email={}, epita_email={}, phone={})".format(

@@ -29,27 +29,27 @@ from django.contrib.auth.decorators import login_required
 urlpatterns = [
     path('', views.home, name='home'),
 
-    # Professor/superuser view Attendance
-    path('attendance/', login_required(CourseView.as_view()), name='course_list'),
-    path('attendance/course/<slug:slug>', login_required(ScheduleView.as_view()), name='schedule_list'),
-    path('attendance/course/<slug:slug>/schedule/', login_required(AttendanceView.as_view()), name='attendance_list'),
-
-    # Student view Attendance
-    path('attendance/course/<slug:slug>/schedule/', login_required(AttendanceView.as_view()), name='attendance'),
+    # Attendance
     path('attendance/course/<slug:slug>/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
     path('attendance/course/<slug:slug>/schedule/manualoverride', login_required(OverrideStudentAttendanceData.as_view()), name='override_attendance'),
     path('attendance/course/<slug:slug>/schedule/togglelock', login_required(ToggleAttendanceLock.as_view()), name='toggle_attendance_lock'),
+    path('attendance/course/<slug:slug>/schedule/', login_required(AttendanceView.as_view()), name='attendance_list'),
+    path('attendance/course/<slug:slug>', login_required(ScheduleView.as_view()), name='schedule_list'),
+    path('attendance/', login_required(CourseView.as_view()), name='course_list'),
 
+    # People
     path('people/', views.people, name='people'),
-    path('login/', accounts_views.login, name='login'),
-
 
     # Quiz paths
-    path('quiz/quiz_builder/', login_required(quiz_views.QuizBuilderView.as_view()), name='quizbuilder'),
     path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
     path('quiz/quiz_builder/getquiz/', login_required(quiz_views.GetQuizData.as_view()), name='existingquestion'),
+    path('quiz/quiz_builder/', login_required(quiz_views.QuizBuilderView.as_view()), name='quizbuilder'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/', quiz_views.delete, name='delete_view'),
+
+    # Admin/Superuser
+    path('login/', accounts_views.login, name='login'),
+    path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
     path('dashboardex/', views.dashboard, name='dashboardex'),
     path('admin/', admin.site.urls),
 
