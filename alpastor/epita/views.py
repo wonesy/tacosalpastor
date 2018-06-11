@@ -1,22 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, HttpResponseBadRequest, HttpResponse
-from django.views.generic import ListView, View
-
+from django.http import QueryDict
+from django.views.generic import ListView
 from rest_framework.exceptions import bad_request
-
 from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
-
 import json
 from django.http import HttpResponse
-from .models import Student, Professor, StudentCourse, Course, Attendance, Schedule
-
+from .models import Student, StudentCourse, Course, Attendance, Schedule
 from django.views.generic import View
-
 from rest_framework.response import Response
 from django.db.models import Count
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required()
 def home(request):
@@ -48,7 +47,6 @@ class ScheduleView(ListView):
     def get(self, request, slug):
         logged_in_user = request.user
         course = get_object_or_404(Course, slug=slug)
-        print(course.professor_id)
         schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
 
         # Student view
@@ -137,11 +135,9 @@ class AttendanceView(ListView):
         file = ""
 
         if form.is_valid():
-            print("student posting here")
-
             # Do not let the user update attendance information if the schedule instance is marked as closed
             if (schedule_instance.attendance_closed) and (not request.user.is_staff) and (form.cleaned_data['status'] != Attendance.EXCUSED):
-                print("Cannot update attendance")
+                logger.warning("Student attempting to change attendance status for a locked schedule")
             else:
                 form.save()
                 file = form.cleaned_data['file_upload']
@@ -218,10 +214,11 @@ class OverrideStudentAttendanceData(View):
 
         attendance_json = json.loads(attendance_payload)
 
+        # Update the status
         for student in attendance_json:
             Attendance.objects.filter(schedule_id=schedule_id, student_id=student['id']).update(status=student['status'])
-            print("Updated status: " + student['name'] + " --> " + str(student['status']))
 
+        # Send back the json serialized data of all students, now that the update has gone through
         response = redirect('update_attendance', slug=slug)
         response['Location'] += '?schedule_id=' + schedule_id
         return response
@@ -229,11 +226,13 @@ class OverrideStudentAttendanceData(View):
 class ToggleAttendanceLock(View):
 
     def get(self, request):
+        logger.error("Attempting get request for toggle attendance lock")
         return bad_request(request, exception="Forbidden")
 
     def post(self, request, slug):
         # Only professors and admin can change this
         if not (request.user.is_staff or request.user.is_superuser):
+            logger.warning("Attempting to unlock a schedule as a student (user_id={})".format(request.user.id))
             return bad_request(request, exception="Forbidden")
 
         # Grab POST data

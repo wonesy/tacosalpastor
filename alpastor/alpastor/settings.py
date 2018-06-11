@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,8 +26,8 @@ SECRET_KEY = 'zhl88=^=iuuw=_j+^9^hoeu(5!s28lh45p!k6vjqy-6l)9z1)j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 ALLOWED_HOSTS = ['.elasticbeanstalk.com', '127.0.0.1']
-
 
 # Application definition
 
@@ -157,3 +158,61 @@ TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'logging.NullHandler',
+        },
+        'logfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': SITE_ROOT + "/logfile",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['console'],
+            'propagate': True,
+            'level':'WARN',
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'epita': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+        'quiz': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+        'accounts': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+        'alpastor': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+    }
+}

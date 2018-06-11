@@ -15,3 +15,4 @@ class AttendanceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         return obj.student_id.photo_location
 
+

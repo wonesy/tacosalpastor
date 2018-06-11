@@ -106,4 +106,4 @@ alpastor/.idea/*
 migrations/
 
 secrets.env
-
+logfile
