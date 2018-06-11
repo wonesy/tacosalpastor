@@ -1,0 +1,164 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block additional_links %}
+    <link rel="stylesheet" href="{% static 'css/manage_users.css' %}">
+    <script src="{% static 'js/manage_users.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {# Add users card #}
+        <div class="card add-users-card manage-card">
+
+            {# Add users header #}
+            <a data-toggle="collapse" href="#add-users-card-body" aria-expanded="true" aria-controls="add-users-card-body">
+                <div class="card-header">
+                    Add Users
+                </div>
+            </a>
+
+            {# Add users body #}
+            <div id="add-users-card-body" class="collapse show">
+                <div class="card-body container-fluid">
+                    <div class="row">
+
+                        <div class="add-single-user-form col-8">
+                            <form class="needs-validation">
+                                <p>Add a single user</p>
+                                <div class="input-group" id="form-errors"></div>
+                                <label for="first_name"><span class="required-field">*</span>First name:</label>
+                                <input class="input-group" type="text" id="first_name" name="first_name" placeholder="First name" required>
+
+                                <label for="last_name"><span class="required-field">*</span>Last name:</label>
+                                <input class="input-group" type="text" id="last_name" name="last_name" placeholder="Last name" required>
+
+                                <label for="email"><span class="required-field">*</span>Login email address:</label>
+                                <input class="input-group" type="email" id="email" name="email" placeholder="name@epita.fr" required>
+
+                                <label for="email">External email address:</label>
+                                <input class="input-group" type="email" id="external_email" name="external_email" placeholder="external@example.com">
+
+                                <label for="phone">Phone number:</label>
+                                <input class="input-group" type="text" id="phone" name="phone" placeholder="+1234567890">
+
+                                <label for="pic">Photo:</label><br>
+                                <input id="pic" type="file" name="pic" accept="image/*"><br>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label>Professor</label><br>
+                                        <input type="radio" name="staff" value="professor" onchange="toggleStudentForm(this)" checked="checked">
+                                    </div>
+                                    <div class="col-6">
+                                        <label>Student</label><br>
+                                        <input type="radio" name="staff" value="student" onchange="toggleStudentForm(this);">
+                                    </div>
+                                </div>
+
+                                <div id="student-specific-data" class="student-form-container collapse">
+                                    <label for="program"><span class="required-field">*</span>Program</label><br>
+                                    <select id="program" name="program" class="input-group" required>
+                                        <option value="" selected>--------</option>
+                                        {% for value, name in programs %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="specialization"><span class="required-field">*</span>Specialization</label><br>
+                                    <select id="specialization" name="specialization" class="input-group" required>
+                                        <option value="" selected>--------</option>
+                                        {% for value, name in specializations %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="country"><span class="required-field">*</span>Intake Semester:</label>
+                                    <input class="input-group" type="text" id="intake-semester" name="intake-semester" pattern="(Fall|Spring|Summer|Winter) \d{4}" placeholder="Season Year" required>
+
+                                    <label for="country">Country:</label>
+                                    <input class="input-group" type="text" id="country" name="country" placeholder="France" required>
+
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="add-users-csv col-4">
+                            <p>Add users via CSV</p>
+                            <div class="container" style="overflow: hidden;">
+                                <label for="user-csv">CSV/Excel File:</label><br>
+                                <input id="csv-file" type="file" name="user-csv" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"><br>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div style="text-align: center;">
+                        <button class="btn btn-info" onclick="collectNewUserInfo();">Add users</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Add courses card #}
+        <div class="card add-courses-card manage-card">
+
+            {# Add users header #}
+            <a data-toggle="collapse" href="#add-courses-card-body" aria-expanded="true" aria-controls="add-users-card-body">
+                <div class="card-header">
+                    Add Course
+                </div>
+            </a>
+
+            {# Add users body #}
+            <div id="add-courses-card-body" class="collapse">
+                <div class="card-body container-fluid">
+                    <div class="row"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="verify-modal" tabindex="-1" role="dialog" aria-labelledby="verify-modal-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="verify-modal">The following instances will be made</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="modal-preview-instances" class="modal-body">
+                        <table id="modal-preview-table" style="width:100%;" align="left"></table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save instances</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="application/javascript">
+        function toggleStudentForm(elem) {
+            if (elem.value === "professor") {
+                $('#student-specific-data').removeClass('show')
+            } else {
+                $('#student-specific-data').addClass('show')
+            }
+        }
+
+        /*
+        Clear the modal upon re-hiding, empty the list of potential users to be added
+         */
+        $(document).ready(function() {
+            $(".modal").on("hidden.bs.modal", function() {
+                GlobalPotentialUsers = [];
+                $(this).removeData();
+            });
+        });
+
+    </script>
+{% endblock %}
