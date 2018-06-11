@@ -1,8 +1,8 @@
 #!/bin/bash
 
 mkdir -p /var/log/tacosalpastor-logs
-chmod g+s /var/log/app-logs
-chown wsgi:wsgi /var/log/app-logs
+chmod g+s /var/log/tacosalpastor-logs
+chown wsgi:wsgi /var/log/tacosalpastor-logs
 
 settings_file=./alpastor/alpastor/settings.py
 allowed_hosts="ALLOWED_HOSTS = ['.elasticbeanstalk.com']"
