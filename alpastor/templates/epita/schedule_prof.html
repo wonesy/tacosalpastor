@@ -38,12 +38,6 @@
                     <h5 class="card-header">Add Class</h5>
                     <div class="card-body">
                         <form method="post" enctype="multipart/form-data">{% csrf_token %}
-                            {#                        <h5 class="card-title">{{ form.course_id }}</h5>#}
-                            {#                        <p class="card-text">{{ form.date }}</p>#}
-                            {#                        <p class="card-text">{{ form.start_time }}</p>#}
-                            {#                        <p class="card-text">{{ form.end_time }}</p>#}
-                            {#                        <p class="card-text">{{ form.room_id }}</p>#}
-                            {#                        <p class="card-text">{{ form.attendance_closed }}</p>#}
                             {{ form.as_p }}
                             <button id="submitBtn" class="btn btn-primary" type="submit">Create</button>
                         </form>

@@ -125,6 +125,8 @@ class AttendanceView(ListView):
             )
 
             form = self.form_class(instance=attendance_instance)
+            print(attendance_instance)
+            data['attendance'] = attendance_instance
             data['form'] = form
 
         return render(request, self.template_name, data)

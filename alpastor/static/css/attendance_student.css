@@ -1,57 +1,81 @@
-.col-md-6 {
-    background: #dee2e6;
-    border-style: inset;
-    border-width: 15px;
-    border-color: lightseagreen;
+.status-card {
+    max-width: 15rem;
+    min-width: 15rem;
 }
 
-.courseName {
-    font-size: .9em;
-    color: #000;
-    margin-top: 0;
-    padding-left: 0;
-    text-align: left;
-    border-bottom: 2px solid #1e1e1e;
-}
-
-.courseDateDiv {
-    padding-top: 3em;
-    padding-bottom: 3em;
-}
-
-.courseDate {
-    margin: 0;
-    padding-top: .5em;
-    padding-bottom: .5em;
-    font-size: 2em;
-}
-
-.btn1 {
-    margin-top: .5em;
-    margin-bottom: .5em;
-    padding: 1.5em 3em;
-}
-
-.btn-success {
-    float: left;
-    margin-right: .25em;
-}
-
-.btn-danger {
-    float: right;
-    margin-left: .25em;
-}
-
-.btn-secondary {
-    padding-top: .5em;
-    padding-bottom: .5em;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
+.status-card img {
     width: 100%;
-    font-size: 1.25em;
 }
 
-#id_file_upload {
-    padding-top: 2em;
-    padding-bottom: 2em;
+.button-thumbnail {
+    max-width: 10rem;
+    min-width: 10rem;
+    max-height: 85px;
+    min-height: 85px;
+    margin-bottom: 5px;
+}
+
+.name-absent-thumbnail.active {
+    border: #28a745 solid !important;
+}
+
+.name-present-thumbnail.active {
+    border: #dc3545 solid !important;
+}
+
+.button-thumbnail label {
+    max-width: 8rem;
+    min-width: 8rem;
+    min-height: 4rem;
+    max-height: 4rem;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.btn-portraits, .btn-names {
+    background: #AAAAAA;
+    min-width: 95px;
+}
+
+.btn-portraits.active, .btn-names.active {
+    color: white;
+    background: #17a2b8;
+}
+
+.btn-present, .btn-absent {
+    background: #AAAAAA;
+}
+
+.btn-present.active {
+    background: #28a745;
+}
+
+.btn-absent.active{
+    background: #dc3545;
+}
+
+.override-submit {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.status-container {
+    margin: 50px 20px 50px 20px;
+}
+
+.student-view-container {
+    width: 100%;
+}
+
+.lock-attendance {
+    min-width: 120px;
+}
+
+.locked {
+    background: #1e1e1e;
+    border: #1e1e1e;
+}
+
+.locked:hover {
+    background: #000000;
 }
