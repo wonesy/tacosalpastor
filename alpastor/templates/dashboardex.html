@@ -3,94 +3,79 @@
 {% load static %}
 
 {% block additional_links %}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block content %}
 
-
-    <div class="container">
-
-
-        <!-- Trigger the modal with a button -->
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Country</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal2">Program</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal3">Specialization
-        </button>
-
-        <!--Country Modal -->
-        <div class="modal fade" id="myModal" role="dialog">
-            <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Country</h4>
-                    </div>
-                    <div class="modal-body">
-
-                        <canvas id="myChart" width="100" height="100"></canvas>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <!-- Course modal -->
-        <div class="modal fade" id="myModal2" role="dialog">
-            <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">program</h4>
-                    </div>
-                    <div class="modal-body">
-
-                        <canvas id="myChartProgram" width="100" height="100"></canvas>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- Course modal -->
-        <div class="modal fade" id="myModal3" role="dialog">
-            <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">program</h4>
-                    </div>
-                    <div class="modal-body">
-
-                        <canvas id="myChartSpl" width="100" height="100"></canvas>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <div class="row col-md-6 offset-md-3" align="center">
+        Total
 
     </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="well">
+                <h4>Countries</h4>
+                <p>{{ country.count }}</p>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="well">
+                <h4>Students</h4>
+                <p>{{ active_students.count }}</p>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="well">
+                <h4>Specialisation</h4>
+                <p>{{ splgraph.count }}</p>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="well">
+                <h4>Program</h4>
+                <p>{{ program.count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-3">
+            <div class="well">
+                <h4> Select Graph </h4>
+                <select class="div-toggle" data-target=".my-info-1">
+                    <option value="country" data-show=".country">Country</option>
+                    <option value="program" data-show=".program">Program</option>
+                    <option value="specialization" data-show=".specialization">Specialization</option>
+                    <option value="semester" data-show=".semester">Semester</option>
+                </select>
+
+
+            </div>
+        </div>
+
+        <div class="col-sm-5 well my-info-1" style="margin-left: 14px;">
+
+            <div class="country hide graph">
+                <canvas id="myChart" width="100" height="100"></canvas>
+            </div>
+            <div class="program hide graph">
+                <canvas id="myChartProgram" width="100" height="100"></canvas>
+            </div>
+            <div class="specialization hide graph">
+                <canvas id="myChartSpl" width="100" height="100"></canvas>
+            </div>
+            <div class="semester hide graph">
+                <canvas id="myChartSem" width="100" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
     {#    <div class="row">#}
@@ -123,17 +108,7 @@
     {##}
     {#        {% endfor %}#}
     {#    </div>#}
-    <div class="row">
 
-
-        {#                <h1>Country</h1>#}
-        <canvas id="myChart" width="100" height="100"></canvas>
-
-
-        {#                <h1>Prog</h1>#}
-        <canvas id="myChartProgram" width="100" height="100"></canvas>
-
-    </div>
 
 
     <script>
@@ -142,22 +117,25 @@
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: [{% for item in country %} "{{ item }}", {% endfor %}],
+                labels: [{% for item in country %} "{{ item.country }}", {% endfor %}],
+
                 datasets: [{
 
-                    data: [{% for y in vaar2 %}
+                    data: [{% for y in country %}
 
                         {{ y.the_count }},
 
                     {% endfor %}],
-                    backgroundColor: [
+                    backgroundColor: [getRandomColorHex(),
                         getRandomColorHex(),
                         getRandomColorHex(),
                         getRandomColorHex(),
                         getRandomColorHex(),
                         getRandomColorHex(),
-                        getRandomColorHex()
-                    ],
+                        getRandomColorHex(),
+                        getRandomColorHex(),
+                        getRandomColorHex(),
+                        getRandomColorHex()],
                     borderColor: [
                         'rgba(255,99,132,1)',
                         'rgba(54, 162, 235, 1)',
@@ -170,12 +148,18 @@
                 }]
             },
             options: {
+
                 scales: {
                     yAxes: [{
                         ticks: {
                             beginAtZero: true
                         }
                     }]
+                },
+                title: {
+                    display: true,
+                    text: 'Country',
+                    fontSize: 30
                 },
                 legend: {
                     labels: {
@@ -212,19 +196,19 @@
 
                     {% endfor %}],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(255, 99, 132, 0.4)',
+                        'rgba(153, 102, 255, 0.4)',
+                        'rgba(54, 162, 235, 0.4)',
+                        'rgba(255, 206, 86, 0.4)',
+                        'rgba(75, 192, 192, 0.4)',
+                        'rgba(255, 159, 64, 0.4)'
                     ],
                     borderColor: [
                         'rgba(255,99,132,1)',
+                        'rgba(153, 102, 255, 1)',
                         'rgba(54, 162, 235, 1)',
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
                         'rgba(255, 159, 64, 1)'
                     ],
                     borderWidth: 1
@@ -237,6 +221,11 @@
                             beginAtZero: true
                         }
                     }]
+                },
+                title: {
+                    display: true,
+                    text: 'Program',
+                    fontSize: 30
                 },
                 legend: {
                     labels: {
@@ -272,12 +261,12 @@
 
                     {% endfor %}],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(255, 99, 132, 0.4)',
+                        'rgba(54, 162, 235, 0.4)',
+                        'rgba(255, 206, 86, 0.4)',
+                        'rgba(75, 192, 192, 0.4)',
+                        'rgba(153, 102, 255, 0.4)',
+                        'rgba(255, 159, 64, 0.4)'
                     ],
                     borderColor: [
                         'rgba(255,99,132,1)',
@@ -298,6 +287,79 @@
                         }
                     }]
                 },
+                title: {
+                    display: true,
+                    text: 'Specialization',
+                    fontSize: 30
+                },
+                legend: {
+                    labels: {
+                        generateLabels: function (chart) {
+                            var labels = chart.data.labels;
+                            var dataset = chart.data.datasets[0];
+                            var legend = labels.map(function (label, index) {
+                                return {
+                                    datasetIndex: 0,
+                                    text: label,
+                                    fillStyle: dataset.backgroundColor[index],
+                                    strokeStyle: dataset.borderColor[index],
+                                    lineWidth: 1
+                                }
+                            });
+                            return legend;
+                        }
+                    }
+                }
+            }
+
+
+        });
+
+        var fourth = document.getElementById("myChartSem").getContext('2d');
+        var myChartSem = new Chart(fourth, {
+            type: 'bar',
+            data: {
+                labels: [{% for x in intakeSemester %} "{{ x.intakeSemester }}", {% endfor %}],
+                datasets: [{
+
+                    data: [{% for sem in intakeSemester %}
+
+                        {{ sem.count_intake }},
+
+                    {% endfor %}],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.4)',
+                        'rgba(255, 206, 86, 0.4)',
+                        'rgba(255, 99, 132, 0.4)',
+                        'rgba(75, 192, 192, 0.4)',
+                        'rgba(153, 102, 255, 0.4)',
+                        'rgba(255, 159, 64, 0.4)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255,99,132,1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Intake Semester',
+                    fontSize: 30
+                },
+
                 legend: {
                     labels: {
                         generateLabels: function (chart) {
@@ -330,6 +392,17 @@
             }
             return color;
         }
+
+
+        $(document).on('change', '.div-toggle', function () {
+            var target = $(this).data('target');
+            var show = $("option:selected", this).data('show');
+            $(target).children().addClass('hide');
+            $(show).removeClass('hide');
+        });
+        $(document).ready(function () {
+            $('.div-toggle').trigger('change');
+        });
 
 
     </script>

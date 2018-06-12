@@ -4,6 +4,7 @@
 
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
+
 {% endblock %}
 
 {% block content %}
@@ -22,8 +23,6 @@
                 </div>
             </div>
 
-            {#            <button id="sort" class="btnalpha">Alphabetical</button>#}
-            {#            <button id="numBnt">Numerical</button>#}
             <button onClick="doCsv()">EXPORT to csv</button>
 
             <br>
@@ -33,15 +32,48 @@
 
             <div class="panel">
 
-                <br>
                 <label class="container">ME
-                    <input type="checkbox" id="ME" value="ME">
+                    <input type="checkbox" id="1" value="ME">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container subclass">SDM
+                    <input type="checkbox" id="SDM" value="SDM">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container subclass">SNS
+                    <input type="checkbox" id="SNS" value="SNS">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container subclass">GITM
+                    <input type="checkbox" id="GITM" value="GITM">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">MSc
+                    <input type="checkbox" id="2" value="MSc">
                     <span class="checkmark"></span>
                 </label>
 
+                <label class="container subclass">SE
+                    <input type="checkbox" id="SE" value="SE">
+                    <span class="checkmark"></span>
+                </label>
 
-                <label class="container">Msc
-                    <input type="checkbox" id="MSc" value="Msc">
+                <label class="container subclass">ISM
+                    <input type="checkbox" id="ISM" value="ISM">
+                    <span class="checkmark"></span>
+                </label>
+
+                <label class="container subclass">CS
+                    <input type="checkbox" id="CS" value="CS">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container subclass">DSA
+                    <input type="checkbox" id="DSA" value="DSA">
+                    <span class="checkmark"></span>
+                </label>
+
+                <label class="container">Global IT Management
+                    <input type="checkbox" id="3" value="3">
                     <span class="checkmark"></span>
                 </label>
 
@@ -49,12 +81,18 @@
 
         </div>
 
+        <div id="nT">
+            <div class="row wrapper secondDiv stdfilter" id="items">
 
-        <div class="row wrapper stdfilter" id="nT">
-            {% for student in students %}
-                <div class="secondDiv" data-category="{{ student.program }}">
-                    <div class="col-sm-12 col-md-4 col-lg-3 people-block entryDiv newDiv">
-                    <div class="people-header text-block"> {{ student.user.first_name }} {{ student.user.last_name }} </div>
+                {% for student in students %}
+
+                    <div class="entryDiv" data-category="{{ student.program }}"
+                         data-level="{{ student.specialization }}">
+                        <div class="col-sm-12 col-md-4 col-lg-3 people-block">
+
+                            <div class="people-header text-block">
+                                <div class="name"> Name:</div>
+                                {{ student.user.first_name }} {{ student.user.last_name }} <br></div>
 
                             <div class="people-img">
                                 {% if student.photo_location != "" %}
@@ -68,35 +106,42 @@
                                 {% endif %}
                             </div>
                             <div class="people-top">
-                            <div class="people-names" id="demo">
-                                <input hidden
-                                       value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.intakeSemester }} {{ student.user.email }}">
-{#                                <div class="text-block"><strong> Name#}
-{#                                    : </strong> {{ student.user.first_name }} {{ student.user.last_name }}<br></div>#}
-                                <strong> Country : </strong>{{ student.country }} <br>
-                                {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                                    <img src="{% static image_static %}" alt={{ student.first_name }}>
-                                {% endwith %}
+                                <div class="people-names" id="demo">
+                                    <input hidden
+                                           value="{{ student.user.get_full_name }} {{ student.country }} {{ student.program }} {{ student.specialization }} {{ student.intakeYear }} {{ student.user.email }}">
+                                    <strong> Country :</strong>{{ student.country }} <br>
+                                    {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                                        <img src="{% static image_static %}" alt={{ student.first_name }}>
+                                    {% endwith %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="people-bot">
-                            <div class="people-info">
-                                <strong> EPITA Email : </strong>{{ student.user.email }}<br>
-                                <strong> Email :</strong> {{ student.user.external_email }}<br>
-                                <strong> Phone :</strong> {{ student.phone }}<br>
-                                <strong> Program :</strong> {{ student.program }}<br>
-                                <strong> Specialization : </strong> {{ student.specialization }}<br>
-                                <div class="text-block2"><strong> Year : </strong> [{{ student.intakeSemester }}]</div>
+                            <div class="people-bot">
+                                <div class="people-info">
+                                    <strong>EPITA Email :</strong>{{ student.user.email }}<br>
+                                    <strong>Email :</strong> {{ student.user.external_email }}<br>
+                                    <strong>Phone :</strong> {{ student.phone }}<br>
+                                    <strong>Program :</strong> {{ student.program }}<br>
+                                    <strong>Specialization : </strong> {{ student.specialization }}<br>
+                                    <div class="text-block2">
+                                        <article><strong> Semester :</strong> {{ student.intakeSemester }}</article>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
+        {#<div class="col-sm-6 col-sm-offset-3"><a href="#" id="prev">prev</a>#}
+        {#<a href="#" id="next">next</a>#}
+        {#<br />#}
+        {#<span id="total"></span>#}
+        {#    </div>#}
     </div>
 
-
     <script>
+
+
         // search everything
         $("#searcher").on("keyup click input", function () {
             var val = $(this).val();
@@ -113,21 +158,23 @@
         });
 
         // filter
-
         $('input[type="checkbox"]').click(function () {
-            console.log("hii");
             if ($('input[type="checkbox"]:checked').length > 0) {
-                console.log("hi")
-
                 $('.stdfilter > div').hide();
                 $('input[type="checkbox"]:checked').each(function () {
                     $('.stdfilter >div[data-category=' + this.id + ']').show();
+                    $('.stdfilter >div[data-level=' + this.id + ']').show();
                 });
             } else {
                 $('.stdfilter >div').show();
 
             }
         });
+
+        //filter everything
+
+
+        //random try
 
 
         // accordion
@@ -148,7 +195,7 @@
 
 
         // sort by name and year
-        var $divs = $(".secondDiv");
+        var $divs = $(".entryDiv");
         $("#sort").on("click", function () {
 
             var alpha = $divs.sort(function (a, b) {
@@ -163,12 +210,12 @@
 
         $('#numBnt').on('click', function () {
             var numericallyOrderedDivs = $divs.sort(function (a, b) {
-                return $(a).find(".text-block2").text() > $(b).find(".text-block2").text();
+                return $(a).find(".text-block2").text().replace(/([a-zA-Z])/g, '') > $(b).find(".text-block2").text().replace(/([a-zA-Z])/g, '');
             });
             $(".row").html(numericallyOrderedDivs);
         });
 
-
+        // download csv
         function doCsv() {
 
             var nT = document.getElementById("nT").innerHTML;
@@ -176,19 +223,69 @@
                 .replace(/<\/strong>/g, '')
                 .replace(/<div([\w\W]+?)>/g, '')
                 .replace(/<br>/g, ', ')
-                .replace(/\s+/g, '')
-                .replace(/\n/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/<\n>/g, '')
                 .replace(/<\/div>/g, '')
                 .replace(/<input([\w\W]+?)>/g, '')
-                .replace(/<img([\w\W]+?)>/g, '');
-            alert(dataa);
-            alert(dataa);
+                .replace(/<img([\w\W]+?)>/g, '')
+                .replace(/<article>/g, '')
+                .replace(/<\/article>/g, '\n');
 
+
+            var download = function (content, fileName, mimeType) {
+                var a = document.createElement('a');
+                mimeType = mimeType || 'application/octet-stream';
+
+                if (navigator.msSaveBlob) { // IE10
+                    navigator.msSaveBlob(new Blob([content], {
+                        type: mimeType
+                    }), fileName);
+                } else if (URL && 'download' in a) { //html5 A[download]
+                    a.href = URL.createObjectURL(new Blob([content], {
+                        type: mimeType
+                    }));
+                    a.setAttribute('download', fileName);
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+                }
+            }
+
+            download(dataa, 'Students.csv', 'text/csv;encoding:utf-8');
         }
 
 
+        var max = 5;
+        var pageNum = 0;
+        var _ = $('#nT .people-block');
+
+        $(document).ready(function () {
+            var total = _.length;
+            var pages = total / max;
 
 
+            $('#prev').click(function () {
+                pageNum--;
+                sort("prev");
+            });
+
+            $('#next').click(function () {
+                pageNum++;
+                sort("next");
+            });
+            $('#next').trigger('click');
+        });
+
+
+        function sort(a) {
+            _.hide();
+            _.filter(function (i) {
+                return i >= (pageNum - 1) * max && i < (pageNum) * max;
+            }).show();
+            $("#total").text("page " + pageNum + " of " + Math.ceil($('#rows .row').length / max));
+        }
 
     </script>
 {% endblock %}

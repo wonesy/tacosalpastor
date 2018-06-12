@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 def home(request):
     return render(request, 'base_generic.html')
 
+
 class CourseView(ListView):
     template_name = 'epita/course_list.html'
 
@@ -39,6 +40,7 @@ class CourseView(ListView):
             [course_list.append(course.course_id) for course in enrolled_in]
 
         return render(request, self.template_name, {'course_list': course_list})
+
 
 class ScheduleView(ListView):
     template_name = 'epita/schedule_prof.html'
@@ -95,6 +97,7 @@ class ScheduleView(ListView):
 
 
 
+
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
     form_class = AttendanceForm
@@ -144,9 +147,9 @@ class AttendanceView(ListView):
         args = {'form': form, 'file': file}
         return render(request, self.template_name, args)
 
+
 @login_required()
 def people(request):
-
     people_dict = {}
 
     active_students = Student.objects.all()
@@ -189,6 +192,7 @@ class GetStudentAttendanceData(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """ Save the POST data """
         serializer.save()
+
 
 class OverrideStudentAttendanceData(View):
     def get(self, request, **kwargs):
@@ -273,20 +277,23 @@ def dashboard(request):
 
     people_dict['students'] = active_students
     # bar graph by country
-    country = Student.objects.order_by('country').values_list('country', flat=True).distinct()
-    print(country)
 
-    vaar2 = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
-    print(vaar2)
+    country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+    print(country)
     # bar graph by program
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
     print(program)
+    print(program.count())
 
     # bar graph by specialization
     splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
         'specialization')
 
-    # bar graph by year
-    return render(request, 'dashboardex.html',
-                  {'country': country, 'vaar2': vaar2, 'program': program, 'splgraph': splgraph})
+    # bar graph by intake semester
+    intakeSemester = Student.objects.values('intakeSemester').annotate(count_intake=Count('intakeSemester')).order_by(
+        'intakeSemester')
+    print(intakeSemester)
 
+    return render(request, 'dashboardex.html',
+                  {'country': country, 'program': program, 'splgraph': splgraph, 'active_students': active_students,
+                   'intakeSemester': intakeSemester})
