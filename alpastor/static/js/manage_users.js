@@ -130,6 +130,9 @@ function processUserCSVFile(csvFileElem) {
     data.append('file', csvFileElem.files[0]);
 
     // Collect override information
+    data.append('overrideSpecialization', $('#override-specialization').val());
+    data.append('overrideIntakeSemester', $('#override-intake-semester').val());
+    data.append('overrideCountry', $('#override-country').val());
 
     $.ajax({
         type: "POST",
@@ -145,6 +148,8 @@ function processUserCSVFile(csvFileElem) {
                 let student = new Student(data[i].first_name, data[i].last_name, data[i].email);
                 student.program = data[i].program;
                 student.country = data[i].country;
+                student.specialization = data[i].specialization;
+                student.intakeSemester = data[i].intakeSemester;
                 GlobalPotentialUsers.push(student);
             }
             populateModalUserPreview();

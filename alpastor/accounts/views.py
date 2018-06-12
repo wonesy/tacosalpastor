@@ -49,13 +49,17 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
     program_opts = ["maj", "prog", "program", "major", "majeur"]
     email_opts = ["email", "mail", "courriel"]
     country_opts = ["country", "pays"]
+    specialization_opts = ["specialization"]
+    semester_opts = ["intake", "intake semester", "semestre", "semester"]
 
     csv_positions = {
         'first_name' : -1,
         'last_name': -1,
         'email': -1,
         'program': -1,
-        'country': -1
+        'country': -1,
+        'specialization': -1,
+        'intake_semester': -1,
     }
 
     def get(self, request, *args, **kwargs):
@@ -89,6 +93,10 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
                 self.csv_positions['program'] = i
             elif field.lower() in self.country_opts:
                 self.csv_positions['country'] = i
+            elif field.lower() in self.specialization_opts:
+                self.csv_positions['specialization'] = i
+            elif field.lower() in self.semester_opts:
+                self.csv_positions['intake_semester'] = i
 
         # Validate CSV headers
         if self.csv_positions['email'] < 0:
@@ -100,17 +108,23 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
         elif self.csv_positions['program'] < 0:
             return bad_request("Cannot find program in CSV", exception="BadCSV")
 
-        # user = {
-        #     'first_name': "",
-        #     'last_name': "",
-        #     'program': "",
-        #     'email': "",
-        #     'type': "Student",
-        #     'country': "France"
-        # }
+        # Get override data (if any)
+        override_specialization = request.POST.get('overrideSpecialization')
+        override_intakeSemester = request.POST.get('overrideIntakeSemester')
+        override_country = request.POST.get('overrideCountry')
 
         for line in lines[1:]:
-            user = {}
+            user = {
+                'first_name': "",
+                'last_name': "",
+                'program': "",
+                'specialization': "",
+                'intakeSemester': "",
+                'email': "",
+                'type': "Student",
+                'country': ""
+            }
+
             if line == "":
                 continue
 
@@ -121,10 +135,26 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
             user['program'] = fields[self.csv_positions['program']]
             user['email'] = fields[self.csv_positions['email']]
 
-            if self.csv_positions['country'] > 0:
+            # Country
+            if self.csv_positions['country'] >= 0:
                 user['country'] = fields[self.csv_positions['country']]
-            else:
-                user['country'] = "France"
+
+            if user['country'] == "" and override_country != None:
+                user['country'] = override_country
+
+            # Specialization
+            if self.csv_positions['specialization'] >= 0:
+                user['specialization'] = fields[self.csv_positions['specialization']]
+
+            if user['specialization'] == "" and override_specialization != None:
+                user['specialization'] = override_specialization
+
+            # Intake Semester
+            if self.csv_positions['intake_semester'] >= 0:
+                user['intakeSemester'] = fields[self.csv_positions['intake_semester']]
+
+            if user['intakeSemester'] == "" and override_intakeSemester != None:
+                user['intakeSemester'] = override_intakeSemester
 
             all_users.append(user)
 
@@ -144,8 +174,6 @@ class SaveNewUsers(View):
         response_messages = []
 
         for user in users:
-            print(user)
-
             if user['isProfessor'] == True:
                 (rc, msg) = self.processNewProfessor(user)
             else:
