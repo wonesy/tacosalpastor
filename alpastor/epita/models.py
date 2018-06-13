@@ -113,13 +113,6 @@ class Student(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
-    def get_non_none_program_choices(self):
-        tmp = []
-        for val,name in Student.PROGRAM_CHOICES:
-            if val != Student.NONE:
-                tmp.append((val, name))
-        return tmp
-
 class Professor(models.Model):
     """
     Defines the Professor database table
@@ -159,11 +152,12 @@ class Course(models.Model):
     class Meta:
         unique_together = (('title', 'semester'),)
 
-    professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE)
-    title = models.CharField(max_length=127)
-    description = models.TextField(max_length=1000, blank=True)
-    semester = models.CharField(max_length=31)
-    module = models.CharField(max_length=63, blank=True)
+    professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=True)
+    code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123")
+    title = models.CharField(max_length=127, help_text="Course title")
+    description = models.TextField(max_length=1000, blank=True, help_text="Course description")
+    semester = models.CharField(max_length=31, help_text="Season Year (e.g. Fall 2017)")
+    module = models.CharField(max_length=63, blank=True, help_text="Module or teaching unit")
     credits = models.IntegerField()
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
 

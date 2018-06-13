@@ -39,6 +39,36 @@ function writeActions(actions) {
     }
 }
 
+function savePotentialCourse() {
+    let formData = new FormData();
+
+    inputElems = $('#add-course-form').find('input');
+
+    inputElems.each(function(idx) {
+        formData.append(this.name, this.value);
+    });
+
+    $.ajax({
+        type: "POST",
+        url: window.location.origin + window.location.pathname + "savenewcourse/",
+        data: $('#add-course-form').serialize(),
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            console.log("SUCCESS");
+            writeActions([data.message]);
+        },
+        error: function (e, data) {
+            console.log("ERROR : ", e);
+            writeActions([e.responseJSON.message]);
+        }
+    });
+
+    // Show the actions display
+    $("#actions-card-body").toggleClass("show");
+}
+
 function savePotentialUsers() {
     $.ajax({
         type: "POST",

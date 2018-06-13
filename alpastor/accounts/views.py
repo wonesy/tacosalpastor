@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from accounts.forms import LoginForm
 from accounts.models import User
 from epita.models import Student, Professor
+from epita.forms import CourseForm
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
 from django.http import HttpResponseRedirect, JsonResponse, QueryDict, HttpResponse
@@ -38,10 +39,33 @@ def login(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def manageusers(request):
+    course_form = CourseForm()
     return render(request, 'accounts/manage_users.html', {
-        'programs': Student.get_non_none_program_choices(None),
+        'programs': Student.PROGRAM_CHOICES,
         'specializations': Student.SPECIALIZATION_CHOICES,
+        'course_form': course_form
     })
+
+class SaveNewCourse(View):
+    def get(self, request, *args, **kwargs):
+        return bad_request(request, exception="Forbidden")
+
+    def post(self, request, *args, **kwargs):
+        rc = 200
+        msg_success = "[PASS] created new course with code {}"
+        msg_fail = "[FAIL] could not create new course with code {}"
+
+        data = QueryDict(request.body).dict()
+        form = CourseForm(data)
+        if form.is_valid():
+            logger.info("Saving new course=[{}] {}".format(data['code'], data['title']))
+            response_msg = msg_success.format(data['code'])
+            form.save()
+        else:
+            logger.warning("Attempted to save invalid form")
+            response_msg = msg_fail.format(data['code'])
+            rc = 400
+        return JsonResponse(status=rc, data={'message': response_msg})
 
 class ProcessUserCSVData(generics.ListCreateAPIView):
     first_name_opts = ["prenom", "first", "first_name", "firstname", "first name"]

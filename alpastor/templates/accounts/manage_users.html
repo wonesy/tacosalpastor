@@ -76,7 +76,6 @@
                                 <div id="student-specific-data" class="student-form-container collapse">
                                     <label for="program"><span class="required-field">*</span>Program:</label><br>
                                     <select id="program" name="program" class="input-group" required>
-                                        <option value="" selected>--------</option>
                                         {% for value, name in programs %}
                                             <option value="{{ value }}">{{ name }}</option>
                                         {% endfor %}
@@ -84,7 +83,6 @@
 
                                     <label for="specialization"><span class="required-field">*</span>Specialization:</label><br>
                                     <select id="specialization" name="specialization" class="input-group" required>
-                                        <option value="" selected>--------</option>
                                         {% for value, name in specializations %}
                                             <option value="{{ value }}">{{ name }}</option>
                                         {% endfor %}
@@ -110,7 +108,6 @@
                                     <p>Use the fields below to fill blanks in the CSV</p>
                                     <label for="override-specialization">Specialization:</label><br>
                                     <select id="override-specialization" name="override-specialization" class="input-group">
-                                        <option value="" selected>--------</option>
                                         {% for value, name in specializations %}
                                             <option value="{{ value }}">{{ name }}</option>
                                         {% endfor %}
@@ -146,8 +143,16 @@
             {# Add users body #}
             <div id="add-courses-card-body" class="collapse">
                 <div class="card-body container-fluid">
-                    <div class="row"></div>
+                    <div class="row">
+                        <form id="add-course-form" enctype="multipart/form-data" method="post" name="newCourse">
+                            {{ course_form }}
+                        </form></div>
                 </div>
+                <br>
+                <div style="text-align: center;">
+                    <button class="btn btn-info" onclick="savePotentialCourse();">Add course</button>
+                </div>
+                <br>
             </div>
         </div>
 
