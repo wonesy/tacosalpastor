@@ -1,23 +1,11 @@
-function showTime() {
-    var time = new Date();
-    var hr = time.getHours().toString();
-    var min = time.getMinutes().toString();
-    var sec = time.getSeconds().toString();
+let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3, "toggle":4};
 
-    if (hr.length < 2) {
-        hr = "0" + hr;
-    }
-
-    if (min.length < 2) {
-        min = "0" + min;
-    }
-
-    if (sec.length < 2) {
-        sec = "0" + sec;
-    }
-
-    var clock = document.getElementById("clock");
-    clock.textContent = hr + " : " + min + " : " + sec;
+function markForStatusChange(status) {
+    console.log(status);
+    createHTML(status);
 }
 
-setInterval(showTime, 1000);
+function createHTML(status) {
+    console.log(document.createElement('input'));
+    // document.getElementById('option1').innerText
+}
