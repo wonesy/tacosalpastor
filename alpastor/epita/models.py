@@ -65,13 +65,15 @@ class Student(models.Model):
     # Programs
     ME = 1
     MSc = 2
-    GITM = 3
+    FGITM = 3
+    EXCHANGE = 4
 
     PROGRAM_CHOICES = [
         (NONE, 'None'),
         (ME, 'Master of Engineering'),
         (MSc, 'Master of Science'),
-        (GITM, 'Global IT Management'),
+        (FGITM, 'Global IT Management (French)'),
+        (EXCHANGE, "Exchange"),
     ]
 
     # Specializations
@@ -81,6 +83,7 @@ class Student(models.Model):
     CS = 4
     SDM = 5
     SDS = 6
+    IGITM = 7
 
     SPECIALIZATION_CHOICES = [
         (NONE, 'None'),
@@ -90,7 +93,34 @@ class Student(models.Model):
         (CS, 'Computer Security'),
         (SDM, 'Software Development & Multimedia'),
         (SDS, 'Systems Networks & Security'),
+        (IGITM, 'Global IT Management (International)'),
     ]
+
+    # Enrollment status
+    ENROLLED = 0
+    WITHDRAWN = 1
+    EXPELLED = 2
+    GRADUATED = 3
+
+    ENROLLMENT_CHOICES = [
+        (ENROLLED, 'Enrolled'),
+        (WITHDRAWN, 'Withdrawn'),
+        (EXPELLED, 'Expelled'),
+        (GRADUATED, 'Graduated'),
+    ]
+
+    # Additional Flags
+    OK = 0
+    ACADEMIC_WARNING = 1
+    ATTENDANCE_WARNING = 2
+
+    ADDITIONAL_FLAGS = [
+        (OK, "OK"),
+        (ACADEMIC_WARNING, "Academic warning"),
+        (ATTENDANCE_WARNING, "Attendance warning"),
+    ]
+
+
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
@@ -99,9 +129,19 @@ class Student(models.Model):
     intakeSemester = models.CharField(max_length=31)
     country = models.CharField(max_length=127)
     country_code = models.CharField(max_length=2, blank=True)
-    city = models.CharField(max_length=127, blank=True)
+    city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
-    photo_location = models.CharField(max_length=511, blank=True)
+    photo_location = models.CharField(max_length=511, null=True, blank=True)
+    address_street = models.CharField(max_length=255, null=True, blank=True, help_text="Street")
+    address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
+    address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
+    address_code = models.IntegerField(blank=True, null=True, help_text="Department code")
+    dob = models.DateField(null=True, blank=True, help_text="Date of birth")
+    enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
+    flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
+
+
+
 
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
@@ -158,7 +198,8 @@ class Course(models.Model):
     description = models.TextField(max_length=1000, blank=True, help_text="Course description")
     semester = models.CharField(max_length=31, help_text="Season Year (e.g. Fall 2017)")
     module = models.CharField(max_length=63, blank=True, help_text="Module or teaching unit")
-    credits = models.IntegerField()
+    credits = models.IntegerField(null=True, blank=True)
+    hours = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
 
     def clean(self):

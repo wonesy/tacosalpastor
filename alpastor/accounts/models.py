@@ -38,13 +38,24 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
+    MR = 0
+    MS = 1
+    MRS = 2
+
+    TITLE_OPTIONS = [
+        (MR, "Mr."),
+        (MS, "Ms."),
+        (MRS, "Mrs.")
+    ]
     email = models.EmailField(_('email address'), unique=True)
+    title = models.IntegerField(_('title'), default=MR, blank=True, choices=TITLE_OPTIONS)
     first_name = models.CharField(_('first name'), max_length=127, blank=True)
     last_name = models.CharField(_('last name'), max_length=127, blank=True)
     external_email = models.EmailField(_('external email address'), blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('Professor'), default=False, blank=True)
+    is_registered = models.BooleanField(_('Is registered'), default=False, blank=False)
 
     objects = UserManager()
 
