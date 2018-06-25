@@ -12,46 +12,41 @@
         <form method="post" enctype="multipart/form-data">{% csrf_token %}
             <div class="title-container">
                 <h1>{{ attendance.schedule_id.course_id }}</h1>
-                <h1>{{ form.schedule_id }}</h1>
+                <h1>{{ form.schedule_id.as_hidden }}</h1>
                 <h3>{{ attendance.schedule_id.date }}</h3>
                 <h5>{{ attendance.schedule_id.start_time|time:"H:i" }}
                     - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
             </div>
-            <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card">
+            <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card mx-auto">
                 <div class="card text-white mb-3">
-                    <div class="card-header bg-danger">{{ form.student_id }}</div>
+                    <div class="card-header bg-danger">
+                        {{ form.student_id }}
+                    </div>
                     <div class="card-body">
                         <img src="/static/image/portraits/generic_avatar.jpg">
-                        <p class="card-text">{{ form.status }}</p>
+                        {#                        <p class="card-text">{{ form.status }}</p>#}
                     </div>
                     <div class="card-footer">
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-present">
-                                <input type="radio" name="options1" id="option1" autocomplete="off"
-                                       onchange="markForStatusChange(StatusEnum.present);"> Present</label>
-                            <label class="btn btn-absent active">
-                                <input type="radio" name="options1" id="option2" autocomplete="off"
-                                       onchange="markForStatusChange(StatusEnum.absent);"
-                                       checked=""> Absent</label>
+                            <label class="btn btn-present active">
+                                <input type="radio" name="status" id="option1" value="1" autocomplete="off" checked="">
+                                Present</label>
+                            <label class="btn btn-absent">
+                                <input type="radio" name="status" value="3" id="option2" autocomplete="off"
+                                       onchange="addFileUploadButton()"> Excused</label>
                         </div>
                         <input type="hidden" name="course_id" value="{{ attendance.schedule_id.course_id }}">
-
+                        <input type="text" value="{{ form.instance.id }}" name="id" hidden>
                         <button class="btn-present" type="submit">Submit</button>
                     </div>
                 </div>
             </div>
-{#            {{ form.status }}#}
-{#            {{ form.schedule_id }}#}
-{#            {{ form.student_id }}#}
-            {{ form.file_upload }}
+            {#            {{ form.file_upload }}#}
+            <div id="fileUpload">
 
-            <input type="text" value="{{ form.instance.id }}" name="id" hidden>
-
-{#            {{ form.instance.id }}#}
-{#                        <button class="btn-present" type="submit">Submit</button>#}
+            </div>
+{#            <input type="file" name="file_upload" id="id_file_upload">#}
         </form>
-
-        {{ form }}
     </div>
     </body>
 {% endblock %}

@@ -12,6 +12,7 @@ from .models import Student, StudentCourse, Course, Attendance, Schedule
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
+from django.urls import reverse
 
 import logging
 
@@ -130,7 +131,7 @@ class AttendanceView(ListView):
 
         return render(request, self.template_name, data)
 
-    def post(self, request, **kwargs):
+    def post(self, request, slug, **kwargs):
         schedule_id = request.GET.get('schedule_id', )
         schedule_instance = Schedule.objects.get(pk=schedule_id)
 
@@ -146,6 +147,7 @@ class AttendanceView(ListView):
                 form.save()
                 file = form.cleaned_data['file_upload']
         args = {'form': form, 'file': file}
+
         return render(request, self.template_name, args)
 
 

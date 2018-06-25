@@ -1,11 +1,9 @@
-let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3, "toggle":4};
-
-function markForStatusChange(status) {
-    console.log(status);
-    createHTML(status);
-}
-
-function createHTML(status) {
-    console.log(document.createElement('input'));
-    // document.getElementById('option1').innerText
+function addFileUploadButton() {
+    let divName = document.getElementById('fileUpload');
+    let addInput = document.createElement('INPUT');
+    addInput.setAttribute('type', 'file');
+    addInput.setAttribute('name', 'file_upload');
+    addInput.setAttribute('id', 'id_file_upload');
+    divName.appendChild(addInput);
+    console.log(divName);
 }
