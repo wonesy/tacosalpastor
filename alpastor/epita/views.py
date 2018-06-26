@@ -147,8 +147,9 @@ class AttendanceView(ListView):
                 form.save()
                 file = form.cleaned_data['file_upload']
         args = {'form': form, 'file': file}
+        url = reverse('schedule_list', kwargs={'slug': slug})
 
-        return render(request, self.template_name, args)
+        return redirect(url)
 
 
 @login_required()
