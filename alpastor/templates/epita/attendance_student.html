@@ -20,11 +20,11 @@
             <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card mx-auto">
                 <div class="card text-white mb-3">
                     <div class="card-header bg-danger">
-                        {{ form.student_id }}
+                        <h6 id="studentName">{{ form.instance.student_id }}</h6>
+                        {{ form.student_id.as_hidden }}
                     </div>
                     <div class="card-body">
                         <img src="/static/image/portraits/generic_avatar.jpg">
-                        {#                        <p class="card-text">{{ form.status }}</p>#}
                     </div>
                     <div class="card-footer">
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -41,11 +41,7 @@
                     </div>
                 </div>
             </div>
-            {#            {{ form.file_upload }}#}
-            <div id="fileUpload">
-
-            </div>
-{#            <input type="file" name="file_upload" id="id_file_upload">#}
+            <div id="fileUpload"></div>
         </form>
     </div>
     </body>
