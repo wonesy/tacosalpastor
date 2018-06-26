@@ -4,14 +4,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
-from accounts.forms import LoginForm
-from accounts.models import User
-from epita.models import Student, Professor
+from accounts.forms import LoginForm, ResetPasswordForm
+from accounts.models import User, ResetToken
+from epita.models import Student
 from epita.forms import CourseForm
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
-from django.http import HttpResponseRedirect, JsonResponse, QueryDict, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, QueryDict
 from django.views.generic import View
+from django.utils.crypto import get_random_string
+from django.utils import timezone
 import json
 import enum
 import logging
@@ -21,7 +23,8 @@ logger = logging.getLogger(__name__)
 class ReturnCodes(enum.Enum):
     OK = 0
     ERR_USER_EXISTS = 1
-    ERR_INVALID_FIELD =2
+    ERR_INVALID_FIELD = 2
+    ERR_INVALID_TOKEN = 3
 
 # Create your views here.
 def login(request):
@@ -32,7 +35,6 @@ def login(request):
             auth_login(request, form.get_user())
             return redirect(request.GET.get('next', 'home'))
     else:
-
         form = LoginForm()
 
     return render(request, 'accounts/login.html', {'form': form})
@@ -334,3 +336,57 @@ class SaveNewUsers(View):
 
 
         return Student.NONE
+
+class GenerateResetToken(View):
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except:
+            logger.info("Requested password reset for an email that doesn't exist: {}".format(email))
+            return render(request, 'reset/reset_link_sent.html', {'email': email})
+
+        # Delete all existing tokens for the specific user
+        ResetToken.objects.filter(user=user).delete()
+
+        # Generate new token and calculate the expiration date
+        token = get_random_string(length=128)
+        expiration = timezone.now() + timezone.timedelta(days=1)
+
+        # Add this new token to the database
+        reset_token = ResetToken.objects.create(user=user, token=token, expiration=expiration)
+        logger.info("Created a password reset token for user: {} that expires at {}".format(
+            reset_token.user, reset_token.expiration
+        ))
+
+        return render(request, 'reset/reset_link_sent.html', {'email': email})
+
+    def get(self, request, token, *args, **kwargs):
+        return bad_request(request, exception="Forbidden")
+
+class ResetPassword(View):
+    def post(self, request, token, *args, **kwargs):
+        try:
+            reset_token = ResetToken.objects.get(token=token)
+        except (ResetToken.DoesNotExist, MultipleObjectsReturned):
+            return render(request, 'reset/reset_password.html', {'validlink': False})
+
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        return render(request, 'reset/reset_password.html', {'form': form, 'user': reset_token.user, 'validlink': True})
+
+    def get(self, request, token, *args, **kwargs):
+        try:
+            reset_token = ResetToken.objects.get(token=token)
+        except (ResetToken.DoesNotExist, MultipleObjectsReturned):
+            return render(request, 'reset/reset_password.html', {'validlink': False})
+
+        if reset_token.expired():
+            return render(request, 'reset/reset_password.html', {'validlink': False})
+
+        form = ResetPasswordForm()
+
+        return render(request, 'reset/reset_password.html', {'form': form, 'user': reset_token.user, 'validlink': True})

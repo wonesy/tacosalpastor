@@ -47,6 +47,10 @@ urlpatterns = [
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/', quiz_views.delete, name='delete_view'),
 
+     # Password Reset
+    path('generatereset/', accounts_views.GenerateResetToken.as_view(), name='genreset'),
+    path('reset/<str:token>/', accounts_views.ResetPassword.as_view(), name='resetpass'),
+
     # Admin/Superuser
     path('login/', accounts_views.login, name='login'),
     path('manageusers/processusercsv/', login_required(accounts_views.ProcessUserCSVData.as_view()), name='processusercsv'),
