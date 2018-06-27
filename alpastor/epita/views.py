@@ -7,7 +7,7 @@ from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import Student, StudentCourse, Course, Attendance, Schedule
 from django.views.generic import View
 from rest_framework.response import Response
@@ -21,6 +21,23 @@ logger = logging.getLogger(__name__)
 @login_required()
 def home(request):
     return render(request, 'base_generic.html')
+
+
+class AttendanceGraphs(ListView):
+    template_name = 'epita/graphs.html'
+    form_class = AttendanceForm
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args):
+        attendance = Attendance.objects.all()
+        data = {}
+        for i in attendance:
+            data['status'] = i.status
+        # return render(request, self.template_name, {'form': form})
+        return JsonResponse(data)
 
 
 class CourseView(ListView):
