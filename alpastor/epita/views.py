@@ -30,25 +30,23 @@ class AttendanceGraphs(ListView):
     def get(self, request, *args):
         student = 'Willy0'
         course = 'Advanced C Programming'
+        semester = 'Fall 2017'
         # all_data = self.individual_student_class_dates(student, course)
-        all_data = self.whole_class(course)
+        all_data = self.whole_class(course, semester)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
 
-    def whole_class(self, course):
+    def whole_class(self, course, semester):
         attendance = Attendance.objects.filter(schedule_id__course_id__title=course)
         course_id = attendance[0].schedule_id.course_id
         students = Student.objects.filter(studentcourse__course_id=course_id)
-        attendance_data = {'student': []}
-        print(students.count())
+        attendance_data = {'course': course, 'semester': semester, 'student': []}
         count = 0
         for student in students:
             attendance_data['student'].append({'name': student.user.get_full_name()})
-            attendance_data['student'][count]['course'] = course_id.title
             attendance_data['student'][count]['attendance'] = []
-            student_id = student.user.id
+            student_id = student.id
             student_attendance = Attendance.objects.filter(student_id=student_id, schedule_id__course_id=course_id)
-            print(student_attendance)
             for i in student_attendance:
                 attendance_data['student'][count]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
             count += 1
