@@ -6,13 +6,17 @@
     <head>
         <script src="{% static 'js/graphs.js' %}"></script>
     </head>
+    <h5 id="popData"></h5>
 
-    <form method="post" enctype="multipart/form-data"> {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" id="formSubmit">Submit</button>
-
-    </form>
+{#    <form method="post" enctype="multipart/form-data"> {% csrf_token %}#}
+{#        {{ form.as_p }}#}
+{#        <button type="submit" id="formSubmit">Submit</button>#}
+{##}
+{#    </form>#}
     <script>
+        {#let attendance_stuff = {{ attendance_data }}#}
+        document.getElementById('popData').innerText = {{ attendance_data }};
+        console.log({{ attendance_data }});
         let url = window.href;
         $('#formSubmit').on('submit', function () {
             let id_status = $('#id_status').val();

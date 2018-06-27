@@ -28,16 +28,30 @@ class AttendanceGraphs(ListView):
     form_class = AttendanceForm
 
     def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+        attendance = Attendance.objects.filter(student_id__user__first_name='Willy0')[0]
+        student = Student.objects.filter(user__first_name='Willy0')[0]
+        student_string = '\'' + student.user.get_full_name() + '\''
+        attendance_data = {student_string: []}
+        student_data = {}
+        student_data['status'] = attendance.status
+        student_data['course'] = attendance.schedule_id.course_id.title
+        student_data['date'] = attendance.schedule_id.date
+        attendance_data[student_string].append(student_data)
+        # return render(request, self.template_name, {'attendance_data': attendance_data})
+        return JsonResponse(attendance_data)
 
-    def post(self, request, *args):
-        attendance = Attendance.objects.all()
-        data = {}
-        for i in attendance:
-            data['status'] = i.status
-        # return render(request, self.template_name, {'form': form})
-        return JsonResponse(data)
+    # def post(self, request, *args):
+    #     attendance = Attendance.objects.all()
+    #     attendance_data = {'student': []}
+    #     for i in attendance:
+    #         tmp_dict = {}
+    #         tmp_dict['status'] = i.status
+    #         tmp_dict['name'] = i.student_id.user.get_full_name()
+    #         tmp_dict['course'] = i.schedule_id.course_id.title
+    #         tmp_dict['date'] = i.schedule_id.date
+    #         attendance_data['student'].append(tmp_dict)
+    #     # return render(request, self.template_name, {'form': form})
+    #     return JsonResponse(attendance_data)
 
 
 class CourseView(ListView):
