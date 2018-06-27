@@ -255,22 +255,6 @@ class ToggleAttendanceLock(View):
 
         return HttpResponse(200)
 
-# def export_to_excel(request):
-#
-#     lists = Student.objects.all()
-#
-#     # your excel html format
-#     template_name = "people.html"
-#
-#     response = render(template_name, {'lists': lists})
-#
-#     # this is the output file
-#     filename = "model.csv"
-#
-#     response['Content-Disposition'] = 'attachment; filename='+filename
-#     response['Content-Type'] = 'application/vnd.ms-excel; charset=utf-16'
-#     return response
-
 
 def dashboard(request):
     people_dict = {}
@@ -278,6 +262,7 @@ def dashboard(request):
     active_students = Student.objects.all()
 
     people_dict['students'] = active_students
+
     # bar graph by country
 
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
