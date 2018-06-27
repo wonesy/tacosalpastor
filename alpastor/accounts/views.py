@@ -14,6 +14,8 @@ from django.http import HttpResponseRedirect, JsonResponse, QueryDict
 from django.views.generic import View
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template, render_to_string
 import json
 import enum
 import logging
@@ -340,25 +342,42 @@ class SaveNewUsers(View):
 class GenerateResetToken(View):
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
+        user = None
+        token = None
+        template_name = "reset/password_reset_email_nouser.html"
 
         try:
             user = User.objects.get(email=email)
         except:
             logger.info("Requested password reset for an email that doesn't exist: {}".format(email))
-            return render(request, 'reset/reset_link_sent.html', {'email': email})
 
-        # Delete all existing tokens for the specific user
-        ResetToken.objects.filter(user=user).delete()
+        if user:
+            # Delete all existing tokens for the specific user
+            num_deleted = ResetToken.objects.filter(user=user).delete()
 
-        # Generate new token and calculate the expiration date
-        token = get_random_string(length=128)
-        expiration = timezone.now() + timezone.timedelta(days=1)
+            # Generate new token and calculate the expiration date
+            token = get_random_string(length=128)
+            expiration = timezone.now() + timezone.timedelta(days=1)
 
-        # Add this new token to the database
-        reset_token = ResetToken.objects.create(user=user, token=token, expiration=expiration)
-        logger.info("Created a password reset token for user: {} that expires at {}".format(
-            reset_token.user, reset_token.expiration
-        ))
+            # Add this new token to the database
+            reset_token = ResetToken.objects.create(user=user, token=token, expiration=expiration)
+            logger.info("Created a password reset token for user: {} that expires at {}".format(
+                reset_token.user, reset_token.expiration
+            ))
+
+            template_name = "reset/password_reset_email.html"
+
+
+
+        # Send email here
+        subject = "EPITA Admin Password Reset Request"
+        from_email = "do_not_reply@epita.fr"
+        d = {"token1": token, "domain": request.get_host(), "protocol": "http"}
+        html_template = get_template(template_name)
+        html_content = html_template.render(d)
+        msg = EmailMultiAlternatives(subject, render_to_string(template_name, d), from_email, [email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return render(request, 'reset/reset_link_sent.html', {'email': email})
 
