@@ -7,11 +7,12 @@ from .forms import AttendanceForm, ScheduleForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import Student, StudentCourse, Course, Attendance, Schedule
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
+from django.urls import reverse
 
 import logging
 
@@ -20,6 +21,23 @@ logger = logging.getLogger(__name__)
 @login_required()
 def home(request):
     return render(request, 'base_generic.html')
+
+
+class AttendanceGraphs(ListView):
+    template_name = 'epita/graphs.html'
+    form_class = AttendanceForm
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args):
+        attendance = Attendance.objects.all()
+        data = {}
+        for i in attendance:
+            data['status'] = i.status
+        # return render(request, self.template_name, {'form': form})
+        return JsonResponse(data)
 
 
 class CourseView(ListView):
@@ -125,13 +143,12 @@ class AttendanceView(ListView):
             )
 
             form = self.form_class(instance=attendance_instance)
-            print(attendance_instance)
             data['attendance'] = attendance_instance
             data['form'] = form
 
         return render(request, self.template_name, data)
 
-    def post(self, request, **kwargs):
+    def post(self, request, slug, **kwargs):
         schedule_id = request.GET.get('schedule_id', )
         schedule_instance = Schedule.objects.get(pk=schedule_id)
 
@@ -147,7 +164,9 @@ class AttendanceView(ListView):
                 form.save()
                 file = form.cleaned_data['file_upload']
         args = {'form': form, 'file': file}
-        return render(request, self.template_name, args)
+        url = reverse('schedule_list', kwargs={'slug': slug})
+
+        return redirect(url)
 
 
 @login_required()

@@ -1,23 +1,11 @@
-function showTime() {
-    var time = new Date();
-    var hr = time.getHours().toString();
-    var min = time.getMinutes().toString();
-    var sec = time.getSeconds().toString();
-
-    if (hr.length < 2) {
-        hr = "0" + hr;
+function addFileUploadButton() {
+    if (document.getElementById('id_file_upload') === null) {
+        let divName = document.getElementById('fileUpload');
+        let addInput = document.createElement('INPUT');
+        addInput.setAttribute('type', 'file');
+        addInput.setAttribute('name', 'file_upload');
+        addInput.setAttribute('id', 'id_file_upload');
+        divName.appendChild(addInput);
+        console.log(divName);
     }
-
-    if (min.length < 2) {
-        min = "0" + min;
-    }
-
-    if (sec.length < 2) {
-        sec = "0" + sec;
-    }
-
-    var clock = document.getElementById("clock");
-    clock.textContent = hr + " : " + min + " : " + sec;
 }
-
-setInterval(showTime, 1000);

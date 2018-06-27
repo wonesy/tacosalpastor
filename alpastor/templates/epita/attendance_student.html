@@ -7,33 +7,42 @@
         <link href="{% static 'css/attendance_student.css' %}" rel="stylesheet">
         <script src="{% static 'js/attendance_student.js' %}"></script>
     </head>
-    <body onload="showTime()">
+    <body>
     <div class="attendance-container text-center">
-        <div class="title-container">
-            <h1>{{ attendance.schedule_id.course_id }}</h1>
-            <h3>{{ attendance.schedule_id.date }}</h3>
-            <h5>{{ attendance.schedule_id.start_time|time:"H:i" }} - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
-        </div>
-        <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card">
-            <div class="card text-white mb-3">
-                <div class="card-header bg-danger">Willy0 Williamson</div>
-                <div class="card-body">
-                    <img src="/static/image/portraits/generic_avatar.jpg">
-                    <p class="card-text">Absent</p>
-                </div>
-                <div class="card-footer">
-                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                        <label class="btn btn-present">
-                            <input type="radio" name="options1" id="option1" autocomplete="off"
-                                   onchange="markForStatusChange(1, StatusEnum.present);"> Present</label>
-                        <label class="btn btn-absent active">
-                            <input type="radio" name="options1" id="option2" autocomplete="off"
-                                   onchange="markForStatusChange(1, StatusEnum.absent);"
-                                   checked=""> Absent</label>
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="title-container">
+                <h1>{{ attendance.schedule_id.course_id }}</h1>
+                <h1>{{ form.schedule_id.as_hidden }}</h1>
+                <h3>{{ attendance.schedule_id.date }}</h3>
+                <h5>{{ attendance.schedule_id.start_time|time:"H:i" }}
+                    - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
+            </div>
+            <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card mx-auto">
+                <div class="card text-white mb-3">
+                    <div class="card-header bg-danger">
+                        <h6 id="studentName">{{ form.instance.student_id }}</h6>
+                        {{ form.student_id.as_hidden }}
+                    </div>
+                    <div class="card-body">
+                        <img src="/static/image/portraits/generic_avatar.jpg">
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-present active">
+                                <input type="radio" name="status" id="option1" value="1" autocomplete="off" checked="">
+                                Present</label>
+                            <label class="btn btn-absent">
+                                <input type="radio" name="status" value="3" id="option2" autocomplete="off"
+                                       onchange="addFileUploadButton()"> Excused</label>
+                        </div>
+                        <input type="hidden" name="course_id" value="{{ attendance.schedule_id.course_id }}">
+                        <input type="text" value="{{ form.instance.id }}" name="id" hidden>
+                        <button class="btn-present" type="submit">Submit</button>
                     </div>
                 </div>
             </div>
-        </div>
+            <div id="fileUpload"></div>
+        </form>
     </div>
     </body>
 {% endblock %}
