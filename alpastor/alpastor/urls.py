@@ -49,7 +49,7 @@ urlpatterns = [
 
      # Password Reset
     path('generatereset/', accounts_views.GenerateResetToken.as_view(), name='genreset'),
-    path('reset/<str:token>/', accounts_views.ResetPassword.as_view(), name='resetpass'),
+    path('resetpass/<str:token>/', accounts_views.ResetPassword.as_view(), name='resetpass'),
 
     # Admin/Superuser
     path('login/', accounts_views.login, name='login'),
