@@ -30,25 +30,86 @@ class AttendanceGraphs(ListView):
     def get(self, request, *args):
         student = 'Willy0'
         course = 'Advanced C Programming'
+        intake = 'Fall 2017'
         semester = 'Fall 2017'
         # all_data = self.individual_student_class_dates(student, course)
-        all_data = self.whole_class(course, semester)
+        # all_data = self.whole_class(course, semester)
+        all_data = self.whole_semester(semester, intake)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
+
+        # PROGRAM_CHOICES = [
+        #     (0, 'None'),
+        #     (1, 'Master of Engineering'),
+        #     (2, 'Master of Science'),
+        #     (3, 'Global IT Management (French)'),
+        #     (4, "Exchange")
+        # ]
+        #
+        # SPECIALIZATION_CHOICES = [
+        #     (0, 'None'),
+        #     (1, 'Software Engineering'),
+        #     (2, 'Information Systems Management'),
+        #     (3, 'Data Science & Analytics'),
+        #     (4, 'Computer Security'),
+        #     (5, 'Software Development & Multimedia'),
+        #     (6, 'Systems Networks & Security'),
+        #     (7, 'Global IT Management (International)')
+
+    def whole_semester(self, semester, intake):
+        attendance_data = {'intake': intake, 'semester': semester, 'programs': []}
+        programs_tuple = Student.PROGRAM_CHOICES
+        specializations_tuple = Student.SPECIALIZATION_CHOICES
+        me_specializations = []
+        msc_specializations = []
+        no_specialization = [{'specialization': 'None'}]
+        for i in range(len(programs_tuple)):
+            if programs_tuple[i][1] == 'Master of Engineering':
+                for j in range(len(specializations_tuple)):
+                    if (specializations_tuple[j][1] == 'Software Development & Multimedia'
+                            or specializations_tuple[j][1] == 'Systems Networks & Security'
+                            or specializations_tuple[j][1] == 'Global IT Management (International)'):
+                        me_specializations.append({'specialization': specializations_tuple[j][1]})
+            if programs_tuple[i][1] == 'Master of Science':
+                for j in range(len(specializations_tuple)):
+                    if (specializations_tuple[j][1] == 'Software Engineering'
+                            or specializations_tuple[j][1] == 'Information Systems Management'
+                            or specializations_tuple[j][1] == 'Data Science & Analytics'
+                            or specializations_tuple[j][1] == 'Computer Security'):
+                        msc_specializations.append({'specialization': specializations_tuple[j][1]})
+
+        for program in programs_tuple:
+            if program[1] not in attendance_data['programs']:
+                if program[1] == 'Master of Engineering':
+                    attendance_data['programs'].append({'program': program[1], 'specializations': me_specializations})
+                elif program[1] == 'Master of Science':
+                    attendance_data['programs'].append({'program': program[1], 'specializations': msc_specializations})
+                else:
+                    attendance_data['programs'].append({'program': program[1], 'specializations': no_specialization})
+
+        no_specialization = Student.objects.filter(program=Student.NONE, intakeSemester=intake)
+
+        me_students = Student.objects.filter(program=Student.ME, intakeSemester=intake)
+        msc_students = Student.objects.filter(program=Student.MSc, intakeSemester=intake)
+        gitm_students = Student.objects.filter(program=Student.FGITM, intakeSemester=intake)
+        exchange_students = Student.objects.filter(program=Student.EXCHANGE, intakeSemester=intake)
+        Attendance.objects.filter(schedule_id__course_id__semester=semester)
+        print(msc_students)
+        return attendance_data
 
     def whole_class(self, course, semester):
         attendance = Attendance.objects.filter(schedule_id__course_id__title=course)
         course_id = attendance[0].schedule_id.course_id
         students = Student.objects.filter(studentcourse__course_id=course_id)
-        attendance_data = {'course': course, 'semester': semester, 'student': []}
+        attendance_data = {'course': course, 'semester': semester, 'students': []}
         count = 0
         for student in students:
-            attendance_data['student'].append({'name': student.user.get_full_name()})
-            attendance_data['student'][count]['attendance'] = []
+            attendance_data['students'].append({'name': student.user.get_full_name()})
+            attendance_data['students'][count]['attendance'] = []
             student_id = student.id
             student_attendance = Attendance.objects.filter(student_id=student_id, schedule_id__course_id=course_id)
             for i in student_attendance:
-                attendance_data['student'][count]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
+                attendance_data['students'][count]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
             count += 1
         return attendance_data
 
