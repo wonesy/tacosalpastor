@@ -16,6 +16,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
+from django.conf import settings
 import json
 import enum
 import logging
@@ -289,12 +290,12 @@ class SaveNewUsers(View):
 
     def programStringToValue(self, program):
         programLower = program.lower()
-        gitm_options = [str(Student.GITM), "gitm", "global it management"]
+        gitm_options = [str(Student.FGITM), "gitm", "global it management", "fgitm", "french global it management", "french gitm"]
         me_options = [str(Student.ME), "me", "master of engineering", "masters of engineering"]
         msc_options = [str(Student.MSc), "msc", "master of science", "masters of science"]
 
         if programLower in gitm_options:
-            return Student.GITM
+            return Student.FGITM
 
         if programLower in me_options:
             return Student.ME
@@ -370,9 +371,9 @@ class GenerateResetToken(View):
 
 
         # Send email here
-        subject = "EPITA Admin Password Reset Request"
-        from_email = "do_not_reply@epita.fr"
-        d = {"token1": token, "domain": request.get_host(), "protocol": "http"}
+        subject = "EPITA password reset request"
+        from_email = settings.EMAIL_HOST_USER
+        d = {"token": token, "domain": request.get_host(), "protocol": "http"}
         html_template = get_template(template_name)
         html_content = html_template.render(d)
         msg = EmailMultiAlternatives(subject, render_to_string(template_name, d), from_email, [email])
@@ -393,8 +394,9 @@ class ResetPassword(View):
 
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save(user=reset_token.user)
             return redirect('home')
+
         return render(request, 'reset/reset_password.html', {'form': form, 'user': reset_token.user, 'validlink': True})
 
     def get(self, request, token, *args, **kwargs):
