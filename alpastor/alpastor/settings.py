@@ -222,4 +222,9 @@ LOGGING = {
     }
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # DEV TODO
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_HOST_USER = 'jones.cameron@epita.fr'
+EMAIL_HOST_PASSWORD = 'oh<V,vox'
+EMAIL_PORT = 587

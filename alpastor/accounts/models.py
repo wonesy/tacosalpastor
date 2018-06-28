@@ -85,6 +85,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def set_registered(self):
+        if not self.is_registered:
+            self.is_registered = True
+            self.save()
+
     def __repr__(self):
         return self.get_full_name()
 

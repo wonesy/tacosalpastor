@@ -65,12 +65,36 @@ class CustomUserChangeForm(forms.ModelForm):
         return user
 
 class ResetPasswordForm(forms.Form):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+    }))
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+    }))
 
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
+    def clean(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+
+        if not password1 or not password2:
+            raise forms.ValidationError("Must fill both passwords")
+
         if password1 and password2 and (password1 != password2):
             raise forms.ValidationError("Passwords do not match")
-        return password2
+
+
+    def save(self, **kwargs):
+        user = kwargs['user']
+        if not user:
+            raise forms.ValidationError("user does not exist")
+
+        try:
+            self.full_clean()
+        except forms.ValidationError:
+            raise forms.ValidationError("could not clean the data in form")
+
+        new_password = self.cleaned_data['password1']
+
+        user.set_password(new_password)
+        user.set_registered()
+        user.save()
