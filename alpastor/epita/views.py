@@ -154,8 +154,8 @@ class AttendanceView(ListView):
 def people(request):
     people_dict = {}
 
-    active_students = Student.objects.all()
-
+    active_students = Student.objects.filter(user__is_active=True).order_by(
+        'intakeSemester', 'program', 'specialization', 'user__last_name')
     people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
