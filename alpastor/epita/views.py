@@ -34,7 +34,8 @@ class AttendanceGraphs(ListView):
         semester = 'Fall 2017'
         # all_data = self.individual_student_class_dates(student, course)
         # all_data = self.whole_class(course, semester)
-        all_data = self.whole_semester(semester, intake)
+        # all_data = self.whole_semester(semester, intake)
+        all_data = self.individual_student_allclass(student)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
 
@@ -125,6 +126,44 @@ class AttendanceGraphs(ListView):
             attendance_data['student'][0]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
         print(attendance_data)
         return attendance_data
+
+    def individual_student_allclass(self, name):
+
+        student = Student.objects.filter(user__first_name=name)[0]
+        allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
+        # print(allcourse)
+        stdname = student.user.get_full_name()
+        status = Attendance.objects.filter(student_id__user__first_name=name,
+                                           schedule_id__course_id__title=allcourse[0].course_id).values('status')
+        # print(status)
+
+        attendance_data = {'name': stdname, 'student': []}
+
+        for y in range(len(allcourse)):
+            b = Attendance.objects.filter(student_id__user__first_name=name,
+                                          schedule_id__course_id__title=allcourse[y].course_id).values('status')
+
+            print(b)
+            attendance_data['student'].append({'course': allcourse[y].course_id.title, 'st': b})
+            # attendance_data['student'].append({'st': b})
+        # print(attendance_data)
+
+        # attendance_data['student'].append({'allcourse': allcourse})
+        # attendance_data['student'][0]['allcourse'] = []
+        #
+        # for x in allcourse:
+        #     attendance_data['student'].append({'course': x.course_id.title})
+        #
+        # print(x)
+        # print(attendance_data)
+        #
+        # for i in student:
+        #     attendance_data['student'][0]['allcourse'].append({'status': i.status})
+        #     print('attendace data')
+        #     print(attendance_data)
+        return attendance_data
+
+
 
 
 class CourseView(ListView):
@@ -372,11 +411,11 @@ def dashboard(request):
     # bar graph by country
 
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
-    print(country)
+    #print(country)
     # bar graph by program
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
-    print(program)
-    print(program.count())
+    # print(program)
+    #print(program.count())
 
     # bar graph by specialization
     splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
@@ -385,7 +424,18 @@ def dashboard(request):
     # bar graph by intake semester
     intakeSemester = Student.objects.values('intakeSemester').annotate(count_intake=Count('intakeSemester')).order_by(
         'intakeSemester')
-    print(intakeSemester)
+    # print(intakeSemester)
+
+    name = 'Willy0'
+    students = Student.objects.filter(user__first_name=name)[0]
+    allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
+    # print(allcourse)
+
+    status = Attendance.objects.filter(student_id__user__first_name=name,
+                                       schedule_id__course_id__title=allcourse[0].course_id).values('status')
+    print(status)
+
+
 
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program, 'splgraph': splgraph, 'active_students': active_students,
