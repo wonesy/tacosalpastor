@@ -31,6 +31,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_registered', True)
 
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
@@ -85,8 +86,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def set_registered(self):
+        if not self.is_registered:
+            self.is_registered = True
+            self.save()
+
     def __repr__(self):
         return self.get_full_name()
 
     def __str__(self):
         return self.get_full_name()
+
+class ResetToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, blank=False)
+    token = models.CharField(max_length=128, blank=False)
+    expiration = models.DateTimeField(blank=False)
+
+    def expired(self):
+        if timezone.localtime() > self.expiration:
+            return True
+        return False

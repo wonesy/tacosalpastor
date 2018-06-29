@@ -39,14 +39,13 @@
             </div>
         </form>
 
-        <form id="newpassform" method="post" class="new-pass-form">
+        <form action="/generatereset/" id="newpassform" method="post" class="new-pass-form">
             {% csrf_token %}
             <div class="form-box">
                 <h1>New Password</h1>
                 <p>For forgotten passwords or first time sign-on</p>
 
-                <input title="epita_email" type="email" name="email" value="yourname@epita.fr" onFocus="field_focus(this, 'yourname@epita.fr');"
-                       onblur="field_blur(this, 'yourname@epita.fr');" class="email" />
+                <input title="epita_email" type="email" name="email" placeholder="yourname@epita.fr" class="email" />
 
                 <button type="submit" class="btn" value="Send Link">Send Link</button>
             </div> <!-- End Box -->
@@ -58,18 +57,6 @@
 </body>
 
 <script type="text/javascript">
-    function field_focus(field, val) {
-        if (field.value == val) {
-            field.value = '';
-        }
-    }
-
-    function field_blur(field, email) {
-        if (field.value == '') {
-            field.value = email;
-        }
-    }
-
     //Fade in dashboard box
     $(document).ready(function() {
         $('.box').hide().fadeIn(1000);

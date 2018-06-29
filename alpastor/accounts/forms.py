@@ -5,15 +5,11 @@ from accounts.models import User as CustomUser
 class LoginForm(forms.Form):
     username = forms.EmailField(max_length=255, help_text="Must be your epita-issued email address", required=True,
                              widget=forms.TextInput(attrs={
-                                 'onFocus': "field_focus(this, 'yourname@epita.fr');",
-                                 'onblur': "field_blur(this, 'yourname@epita.fr');",
-                                 'value': "yourname@epita.fr",
+                                 'placeholder': "yourname@epita.fr",
                              }))
     password = forms.CharField(max_length=255, required=True,
                                widget=forms.PasswordInput(attrs={
-                                   'onFocus': "field_focus(this, 'examplepass');",
-                                   'onblur': "field_blur(this, 'examplepass');",
-                                   'value': "examplepass",
+                                   'placeholder': 'examplepass',
                                }))
 
 
@@ -22,9 +18,11 @@ class LoginForm(forms.Form):
         password = self.cleaned_data.get('password')
         self.user_cache = authenticate(username=username, password=password)
         if not self.user_cache:
-            raise forms.ValidationError("Login was invalid")
+            raise forms.ValidationError("Login was invalid, either wrong password or not such email")
         elif not self.user_cache.is_active:
             raise forms.ValidationError("User is no longer active")
+        elif not self.user_cache.is_registered:
+            raise forms.ValidationError("User is not yet registered")
         return self.cleaned_data
 
     def get_user(self):
@@ -65,3 +63,38 @@ class CustomUserChangeForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
+
+class ResetPasswordForm(forms.Form):
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+    }))
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+    }))
+
+    def clean(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+
+        if not password1 or not password2:
+            raise forms.ValidationError("Must fill both passwords")
+
+        if password1 and password2 and (password1 != password2):
+            raise forms.ValidationError("Passwords do not match")
+
+
+    def save(self, **kwargs):
+        user = kwargs['user']
+        if not user:
+            raise forms.ValidationError("user does not exist")
+
+        try:
+            self.full_clean()
+        except forms.ValidationError:
+            raise forms.ValidationError("could not clean the data in form")
+
+        new_password = self.cleaned_data['password1']
+
+        user.set_password(new_password)
+        user.set_registered()
+        user.save()
