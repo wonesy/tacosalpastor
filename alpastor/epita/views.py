@@ -8,7 +8,7 @@ from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
 from django.http import HttpResponse, JsonResponse
-from .models import Student, StudentCourse, Course, Attendance, Schedule
+from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
@@ -32,9 +32,11 @@ class AttendanceGraphs(ListView):
         course = 'Advanced C Programming'
         intake = 'Fall 2017'
         semester = 'Fall 2017'
+        professor = 'John'
         # all_data = self.individual_student_class_dates(student, course)
         # all_data = self.whole_class(course, semester)
-        all_data = self.whole_semester(semester, intake)
+        # all_data = self.whole_semester(semester, intake)
+        all_data = self.individual_student_allclass(student)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
 
@@ -131,6 +133,25 @@ class AttendanceGraphs(ListView):
             attendance_data['student'][0]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
         print(attendance_data)
         return attendance_data
+
+    def individual_student_allclass(self, name):
+        student = Student.objects.filter(user__first_name=name)[0]
+        allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
+        student_name = student.user.get_full_name()
+        attendance_data = {'name': student_name, 'student': []}
+        for y in range(len(allcourse)):
+            b = Attendance.objects.filter(student_id__user__first_name=name,
+                                          schedule_id__course_id__title=allcourse[y].course_id).values(
+                'status').annotate(status_count=Count('status'))
+            status_list = list(b)
+            attendance_data['student'].append({'course': allcourse[y].course_id.title, 'status': status_list})
+        return attendance_data
+
+    # def individual_professor_allclass(self, name):
+    #     professor = Professor.objects.filter(user__first_name=name)[0]
+    #     courses = Course.objects.filter(professor_id__user__first_name=name)
+    #     professor_name = professor.user.get_full_name()
+
 
 
 class CourseView(ListView):
