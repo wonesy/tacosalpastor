@@ -36,11 +36,9 @@ class AttendanceGraphs(ListView):
         professor = 'John'
         specialization = Student.SE
         # all_data = self.individual_student_class_dates(email, course)
+        all_data = self.whole_semester(semester, specialization)
         # all_data = self.whole_class(course, semester)
-        # all_data = self.whole_semester(semester, specialization)
-        # all_data = self.whole_class(course, semester)
-        # all_data = self.whole_semester(semester, intake)
-        all_data = self.individual_student_allclass(student)
+        # all_data = self.individual_student_allclass(student)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
 
@@ -64,7 +62,6 @@ class AttendanceGraphs(ListView):
 
     def whole_semester(self, semester, specialization_val):
         specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
-        attendance_data = {'specialization': specialization_name}
         courses = Course.objects.values('title').distinct()
         course_list = []
 
@@ -84,32 +81,40 @@ class AttendanceGraphs(ListView):
                     excused += 1
 
             course_list.append({'title': course['title'], 'present': present, 'absent': absent, 'excused': excused})
+        attendance_data = {'specialization': specialization_name, 'courses': course_list}
 
-        attendance_data['courses'] = course_list
         return attendance_data
 
     def whole_class(self, course, semester):
-        attendance = Attendance.objects.filter(schedule_id__course_id__title=course)
-        course_id = attendance[0].schedule_id.course_id
-        students = Student.objects.filter(studentcourse__course_id=course_id)
-        attendance_data = {'course': course, 'semester': semester, 'students': []}
-        count = 0
-        for student in students:
-            attendance_data['students'].append({'name': student.user.get_full_name()})
-            attendance_data['students'][count]['attendance'] = []
-            student_id = student.id
-            student_attendance = Attendance.objects.filter(student_id=student_id, schedule_id__course_id=course_id)
-            for i in student_attendance:
-                attendance_data['students'][count]['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
-            count += 1
+        schedule = Schedule.objects.filter(course_id__title=course, course_id__semester=semester)
+        attendance_list = []
+
+        for i in schedule:
+            attendances = Attendance.objects.values('status').filter(schedule_id__date=i.date)
+            present = 0
+            absent = 0
+            excused = 0
+
+            for j in attendances:
+                if j['status'] == Attendance.PRESENT:
+                    present += 1
+                elif j['status'] == Attendance.ABSENT:
+                    absent += 1
+                elif j['status'] == Attendance.EXCUSED:
+                    excused += 1
+
+            attendance_list.append({'date': i.date, 'present': present, 'absent': absent, 'excused': excused})
+        attendance_data = {'course': course, 'semester': semester, 'attendance': attendance_list}
         return attendance_data
 
     def individual_student_class_dates(self, email, course):
         attendance = Attendance.objects.filter(student_id__user__email=email, schedule_id__course_id__title=course)
         student_name = Student.objects.filter(user__email=email)[0].user.get_full_name()
         attendance_data = {'name': student_name, 'course': course,'attendance': []}
+
         for i in attendance:
             attendance_data['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
+
         return attendance_data
 
     def individual_student_allclass(self, name):
