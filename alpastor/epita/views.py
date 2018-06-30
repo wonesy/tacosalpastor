@@ -35,9 +35,10 @@ class AttendanceGraphs(ListView):
         email = 'me_student0@epita.fr'
         professor = 'John'
         specialization = Student.SE
-        # all_data = self.individual_student_class_dates(email, course)
-        all_data = self.whole_semester(semester, specialization)
-        # all_data = self.whole_class(course, semester)
+        # all_data = self.whole_semester_by_student_by_class(email, course)
+        # all_data = self.whole_semester_by_specialization(semester, specialization)
+        # all_data = self.whole_semester_by_program(semester)
+        all_data = self.whole_semester_by_class(course, semester)
         # all_data = self.individual_student_allclass(student)
         # return render(request, self.template_name, {'all_data': all_data})
         return JsonResponse(all_data)
@@ -60,7 +61,35 @@ class AttendanceGraphs(ListView):
         #     (6, 'Systems Networks & Security'),
         #     (7, 'Global IT Management (International)')
 
-    def whole_semester(self, semester, specialization_val):
+    def build_attendance_results(self, attendance_list):
+        present = 0
+        absent = 0
+        excused = 0
+
+        for i in attendance_list:
+            if i['status'] == Attendance.PRESENT:
+                present += 1
+            elif i['status'] == Attendance.ABSENT:
+                absent += 1
+            elif i['status'] == Attendance.EXCUSED:
+                excused += 1
+        return {'present': present, 'absent': absent, 'excused': excused}
+
+    def whole_semester_by_program(self, semester):
+        programs = Student.PROGRAM_CHOICES
+        program_list = []
+        for program in programs:
+            attendances = list(Attendance.objects.filter(student_id__program=program[0],
+                                                         schedule_id__course_id__semester=semester).values('status'))
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['program'] = program[1]
+            program_list.append(attendance_results)
+        attendance_data = {'semester': semester, 'attendance': program_list}
+
+        return attendance_data
+
+
+    def whole_semester_by_specialization(self, semester, specialization_val):
         specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
         courses = Course.objects.values('title').distinct()
         course_list = []
@@ -68,46 +97,28 @@ class AttendanceGraphs(ListView):
         for course in courses:
             attendances = list(Attendance.objects.filter(schedule_id__course_id__title=course['title'],
                                                          schedule_id__course_id__semester=semester).values('status'))
-            present = 0
-            absent = 0
-            excused = 0
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['title'] = course['title']
+            course_list.append(attendance_results)
 
-            for j in attendances:
-                if j['status'] == Attendance.PRESENT:
-                    present += 1
-                elif j['status'] == Attendance.ABSENT:
-                    absent += 1
-                elif j['status'] == Attendance.EXCUSED:
-                    excused += 1
-
-            course_list.append({'title': course['title'], 'present': present, 'absent': absent, 'excused': excused})
         attendance_data = {'specialization': specialization_name, 'courses': course_list}
 
         return attendance_data
 
-    def whole_class(self, course, semester):
+    def whole_semester_by_class(self, course, semester):
         schedule = Schedule.objects.filter(course_id__title=course, course_id__semester=semester)
         attendance_list = []
 
         for i in schedule:
-            attendances = Attendance.objects.values('status').filter(schedule_id__date=i.date)
-            present = 0
-            absent = 0
-            excused = 0
+            attendances = Attendance.objects.filter(schedule_id__date=i.date).values('status')
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['date'] = i.date
 
-            for j in attendances:
-                if j['status'] == Attendance.PRESENT:
-                    present += 1
-                elif j['status'] == Attendance.ABSENT:
-                    absent += 1
-                elif j['status'] == Attendance.EXCUSED:
-                    excused += 1
-
-            attendance_list.append({'date': i.date, 'present': present, 'absent': absent, 'excused': excused})
+            attendance_list.append(attendance_results)
         attendance_data = {'course': course, 'semester': semester, 'attendance': attendance_list}
         return attendance_data
 
-    def individual_student_class_dates(self, email, course):
+    def whole_semester_by_student_by_class(self, email, course):
         attendance = Attendance.objects.filter(student_id__user__email=email, schedule_id__course_id__title=course)
         student_name = Student.objects.filter(user__email=email)[0].user.get_full_name()
         attendance_data = {'name': student_name, 'course': course,'attendance': []}
