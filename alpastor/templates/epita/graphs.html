@@ -4,38 +4,33 @@
 
 {% block content %}
     <head>
+        <link rel="stylesheet" href="../../static/css/graphs.css">
         <script src="{% static 'js/graphs.js' %}"></script>
     </head>
-    <h5 id="popData">{{ all_data }}</h5>
+    <div class="container">
+        <div class="row text-center">
+            <div class="drop-downs col">
+                <button class="btn btn-md btn-outline-secondary">Program</button>
+            </div>
+            <div class="drop-downs col">
+                <button class="btn btn-md btn-outline-secondary">Specialization</button>
+            </div>
+            <div class="drop-downs col">
+                <button class="btn btn-md btn-outline-secondary">Course</button>
+            </div>
+            <div class="drop-downs col">
+                <input type="text" placeholder="Student Search">
+            </div>
+        </div>
 
-{#    <form method="post" enctype="multipart/form-data"> {% csrf_token %}#}
-{#        {{ form.as_p }}#}
-{#        <button type="submit" id="formSubmit">Submit</button>#}
-{##}
-{#    </form>#}
+        <div id="dataDiv">{{ all_data }}</div>
+        <div id="chartDiv">
+            <canvas id="mainChart"></canvas>
+        </div>
+    </div>
     <script>
-        {#let attendance_stuff = {{ attendance_data }}#}
-        {#document.getElementById('popData').innerText = {{ attendance_data }};#}
-        {#console.log({{ attendance_data }});#}
-        let url = window.href;
-        $('#formSubmit').on('submit', function (e) {
-            let id_status = $('#id_status').val();
-            let schedule_id = $('#id_schedule_id').val();
-            let student_id = $('#id_student_id').val();
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: {
-                    'status': id_status,
-                    'schedule_id': schedule_id,
-                    'student_id': student_id
-                },
-                dataType: 'json',
-                success: function (data) {
-                    alert('This worked!!');
-                }
-            });
-            e.preventDefault();
-        });
+        let raw_data = document.getElementById('dataDiv').innerText;
+        let chart_data = JSON.parse(raw_data);
+        {#console.log(chart_data['semester'])#}
     </script>
 {% endblock %}

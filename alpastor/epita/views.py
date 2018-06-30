@@ -37,11 +37,12 @@ class AttendanceGraphs(ListView):
         specialization = Student.SE
         # all_data = self.whole_semester_by_student_by_class(email, course)
         # all_data = self.whole_semester_by_specialization(semester, specialization)
-        # all_data = self.whole_semester_by_program(semester)
-        all_data = self.whole_semester_by_class(course, semester)
+        all_data = self.whole_semester_by_program(semester)
+        # all_data = self.whole_semester_by_class(course, semester)
         # all_data = self.individual_student_allclass(student)
-        # return render(request, self.template_name, {'all_data': all_data})
-        return JsonResponse(all_data)
+        all_data_json = json.dumps(all_data)
+        return render(request, self.template_name, {'all_data': all_data_json})
+        # return JsonResponse(all_data)
 
         # PROGRAM_CHOICES = [
         #     (0, 'None'),
@@ -84,7 +85,7 @@ class AttendanceGraphs(ListView):
             attendance_results = self.build_attendance_results(attendances)
             attendance_results['program'] = program[1]
             program_list.append(attendance_results)
-        attendance_data = {'semester': semester, 'attendance': program_list}
+        attendance_data = {"semester": semester, "attendance": program_list}
 
         return attendance_data
 
