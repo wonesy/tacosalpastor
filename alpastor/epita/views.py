@@ -37,12 +37,14 @@ class AttendanceGraphs(ListView):
         specialization = Student.SE
         # all_data = self.whole_semester_by_student_by_class(email, course)
         # all_data = self.whole_semester_by_specialization(semester, specialization)
-        all_data = self.whole_semester_by_program(semester)
+        # all_data = self.whole_semester_by_program(semester)
         # all_data = self.whole_semester_by_class(course, semester)
         # all_data = self.individual_student_allclass(student)
-        all_data_json = json.dumps(all_data)
-        return render(request, self.template_name, {'all_data': all_data_json})
-        # return JsonResponse(all_data)
+        all_data = self.individual_professor_allclass(professor)
+        # all_data = self.individual_professor_allclass_by_semester(professor, semester)
+        # all_data_json = json.dumps(all_data)
+        # return render(request, self.template_name, {'all_data': all_data_json})
+        return JsonResponse(all_data)
 
     def build_attendance_results(self, attendance_list):
         present = 0
@@ -123,11 +125,50 @@ class AttendanceGraphs(ListView):
             attendance_data['student'].append({'course': allcourse[y].course_id.title, 'status': status_list})
         return attendance_data
 
-    # def individual_professor_allclass(self, name):
-    #     professor = Professor.objects.filter(user__first_name=name)[0]
-    #     courses = Course.objects.filter(professor_id__user__first_name=name)
-    #     professor_name = professor.user.get_full_name()
+    def individual_professor_allclass_by_semester(self, name, semester):
+        professor = Professor.objects.filter(user__first_name=name)[0]
+        # print(professor)
+        courses = Course.objects.filter(professor_id__user__first_name=name).distinct()
+        print(courses)
+        # course_attendance1 = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+        #                                               schedule_id__course_id__title=courses[0]).values(
+        #     'status').annotate(status_count=Count('status'))
+        # print(course_attendance1)
+        # course_attendance = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+        #                                               schedule_id__course_id__title=courses[1]).values(
+        #     'status').annotate(status_count=Count('status'))
+        # print(course_attendance)
+        professor_name = professor.user.get_full_name()
+        p_attendance_data = {'name': professor_name, 'professor': []}
+        # print(p_attendance_data)
+        for x in range(len(courses)):
+            course_attendance = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+                                                          schedule_id__course_id__semester=semester,
+                                                          schedule_id__course_id__title=courses[x]).values(
+                'status')
+            s_list = list(course_attendance)
+            p_attendance_data['professor'].append({'course': courses[x].title, 'status': s_list})
+            return p_attendance_data
 
+    def individual_professor_allclass(self, name):
+        professor = Professor.objects.filter(user__first_name=name)[0]
+        course = 'Advanced C Programming'
+        courses = Course.objects.filter(professor_id__user__first_name=name, title=course)
+        print(courses)
+        semester_attendance = Attendance.objects.filter(schedule_id__course_id__semester=courses[1].semester).values(
+            'status').annotate(status_count=Count('status'))
+        print(semester_attendance)
+        professor_name = professor.user.get_full_name()
+        p_attendance_data = {'name': professor_name, 'course name': course, 'professor': []}
+        for x in range(len(courses)):
+            semester_attendance = Attendance.objects.filter(
+                schedule_id__course_id__semester=courses[x].semester).values(
+                'status').annotate(status_count=Count('status'))
+            s_list = list(semester_attendance)
+            print("printing s_list")
+            print(s_list)
+            p_attendance_data['professor'].append({'course semester': courses[1].semester, 'status': s_list})
+            return p_attendance_data
 
 
 class CourseView(ListView):
