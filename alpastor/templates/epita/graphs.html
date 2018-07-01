@@ -23,14 +23,21 @@
             </div>
         </div>
 
-        <div id="dataDiv">{{ all_data }}</div>
-        <div id="chartDiv">
-            <canvas id="mainChart"></canvas>
+        <div id="dataDiv" hidden>{{ all_data }}</div>
+        <div id="allChartsDiv">
+            <div class="charts" id="chartDiv">
+                <canvas id="mscChart"></canvas>
+            </div>
+            <div class="charts" id="middleChart">
+                <canvas id="meChart"></canvas>
+            </div>
+            <div class="charts" id="rightChart">
+                <canvas id="exchangeChart"></canvas>
+            </div>
         </div>
     </div>
     <script>
         let raw_data = document.getElementById('dataDiv').innerText;
         let chart_data = JSON.parse(raw_data);
-        {#console.log(chart_data['semester'])#}
     </script>
 {% endblock %}

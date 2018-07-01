@@ -44,24 +44,6 @@ class AttendanceGraphs(ListView):
         return render(request, self.template_name, {'all_data': all_data_json})
         # return JsonResponse(all_data)
 
-        # PROGRAM_CHOICES = [
-        #     (0, 'None'),
-        #     (1, 'Master of Engineering'),
-        #     (2, 'Master of Science'),
-        #     (3, 'Global IT Management (French)'),
-        #     (4, "Exchange")
-        # ]
-        #
-        # SPECIALIZATION_CHOICES = [
-        #     (0, 'None'),
-        #     (1, 'Software Engineering'),
-        #     (2, 'Information Systems Management'),
-        #     (3, 'Data Science & Analytics'),
-        #     (4, 'Computer Security'),
-        #     (5, 'Software Development & Multimedia'),
-        #     (6, 'Systems Networks & Security'),
-        #     (7, 'Global IT Management (International)')
-
     def build_attendance_results(self, attendance_list):
         present = 0
         absent = 0
@@ -88,7 +70,6 @@ class AttendanceGraphs(ListView):
         attendance_data = {"semester": semester, "attendance": program_list}
 
         return attendance_data
-
 
     def whole_semester_by_specialization(self, semester, specialization_val):
         specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
@@ -244,7 +225,7 @@ class AttendanceView(ListView):
 
         else:
             self.template_name = 'epita/attendance_student.html'
-
+            student_instance = Student.objects.get(user_id=logged_in_user.id)
             schedule_instance = Schedule.objects.get(pk=schedule_id)
             attendance_instance, created = Attendance.objects.get_or_create(
                 student_id=student_instance,

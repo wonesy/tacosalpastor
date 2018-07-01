@@ -1,4 +1,9 @@
 /*#chartDiv {*/
-    /*height: 50%;*/
-    /*!*width: auto;*!*/
+/*height: 50%;*/
+/*!*width: auto;*!*/
 /*}*/
+
+.charts {
+    height: 400px;
+    width: 400px;
+}
