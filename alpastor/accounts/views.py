@@ -6,8 +6,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
 from accounts.forms import LoginForm, ResetPasswordForm
 from accounts.models import User, ResetToken
-from epita.models import Student
-from epita.forms import CourseForm
+from epita.models import Student, Course, StudentCourse
+from epita.forms import CourseForm, StudentCourseForm
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
 from django.http import HttpResponseRedirect, JsonResponse, QueryDict
@@ -45,10 +45,12 @@ def login(request):
 @user_passes_test(lambda u: u.is_superuser)
 def manageusers(request):
     course_form = CourseForm()
+    student_course_form = StudentCourseForm()
     return render(request, 'accounts/manage_users.html', {
         'programs': Student.PROGRAM_CHOICES,
         'specializations': Student.SPECIALIZATION_CHOICES,
-        'course_form': course_form
+        'course_form': course_form,
+        'student_course_form': student_course_form
     })
 
 class SaveNewCourse(View):
@@ -71,6 +73,79 @@ class SaveNewCourse(View):
             response_msg = msg_fail.format(data['code'])
             rc = 400
         return JsonResponse(status=rc, data={'message': response_msg})
+
+class AddStudentCourse(View):
+    def post(self, request, **kwargs):
+        rc = 200
+        numUpdated = 0
+        msg_success = "[PASS] added {} user(s) to the course {}"
+        msg_fail = "[FAIL] could not add users to course {}"
+
+        course_id = QueryDict(request.body).get('course_id')
+        program = QueryDict(request.body).get('program')
+        specialization = QueryDict(request.body).get('specialization')
+
+        students = Student.objects.filter(
+            program=program,
+            specialization=specialization
+        )
+
+        try:
+            course = Course.objects.get(id=course_id)
+        except:
+            logger.warning("Error trying to find course by adding studentcourses")
+            response_msg = msg_fail.format(course_id)
+            return JsonResponse(status=400, data={'message': response_msg})
+
+        if not course:
+            logger.warning("Course does not exist, adding studentcourses")
+            response_msg = msg_fail.format(course_id)
+            return JsonResponse(status=400, data={'message': response_msg})
+
+        for student in students:
+            _, created = StudentCourse.objects.update_or_create(student_id=student, course_id=course)
+            if created:
+                numUpdated = numUpdated + 1
+
+        response_msg = msg_success.format(numUpdated, course.verbose_title())
+        logger.info(response_msg)
+
+        return JsonResponse(status=rc, data={'messages': response_msg})
+
+class DeleteStudentCourse(View):
+    def post(self, request, **kwargs):
+        rc = 200
+        msg_success = "[PASS] removed user(s) from the course {}"
+        msg_fail = "[FAIL] could not remove users from course {}"
+
+        course_id = QueryDict(request.body).get('course_id')
+        program = QueryDict(request.body).get('program')
+        specialization = QueryDict(request.body).get('specialization')
+
+        students = Student.objects.filter(
+            program=program,
+            specialization=specialization
+        )
+
+        try:
+            course = Course.objects.get(id=course_id)
+        except:
+            logger.warning("Error trying to find course by removing studentcourses")
+            response_msg = msg_fail.format(course_id)
+            return JsonResponse(status=400, data={'messages': response_msg})
+
+        if not course:
+            logger.warning("Course does not exist, removing studentcourses")
+            response_msg = msg_fail.format(course_id)
+            return JsonResponse(status=400, data={'messages': response_msg})
+
+        for student in students:
+            StudentCourse.objects.filter(student_id=student, course_id=course).delete()
+
+        response_msg = msg_success.format(course.verbose_title())
+        logger.info(response_msg)
+
+        return JsonResponse(status=rc, data={'messages': response_msg})
 
 class ProcessUserCSVData(generics.ListCreateAPIView):
     first_name_opts = ["prenom", "first", "first_name", "firstname", "first name"]

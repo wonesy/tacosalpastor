@@ -61,3 +61,22 @@ class AssignStudentCourseForm(forms.Form):
         super(AssignStudentCourseForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
+
+
+class CourseSelect(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.verbose_title()
+
+class StudentCourseForm(forms.Form):
+    course = CourseSelect(queryset=Course.objects.all())
+    program = forms.ChoiceField(choices=Student.PROGRAM_CHOICES)
+    specialization = forms.ChoiceField(choices=Student.SPECIALIZATION_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super(StudentCourseForm, self).__init__(*args, **kwargs)
+        year = timezone.now().year
+        regex = r".*({}|{}|{})".format(year-1, year, year+1)
+        self.fields['course'].queryset = Course.objects.filter(semester__iregex=regex)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'input-group'
+

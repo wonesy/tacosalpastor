@@ -14,7 +14,7 @@
             {# Actions #}
             <a data-toggle="collapse" href="#actions-card-body" aria-expanded="true" aria-controls="actions-card-body">
                 <div class="card-header">
-                    Actions performed
+                    Actions Performed
                 </div>
             </a>
 
@@ -146,11 +146,44 @@
                     <div class="row">
                         <form id="add-course-form" enctype="multipart/form-data" method="post" name="newCourse">
                             {{ course_form }}
-                        </form></div>
+                        </form>
+                    </div>
                 </div>
                 <br>
                 <div style="text-align: center;">
                     <button class="btn btn-info" onclick="savePotentialCourse();">Add course</button>
+                </div>
+                <br>
+            </div>
+        </div>
+
+        {# Link course <-> student card #}
+        <div class="card link-courses-card manage-card">
+
+            {# Add users header #}
+            <a data-toggle="collapse" href="#link-courses-card-body" aria-expanded="true" aria-controls="link-users-card-body">
+                <div class="card-header">
+                    Link Courses to Programs/Specializations
+                </div>
+            </a>
+
+            {# Add users body #}
+            <div id="link-courses-card-body" class="collapse">
+                <div class="card-body container-fluid">
+                    <div class="row">
+                        <p>Manage all students associated with the selected program/specialization for the selected course</p>
+                        <form id="link-course-form" enctype="multipart/form-data" method="post" name="linkCourse">
+                            {% for field in student_course_form.visible_fields %}
+                                {{ field.label }}:
+                                {{ field }}
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <button class="btn btn-info" onclick='linkStudentCourse("deletestudentcourse/");'>Remove students from course</button>
+                    <button class="btn btn-info" onclick='linkStudentCourse("addstudentcourse/");'>Add students to course</button>
                 </div>
                 <br>
             </div>

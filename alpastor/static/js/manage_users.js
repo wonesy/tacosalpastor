@@ -278,3 +278,39 @@ function collectNewUserInfo() {
 
     return true;
 }
+
+function linkStudentCourse(url) {
+    let formElements = document.getElementById("link-course-form").elements;
+
+    let data = {};
+
+    // Course
+    data['course_id'] = formElements[0].value;
+
+    // Program
+    data['program'] = formElements[1].value;
+
+    // Specialization
+    data['specialization'] = formElements[2].value;
+
+    console.log("here");
+    $.ajax({
+        type: "POST",
+        url: window.location.origin + window.location.pathname + url,
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            console.log("SUCCESS");
+            writeActions([data.messages]);
+        },
+        error: function (e, data) {
+            console.log("ERROR : ", e);
+            writeActions([e.responseJSON.messages]);
+        }
+    });
+
+    // Show the actions display
+    $("#actions-card-body").addClass("show");
+}
