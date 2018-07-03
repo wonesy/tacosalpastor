@@ -310,6 +310,12 @@ function linkStudentCourse(url) {
     // Specialization
     data['specialization'] = formElements[2].value;
 
+    // Intake season
+    data['intake_season'] = formElements[3].value;
+
+    // Intake year
+    data['intake_year'] = formElements[4].value;
+
     console.log("here");
     $.ajax({
         type: "POST",

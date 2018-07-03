@@ -86,10 +86,14 @@ class AddStudentCourse(View):
         course_id = QueryDict(request.body).get('course_id')
         program = QueryDict(request.body).get('program')
         specialization = QueryDict(request.body).get('specialization')
+        intake_season = QueryDict(request.body).get('intake_season')
+        intake_year = QueryDict(request.body).get('intake_year')
 
         students = Student.objects.filter(
             program=program,
-            specialization=specialization
+            specialization=specialization,
+            intake_season=intake_season,
+            intake_year=intake_year
         )
 
         try:

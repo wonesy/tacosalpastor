@@ -67,11 +67,13 @@ class StudentCourseForm(forms.Form):
     course = CourseSelect(queryset=Course.objects.all())
     program = forms.ChoiceField(choices=Student.PROGRAM_CHOICES)
     specialization = forms.ChoiceField(choices=Student.SPECIALIZATION_CHOICES)
+    intake_season = forms.ChoiceField(choices=Student.SEASON_CHOICES)
+    intake_year = forms.IntegerField()
 
     def __init__(self, *args, **kwargs):
         super(StudentCourseForm, self).__init__(*args, **kwargs)
         year = timezone.now().year
-        self.fields['course'].queryset = Course.objects.filter(semester_year__gt=year-2).order_by('semester_year', 'semester_season')
+        self.fields['course'].queryset = Course.objects.filter(semester_year__gt=year-2).order_by('-semester_year', '-semester_season')
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 
