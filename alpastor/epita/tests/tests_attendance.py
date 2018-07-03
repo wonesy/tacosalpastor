@@ -25,10 +25,10 @@ class StaffAttendanceTest(TestCase):
         self.prof1 = Professor.objects.get(user_id=self.user1)
 
         # Create 4 courses
-        self.course0 = Course.objects.create(professor_id=self.prof0, title="Advanced A", credits=3, semester="Fall 2020")
-        self.course1 = Course.objects.create(professor_id=self.prof0, title="Advanced B", credits=3, semester="Fall 2020")
-        self.course2 = Course.objects.create(professor_id=self.prof1, title="Advanced C", credits=3, semester="Fall 2020")
-        self.course3 = Course.objects.create(professor_id=self.prof1, title="Advanced D", credits=3, semester="Fall 2020")
+        self.course0 = Course.objects.create(professor_id=self.prof0, title="Advanced A", credits=3, semester_season=Student.FALL, semester_year=2020)
+        self.course1 = Course.objects.create(professor_id=self.prof0, title="Advanced B", credits=3, semester_season=Student.FALL, semester_year=2020)
+        self.course2 = Course.objects.create(professor_id=self.prof1, title="Advanced C", credits=3, semester_season=Student.FALL, semester_year=2020)
+        self.course3 = Course.objects.create(professor_id=self.prof1, title="Advanced D", credits=3, semester_season=Student.FALL, semester_year=2020)
 
 
         # Create 50 students

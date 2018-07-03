@@ -155,7 +155,7 @@ def people(request):
     people_dict = {}
 
     active_students = Student.objects.filter(user__is_active=True).order_by(
-        'intakeSemester', 'program', 'specialization', 'user__last_name')
+        'intake_year', 'intake_season', 'program', 'specialization', 'user__last_name')
     people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
@@ -277,10 +277,10 @@ def dashboard(request):
         'specialization')
 
     # bar graph by intake semester
-    intakeSemester = Student.objects.values('intakeSemester').annotate(count_intake=Count('intakeSemester')).order_by(
-        'intakeSemester')
-    print(intakeSemester)
+    semester = Student.objects.values('intake_season', 'intake_year').annotate(count_intake=Count('intake_year', 'intake_season')).order_by(
+        'intake_year', 'intake_season')
+    print(semester)
 
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program, 'splgraph': splgraph, 'active_students': active_students,
-                   'intakeSemester': intakeSemester})
+                   'intakeSemester': semester})

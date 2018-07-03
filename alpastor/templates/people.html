@@ -21,7 +21,7 @@
             <button class="sort" data-sort="country">
                 Sort by Country
             </button>
-            <button class="sort" data-sort="intakesemester">
+            <button class="sort" data-sort="intakeSemesterYear">
                 Sort By Year
             </button>
             <button class="sort" data-sort="fullname">
@@ -42,8 +42,12 @@
                         <div class="programContainer"></div>
                     </div>
                     <div class="col-4">
-                        <p>Intake semester</p>
-                        <div class="semesterContainer"></div>
+                        <p>Intake Year</p>
+                        <div class="semesterYearContainer"></div>
+                    </div>
+                    <div class="col-4">
+                        <p>Intake Season</p>
+                        <div class="semesterSeasonContainer"></div>
                     </div>
                 </div>
             </div>
@@ -59,7 +63,8 @@
                     <th>Status</th>
                     <th>Program</th>
                     <th>Specialization</th>
-                    <th>Semester</th>
+                    <th>Semester Season</th>
+                    <th>Semester Year</th>
                     <th>Email</th>
                     <th>EPITA Email</th>
                     <th>Phone</th>
@@ -96,7 +101,8 @@
                             {{ student.get_specialization_display }}
 
                         </td>
-                        <td class="intakesemester"> {{ student.intakeSemester }} </td>
+                        <td class="intakesemester"> {{ student.get_intake_season_display }} </td>
+                        <td class="intakesemester"> {{ student.intake_year }} </td>
                         <td class="email"> {{ student.user.email }} </td>
                         <td class="extemail">{{ student.user.external_email }} </td>
                         <td class="phone">{{ student.phone }}</td>
@@ -113,10 +119,11 @@
 
     <script>
         let options = {
-            valueNames: ['name', 'country', 'born', 'intakesemester', 'fullname'],
+            valueNames: ['name', 'country', 'born', 'intake_season', 'intake_year', 'fullname'],
             page: 20,
             pagination: true
         };
+
         let userList = new List('users', options);
 
 
@@ -133,7 +140,7 @@
                 dates.push($(this).val());
             });
 
-            $("input:checkbox[name=semester]:checked").each(function () {
+            $("input:checkbox[name=semesterYear]:checked").each(function () {
                 semester.push($(this).val());
             });
 
@@ -145,7 +152,7 @@
             userList.filter(function (item) {
                 return (_(values_date).contains(item.values().born) || !values_date)
                     && (_(values_name).contains(item.values().name) || !values_name)
-                    && (_(values_semester).contains(item.values().intakesemester) || !values_semester)
+                    && (_(values_semester).contains(item.values().intake_season) || !values_semester)
             });
         };
 
@@ -177,7 +184,7 @@
             });
 
             _(all_intakesemester).uniq().each(function (item) {
-                $(".semesterContainer").append('<label><input type="checkbox" name="semester" value="' + item + '">' + item + '</label><br>')
+                $(".semesterYearContainer").append('<label><input type="checkbox" name="semester_year" value="' + item + '">' + item + '</label><br>')
             });
         });
 

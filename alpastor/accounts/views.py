@@ -6,7 +6,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
 from accounts.forms import LoginForm, ResetPasswordForm
 from accounts.models import User, ResetToken
-from epita.models import Student, Course, StudentCourse
+from epita.models import Student, Course, StudentCourse, Professor
 from epita.forms import CourseForm, StudentCourseForm
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
@@ -18,6 +18,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.conf import settings
 import json
+import re
 import enum
 import logging
 
@@ -49,6 +50,7 @@ def manageusers(request):
     return render(request, 'accounts/manage_users.html', {
         'programs': Student.PROGRAM_CHOICES,
         'specializations': Student.SPECIALIZATION_CHOICES,
+        'seasons': Student.SEASON_CHOICES,
         'course_form': course_form,
         'student_course_form': student_course_form
     })
@@ -214,7 +216,8 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
 
         # Get override data (if any)
         override_specialization = request.POST.get('overrideSpecialization')
-        override_intakeSemester = request.POST.get('overrideIntakeSemester')
+        override_semester_season = request.POST.get('overrideSemesterSeason')
+        override_semester_year = request.POST.get('overrideSemesterYear')
         override_country = request.POST.get('overrideCountry')
 
         for line in lines[1:]:
@@ -223,7 +226,8 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
                 'last_name': "",
                 'program': "",
                 'specialization': "",
-                'intakeSemester': "",
+                'semester_season': "",
+                'semester_year': "",
                 'email': "",
                 'type': "Student",
                 'country': ""
@@ -255,10 +259,20 @@ class ProcessUserCSVData(generics.ListCreateAPIView):
 
             # Intake Semester
             if self.csv_positions['intake_semester'] >= 0:
-                user['intakeSemester'] = fields[self.csv_positions['intake_semester']]
+                parts = fields[self.csv_positions['intake_semester']].split(' ')
+                year_match = re.match("\d{4}", parts[0], re.M|re.I)
+                if (year_match):
+                    user['semester_year'] = parts[0]
+                    user['semester_season'] = parts[1]
+                else:
+                    user['semester_year'] = parts[1]
+                    user['semester_season'] = parts[1]
 
-            if user['intakeSemester'] == "" and override_intakeSemester != None:
-                user['intakeSemester'] = override_intakeSemester
+            if user['semester_season'] == "" and override_semester_season != None:
+                user['semester_season'] = override_semester_season
+
+            if user['semester_year'] == "" and override_semester_year != None:
+                user['semester_year'] = override_semester_year
 
             all_users.append(user)
 
@@ -290,13 +304,57 @@ class SaveNewUsers(View):
         return JsonResponse(status=response_code, data={'messages': response_messages})
 
     def processNewProfessor(self, professor):
-        return (ReturnCodes.OK, "OK")
+        err_msg_template = "[FAIL] {} - [first_name={}, last_name={}, email_login={}]"
+        success_msg_template = "[PASS] Created professor - [first_name={}, last_name={}, email_login={}]"
+
+        first_name = professor['firstName']
+        last_name = professor['lastName']
+        email_login = professor['emailLogin']
+        external_email = professor['externalEmail']
+        phone = professor['phone']
+        pic = professor['pic']
+
+        # Ensure all required data is there first
+        if first_name == "" or last_name == "":
+            logger.error("Attempted to add student with no name")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Name empty", first_name, last_name, email_login))
+
+        if email_login == "":
+            logger.error("Attempted to add student with no primary email")
+            return (ReturnCodes.ERR_INVALID_FIELD, err_msg_template.format(
+                "Email empty", first_name, last_name, email_login))
+
+        try:
+            newUser = User.objects.create_user(
+                email=email_login,
+                password="epita",
+                first_name=first_name,
+                last_name=last_name,
+                external_email=external_email,
+                is_registered=False,
+                is_staff=True
+            )
+        except IntegrityError:
+            logger.warning("Attempted to create new user that appears to already exist: {}".format(email_login))
+            return (ReturnCodes.ERR_USER_EXISTS, err_msg_template.format(
+                "User exists already", first_name, last_name, email_login))
+
+        try:
+            Professor.objects.filter(user=newUser).update(phone=phone)
+        except MultipleObjectsReturned:
+            logger.warning("Found multiple professors for the same user={}".format(newUser))
+            Student.objects.filter(user=newUser)[0].update(phone=phone)
+
+        logger.info("Created new professor with email={}".format(email_login))
+
+        return (ReturnCodes.OK, success_msg_template.format(first_name, last_name, email_login))
 
     def processNewStudent(self, student):
         err_msg_template = "[FAIL] {} - [first_name={}, last_name={}, email_login={}]"
         success_msg_template = "[PASS] Created student - [first_name={}, last_name={}, email_login={}]"
 
-        first_name = (student['firstName'])
+        first_name = student['firstName']
         last_name = student['lastName']
         email_login = student['emailLogin']
         program = self.programStringToValue(student['program'])
@@ -304,7 +362,8 @@ class SaveNewUsers(View):
         phone = student['phone']
         pic = student['pic']
         specialization = self.specializationStringToValue(student['specialization'])
-        intake_semester = student['intakeSemester']
+        intake_season = student['intakeSeason']
+        intake_year = student['intakeYear']
         country = student['country']
 
         # Ensure all required data is there first
@@ -347,7 +406,8 @@ class SaveNewUsers(View):
                 country=country,
                 program=program,
                 specialization=specialization,
-                intakeSemester=intake_semester
+                intake_season=intake_season,
+                intake_year=intake_year
             )
         except MultipleObjectsReturned:
             logger.warning("Found multiple students for the same user={}".format(newUser))
@@ -356,7 +416,8 @@ class SaveNewUsers(View):
                 country=country,
                 program=int(program),
                 specialization=specialization,
-                intakeSemester=intake_semester
+                intake_season=intake_season,
+                intake_year=intake_year
             )
 
         logger.info("Created new student with email={}".format(email_login))

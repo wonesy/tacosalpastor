@@ -84,6 +84,7 @@ class Student(models.Model):
     SDM = 5
     SDS = 6
     IGITM = 7
+    AI = 8
 
     SPECIALIZATION_CHOICES = [
         (NONE, 'None'),
@@ -94,6 +95,7 @@ class Student(models.Model):
         (SDM, 'Software Development & Multimedia'),
         (SDS, 'Systems Networks & Security'),
         (IGITM, 'Global IT Management (International)'),
+        (AI, "Artificial Intelligence"),
     ]
 
     # Enrollment status
@@ -120,13 +122,25 @@ class Student(models.Model):
         (ATTENDANCE_WARNING, "Attendance warning"),
     ]
 
+    # Seasons
+    WINTER = 0
+    SPRING = 1
+    SUMMER = 2
+    FALL = 3
 
+    SEASON_CHOICES = [
+        (WINTER, "Winter"),
+        (SPRING, "Spring"),
+        (SUMMER, "Summer"),
+        (FALL, "Fall"),
+    ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
     program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
-    intakeSemester = models.CharField(max_length=31)
+    intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
+    intake_year = models.IntegerField(blank=False, default=now().year)
     country = models.CharField(max_length=127)
     country_code = models.CharField(max_length=2, blank=True)
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
@@ -140,14 +154,11 @@ class Student(models.Model):
     enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
     flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
 
-
-
-
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
-               "specialization={}, intakeSemester={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               "specialization={}, intake_season={}, intake_year={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
-                          self.program, self.specialization, self.intakeSemester, self.country, self.country_code, self.city,
+                          self.program, self.specialization, self.intake_season, self.intake_year, self.country, self.country_code, self.city,
                           self.languages, self.photo_location)
 
     def __str__(self):
@@ -181,22 +192,24 @@ class Course(models.Model):
         professor_id = FK to the Professor table, indicating who is teaching it
         title = title of the course
         description = fuller description of the course
-        semester = the semester in which the course will be taught, form Season Year (Spring 2020)
+        semester_season = the semester season in which the course will be taught (Spring)
+        semester_year = the semester year in which the course will be taught (2020)
         module = the grading module that this course falls under (Technical, Business, etc)
         credits = the number of credits that will be offered for this course
 
     Note:
-         columns 'title' and 'semester' must be unique as a pair, meaning you cannot have the same course title
-         during the same semester
+         columns 'title' and 'semester_year' and 'semester_season' must be unique as a pair, meaning you cannot have the same course title
+         during the same semester (year + season)
     """
     class Meta:
-        unique_together = (('title', 'semester'),)
+        unique_together = (('title', 'semester_season', 'semester_year'),)
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=True)
     code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123")
     title = models.CharField(max_length=127, help_text="Course title")
     description = models.TextField(max_length=1000, blank=True, help_text="Course description")
-    semester = models.CharField(max_length=31, help_text="Season Year (e.g. Fall 2017)")
+    semester_season = models.IntegerField(choices=Student.SEASON_CHOICES)
+    semester_year = models.IntegerField(blank=False, default=now().year)
     module = models.CharField(max_length=63, blank=True, help_text="Module or teaching unit")
     credits = models.IntegerField(null=True, blank=True)
     hours = models.IntegerField(null=True, blank=True)
@@ -209,22 +222,28 @@ class Course(models.Model):
         self.title = re.sub(' +', ' ', self.title)
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
-        self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
+        slug_season = self.season_to_string()
+        self.slug = slug_season.lower() + '-' + str(self.semester_year) + '-' + self.title.lower().replace(' ', '-')
 
     def save(self, **kwargs):
         self.full_clean()
         super(Course, self).save()
 
     def __repr__(self):
-        return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
-            self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
+        return "Course(professor_id={}, title={}, description={}, full_semester={}, module={}, credits={})".format(
+            self.professor_id, self.title, self.description, self.full_semester(), self.module, self.credits)
 
     def __str__(self):
         return "{}".format(self.title)
 
     def verbose_title(self):
-        return "{} ({})".format(self.title, self.semester)
+        return "{} ({})".format(self.title, self.full_semester())
 
+    def full_semester(self):
+        return "{} {}".format(self.season_to_string(), self.semester_year)
+
+    def season_to_string(self):
+        return [x[1] for x in Student.SEASON_CHOICES][self.semester_season]
 
 class StudentCourse(models.Model):
     """

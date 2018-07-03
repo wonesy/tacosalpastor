@@ -30,10 +30,9 @@ class ScheduleForm(forms.ModelForm):
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['professor_id', 'code', 'title', 'description', 'semester', 'module', 'credits']
+        fields = ['professor_id', 'code', 'title', 'description', 'semester_season', 'semester_year', 'module', 'credits']
         widgets = {
             'credits': forms.NumberInput(attrs={'min': 0}),
-            'semester': forms.TextInput(attrs={'pattern': "(Fall|Spring|Summer|Winter) \d{4}"}),
         }
         labels = {
             'assign_program': "Assign this course to students of the following\nProgram"
@@ -51,11 +50,8 @@ class CourseForm(forms.ModelForm):
 class AssignStudentCourseForm(forms.Form):
     program = forms.ChoiceField(choices=Student.PROGRAM_CHOICES)
     specialization = forms.ChoiceField(choices=Student.SPECIALIZATION_CHOICES)
-    semester = forms.CharField(max_length=31)
-
-    widgets = {
-        'semester': forms.TextInput(attrs={'pattern': "(Fall|Spring|Summer|Winter) \d{4}"}),
-    }
+    semester_season = forms.ChoiceField(choices=Student.SEASON_CHOICES)
+    semester_year = forms.IntegerField(max_value=timezone.now().year)
 
     def __init__(self, *args, **kwargs):
         super(AssignStudentCourseForm, self).__init__(*args, **kwargs)
@@ -75,8 +71,7 @@ class StudentCourseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(StudentCourseForm, self).__init__(*args, **kwargs)
         year = timezone.now().year
-        regex = r".*({}|{}|{})".format(year-1, year, year+1)
-        self.fields['course'].queryset = Course.objects.filter(semester__iregex=regex)
+        self.fields['course'].queryset = Course.objects.filter(semester_year__gt=year-2).order_by('semester_year', 'semester_season')
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 

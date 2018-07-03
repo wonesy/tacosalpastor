@@ -44,13 +44,13 @@
                             <form class="needs-validation">
                                 <p>Add a single user</p>
                                 <div class="input-group" id="form-errors"></div>
-                                <label for="first_name"><span class="required-field">*</span>First name:</label>
+                                <label for="first_name">First name:</label>
                                 <input class="input-group" type="text" id="first_name" name="first_name" placeholder="First name" required>
 
-                                <label for="last_name"><span class="required-field">*</span>Last name:</label>
+                                <label for="last_name">Last name:</label>
                                 <input class="input-group" type="text" id="last_name" name="last_name" placeholder="Last name" required>
 
-                                <label for="email"><span class="required-field">*</span>Login email address:</label>
+                                <label for="email">Login email address:</label>
                                 <input class="input-group" type="email" id="email" name="email" placeholder="name@epita.fr" required>
 
                                 <label for="email">External email address:</label>
@@ -74,22 +74,29 @@
                                 </div>
 
                                 <div id="student-specific-data" class="student-form-container collapse">
-                                    <label for="program"><span class="required-field">*</span>Program:</label><br>
+                                    <label for="program">Program:</label><br>
                                     <select id="program" name="program" class="input-group" required>
                                         {% for value, name in programs %}
                                             <option value="{{ value }}">{{ name }}</option>
                                         {% endfor %}
                                     </select>
 
-                                    <label for="specialization"><span class="required-field">*</span>Specialization:</label><br>
+                                    <label for="specialization">Specialization:</label><br>
                                     <select id="specialization" name="specialization" class="input-group" required>
                                         {% for value, name in specializations %}
                                             <option value="{{ value }}">{{ name }}</option>
                                         {% endfor %}
                                     </select>
 
-                                    <label for="intake-semester"><span class="required-field">*</span>Intake Semester:</label>
-                                    <input class="input-group" type="text" id="intake-semester" name="intake-semester" pattern="(Fall|Spring|Summer|Winter) \d{4}" placeholder="Season Year" required>
+                                    <label for="intake-season">Intake Semester Season:</label>
+                                    <select id="intake-season" name="intake-season" class="input-group" required>
+                                        {% for value, name in seasons %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="intake-year">Intake Semester Year</label>
+                                    <input class="input-group" id="intake-year" type="number" pattern="\d{4}" min="2018" required>
 
                                     <label for="country">Country:</label>
                                     <input class="input-group" type="text" id="country" name="country" placeholder="France" required>
@@ -106,6 +113,14 @@
                                     <input id="csv-file" type="file" name="user-csv" accept=".csv"><br><br>
 
                                     <p>Use the fields below to fill blanks in the CSV</p>
+
+                                    <label for="override-program">Program:</label><br>
+                                    <select id="override-program" name="override-program" class="input-group">
+                                        {% for value, name in programs %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
                                     <label for="override-specialization">Specialization:</label><br>
                                     <select id="override-specialization" name="override-specialization" class="input-group">
                                         {% for value, name in specializations %}
@@ -113,8 +128,15 @@
                                         {% endfor %}
                                     </select>
 
-                                    <label for="override-intake-semester">Intake Semester:</label>
-                                    <input class="input-group" type="text" id="override-intake-semester" name="override-intake-semester" pattern="(Fall|Spring|Summer|Winter) \d{4}" placeholder="Season Year">
+                                    <label for="override-intake-season">Intake Semester Season:</label>
+                                    <select id="override-intake-season" name="override-intake-season" class="input-group">
+                                        {% for value, name in seasons %}
+                                            <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="override-intake-year">Intake Semester Year</label>
+                                    <input class="input-group" id="override-intake-year" type="number" pattern="\d{4}" min="2018">
 
                                     <label for="override-country">Country:</label>
                                     <input class="input-group" type="text" id="override-country" name="override-country" placeholder="France">
