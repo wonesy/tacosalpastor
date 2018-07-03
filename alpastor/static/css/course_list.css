@@ -12,3 +12,7 @@
 .course-btn {
     min-width: 400px;
 }
+
+.card-header:hover {
+    cursor: pointer;
+}
