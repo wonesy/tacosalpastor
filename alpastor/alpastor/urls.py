@@ -25,6 +25,7 @@ from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib.auth.decorators import login_required
 
+
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
     path('', views.home, name='home'),
@@ -49,7 +50,7 @@ urlpatterns = [
     path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
     path('quiz/quiz_builder/getquiz/', login_required(quiz_views.GetQuizData.as_view()), name='existingquestion'),
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
-    path('quiz/', quiz_views.delete, name='delete_view'),
+    path('quiz/', quiz_views.post_delete, name='delete'),
     path('admin/', admin.site.urls),
 
 ]

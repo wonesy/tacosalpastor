@@ -17,6 +17,11 @@
     margin: auto;
 }
 
+.btn-warning{
+
+    border-radius: 5px;
+}
+
 .question-label {
     margin-top: 5px;
 }

@@ -1,3 +1,14 @@
+
+.canvas{
+    width: 100%;
+    padding: 15px 10px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 18px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .header input[type=text]{
     width: 130px;
     height: 40px;
@@ -31,15 +42,22 @@
     background-color: transparent;
 }
 
+.nav-link{
+    color: #2980b9;
+}
+
+p {
+    font-size: 30px;
+    text-align: center;
+    margin-top: 80px;
+
+}
+
 .card{
-    margin: 20px 15px 20px 15px;
+    margin: 15px 15px -25px 15px;
     padding: 20px;
     border-radius: 15px;
     font-size: 16px;
-}
-
-p{
-    font-size: 15px;
 }
 
 .modal-dialog .btn{
@@ -54,7 +72,7 @@ p{
     margin: 5px;
     float: right;
     border-radius: 12px;
-    margin-top: -38px;
+
 }
 
 .modal-footer button{

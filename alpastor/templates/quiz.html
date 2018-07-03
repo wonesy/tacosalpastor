@@ -9,28 +9,82 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="canvas">
  <div class="header">
           <input type="text" name="search" id="searchCourse" placeholder="search for course or quiz title...">
           <a href="quiz_builder/"><button type="button" class="btn btn-warning">Create Quiz</button></a>
  </div>
+</div>
 
+<div class="canvas">
+ <div class="container">
+          <br>
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#home">Draft</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#menu1">Ready</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#menu2">Completed</a>
+            </li>
+          </ul>
+
+  <!-- Tab panes -->
+     <div class="tab-content">
 {% for quiz in quizzes %}
-<div class="quiz_container">
-<div class="card">
+        <div id="home" class="container tab-pane active"><br>
+            {% if quiz.status == Quiz.DRAFT %}
+            <div class="card">
+             <input hidden value="{{ quiz.course.title}} {{ quiz.title}} ">
+                 <h5>{{ quiz.title }}</h5>
+                     <ol>
 
-    <div class="entry">
-         <input hidden value="{{ quiz.course.title}} {{ quiz.title}} ">
-    <h5>{{ quiz.title }}</h5>
-   <ol>
-       <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"><span class="fa fa-trash" data-toggle="tool-tip" data-placement="top" title="Delete quiz"></span></button>
-       <a href="/quiz/quiz_builder?quiz_id={{ quiz.id }}"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
-       <button type="button" class="btn btn-success"  data-toggle="tool-tip" data-placement="top" title="Open quiz" onclick="myFunction(this)"><span class="fa fa-lock" id="openCloseSpan"></span></button>
+                       <a href="/quiz/?quiz_id={{ quiz.id }}"><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"><span class="fa fa-trash" data-toggle="tool-tip" data-placement="top" title="Delete quiz"></span></button></a>
+                       <a href="/quiz/quiz_builder?quiz_id={{ quiz.id }}"><button type="button" class="btn btn-default" data-toggle="tool-tip" data-placement="top" title="Edit quiz"><span class="fa fa-pencil-alt"></span></button></a>
+                       <button type="button" class="btn btn-success"  data-toggle="tool-tip" data-placement="top" title="Open quiz" onclick="myFunction(this)"><span class="fa fa-lock" id="openCloseSpan"></span></button>
 
-  <div id="myModal" class="modal fade" role="dialog">
+                               <div id="snackbar">{{ quiz.title }} sent to Ready</div>
+                     </ol>
+                <hr>
+            <div class="quiz_container">
+                        <h6><b>{{ quiz.course.title }}</b></h6>
+                        <br>
+            </div>
+                <hr>
+                    <ul>
+                      <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz date"><i class="fa fa-calendar fa-fw"></i> {{quiz.created_on }}</li></a>
+                      <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz duration"><img src="{% static 'image/old-hourglass-.png' %}"> 60 min</li></a>
+                    </ul>
+
+            </div>
+                {% else %}
+                <p>No drafts !!!</p>
+                {% endif %}
+
+        </div>
+    <div id="menu1" class="container tab-pane fade"><br>
+        {% if quiz.status == Quiz.READY %}
+        {% else %}
+        {% endif%}
+        </div>
+    <div id="menu2" class="container tab-pane fade"><br>
+        {% if quiz.status == Quiz.COMPLETED %}
+        {% else %}
+        {% endif%}
+    </div>
+{% endfor %}
+    </div>
+    </div>
+</div>
+
+            <!-- MODAL -->
+ <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
             <!-- Modal content-->
-            <div class="modal-content">
+           <div class="modal-content">
               <div class="modal-header">
                   <h4 class="modal-title">Delete</h4>
                   <button type="button" class="close" data-dismiss="modal"><img src="{% static 'image/cancel.png' %}"></button>
@@ -44,23 +98,8 @@
             </div>
             </div>
     </div>
-          </div>
-               <div id="snackbar">{{ quiz.course.title }} Quiz is open. It ends in 59 minutes</div>
-            </ol>
-            <hr>
-          <div class="container">
-              <h6><b>{{ quiz.course.title }}</b></h6>
-              <br>
-          </div>
-            <hr>
-            <ul>
-              <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz date"><i class="fa fa-calendar fa-fw"></i> {{quiz.created_on }}</li></a>
-              <a href="#" ><li data-toggle="tool-tip" data-placement="bottom" title="Quiz duration"><img src="{% static 'image/old-hourglass-.png' %}"> 60 min</li></a>
-            </ul>
-        </div>
-    </div>
-    <p></p>
-</div>
+ </div>
+
     <script>
       //tooltip
             $(document).ready(function(){
@@ -69,7 +108,9 @@
       //snackbar
             function myFunction() {
     // Get the snackbar DIV
-    var x = document.getElementById("snackbar");
+    var x = document.getElementById("snackbar1");
+   // var x = document.getElementById("snackbar2");
+
 
     // Add the "show" class to DIV
     x.className = "show";
@@ -83,20 +124,14 @@
             $("#searchCourse").on("keyup click input", function () {
                 var val = $(this).val();
                 if (val.length) {
-                    $(".card .entry").hide().filter(function () {
+                    $(".card").hide().filter(function () {
                         return $('input', this).val().toLowerCase().indexOf(val.toLowerCase()) != -1;
                     }).show();
                 }
                 else {
-                    $(" .entry").show();
+                    $(".card").show()
                 }
             });
     </script>
 
-    <script>
-        function myFunction(x) {
-            x.classList.toggle("fa-unlock");
-        }
-    </script>
-{% endfor %}
 {% endblock %}

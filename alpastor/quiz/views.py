@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from quiz.models import Quiz, Question, MultipleChoiceOption, MultipleChoiceQuestion, NumericScaleQuestion, Course
 from django.views import View
@@ -7,6 +8,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 import json
 import enum
+
 
 class QuizStatusCodes(enum.Enum):
     SUCCESS = 0,
@@ -208,7 +210,8 @@ def quizHomePage(request):
     return render(request, "quiz.html", {'quizzes': quizzes})
 
 
-def delete(request,quiz_id =None):
-    object = Quiz.objects.get(id=quiz_id)
-    object.delete()
-    return render(request,'quiz.html')
+def post_delete(request, id=None):
+    instance = get_object_or_404(Quiz, id=id)
+    instance.delete()
+    messages.success(request, "Successfully deleted")
+    return redirect("quiz:quizzes")
