@@ -24,4 +24,5 @@ mysql -u${mysql_username} -p${mysql_user_pw} -e  "CREATE DATABASE alpastor;"
 
 ./manage.py makemigrations
 ./manage.py migrate
+./manage.py createsu
 ./manage.py populatefakedb 

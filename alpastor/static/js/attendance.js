@@ -125,7 +125,7 @@ class StudentAttendance {
         this.status = status;
         this.statusOverride = null;
 
-        if (image === "") {
+        if (image === "" || image === null) {
             image = "/static/image/portraits/generic_avatar.jpg";
         }
 
