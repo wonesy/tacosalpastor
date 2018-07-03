@@ -429,7 +429,7 @@ class GenerateResetToken(View):
 
         if user:
             # Delete all existing tokens for the specific user
-            num_deleted = ResetToken.objects.filter(user=user).delete()
+            ResetToken.objects.filter(user=user).delete()
 
             # Generate new token and calculate the expiration date
             token = get_random_string(length=128)
@@ -465,10 +465,11 @@ class ResetPassword(View):
         try:
             reset_token = ResetToken.objects.get(token=token)
         except (ResetToken.DoesNotExist, MultipleObjectsReturned):
-            return render(request, 'reset/reset_password.html', {'validlink': False})
+            return render(request, 'reset/reset_password.html', {'validlink': False}, status=400)
 
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
+            logger.info("Reset password form was valid, saving new password")
             form.save(user=reset_token.user)
             return redirect('home')
 
@@ -478,10 +479,10 @@ class ResetPassword(View):
         try:
             reset_token = ResetToken.objects.get(token=token)
         except (ResetToken.DoesNotExist, MultipleObjectsReturned):
-            return render(request, 'reset/reset_password.html', {'validlink': False})
+            return render(request, 'reset/reset_password.html', {'validlink': False}, status=400)
 
         if reset_token.expired():
-            return render(request, 'reset/reset_password.html', {'validlink': False})
+            return render(request, 'reset/reset_password.html', {'validlink': False}, status=403)
 
         form = ResetPasswordForm()
 

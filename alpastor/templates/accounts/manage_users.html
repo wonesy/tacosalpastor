@@ -173,6 +173,7 @@
                     <div class="row">
                         <p>Manage all students associated with the selected program/specialization for the selected course</p>
                         <form id="link-course-form" enctype="multipart/form-data" method="post" name="linkCourse">
+
                             {% for field in student_course_form.visible_fields %}
                                 {{ field.label }}:
                                 {{ field }}
