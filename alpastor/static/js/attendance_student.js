@@ -1,23 +1,37 @@
-function showTime() {
-    var time = new Date();
-    var hr = time.getHours().toString();
-    var min = time.getMinutes().toString();
-    var sec = time.getSeconds().toString();
+// Enumeration for attendance statuses
+let StatusEnum = {"total":0, "present":1, "absent":2, "excused":3, "toggle":4};
+Object.freeze(StatusEnum);
 
-    if (hr.length < 2) {
-        hr = "0" + hr;
+function sendStatusChange(originalStatus) {
+    let updatedStatus = $('input[name=options1]:checked').val();
+
+    if (updatedStatus === originalStatus) {
+        return;
     }
 
-    if (min.length < 2) {
-        min = "0" + min;
-    }
+    let url = window.location.origin + window.location.pathname + "studentstatus";
 
-    if (sec.length < 2) {
-        sec = "0" + sec;
-    }
+    $.ajax({
+        type: "POST",
+        url: url,
 
-    var clock = document.getElementById("clock");
-    clock.textContent = hr + " : " + min + " : " + sec;
+        data: {
+            schedule_id: parseGET()['schedule_id'],
+            students: JSON.stringify(changedStudents)
+        },
+
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            console.log("success");
+            for (let i = 0; i < data.length; i++) {
+                    processStudentStatus(data[i]);
+            }
+        },
+        failure: function(errMsg) {
+            console.log(errMsg);
+        }
+    });
+
+    return;
 }
-
-setInterval(showTime, 1000);

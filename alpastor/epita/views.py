@@ -44,7 +44,9 @@ class CourseView(ListView):
                     semester_season=semester[0], semester_year=semester[1], professor_id__user_id=user_instance).order_by('title')
 
         else:
-            enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id')
+            enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id').order_by(
+                '-course_id__semester_year', '-course_id__semester_season'
+            )
             for course in enrolled_in:
                 key = self.season_to_string(course.course_id.semester_season) + " " + str(course.course_id.semester_year)
                 if not key in courses_by_semester:
@@ -142,29 +144,39 @@ class AttendanceView(ListView):
             )
 
             form = self.form_class(instance=attendance_instance)
-            print(attendance_instance)
             data['attendance'] = attendance_instance
+            data['student'] = student_instance
             data['form'] = form
 
         return render(request, self.template_name, data)
 
-    def post(self, request, **kwargs):
-        schedule_id = request.GET.get('schedule_id', )
-        schedule_instance = Schedule.objects.get(pk=schedule_id)
+    def post(self, request, slug, **kwargs):
+        schedule_id = request.GET.get('schedule_id')
 
-        instance = get_object_or_404(Attendance, pk=request.POST['id'])
-        form = self.form_class(request.POST, request.FILES, instance=instance)
-        file = ""
+        instance = get_object_or_404(Attendance, schedule_id=schedule_id,
+                                     student_id__user=request.user)
 
-        if form.is_valid():
-            # Do not let the user update attendance information if the schedule instance is marked as closed
-            if (schedule_instance.attendance_closed) and (not request.user.is_staff) and (form.cleaned_data['status'] != Attendance.EXCUSED):
-                logger.warning("Student attempting to change attendance status for a locked schedule")
-            else:
-                form.save()
-                file = form.cleaned_data['file_upload']
-        args = {'form': form, 'file': file}
-        return render(request, self.template_name, args)
+        if instance.schedule_id.attendance_closed:
+            return redirect('schedule_list', slug=slug)
+
+        status = request.POST.get('status')
+        file_upload = request.POST.get('file_upload')
+        user = request.user
+
+
+
+        if not status:
+            return redirect('schedule_list', slug=slug)
+
+        if (status == str(Attendance.EXCUSED)) and not file_upload:
+            return redirect('schedule_list', slug=slug)
+
+        Attendance.objects.filter(schedule_id_id=schedule_id, student_id__user=user).update(
+            status=status,
+            file_upload=file_upload
+        )
+
+        return redirect('schedule_list', slug=slug)
 
 
 @login_required()
@@ -311,7 +323,6 @@ def dashboard(request):
     for s in semesters:
         s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
         s['intake_season'] = Student.season_to_string(None, s['intake_season'])
-    print(semesters)
 
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
