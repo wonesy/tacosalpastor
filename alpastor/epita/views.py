@@ -88,9 +88,9 @@ class ScheduleView(ListView):
         # Professor/Admin View
         else:
             if request.user.is_superuser:
-                course_queryset = Course.objects.all()
+                course_queryset = Course.objects.all().order_by('-semester_year', '-semester_season')
             else:
-                course_queryset = Course.objects.filter(professor_id__user=request.user)
+                course_queryset = Course.objects.filter(professor_id__user=request.user).order_by('-semester_year', '-semester_season')
 
             form = self.form_class()
             form.fields['course_id'].queryset = course_queryset

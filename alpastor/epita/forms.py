@@ -5,6 +5,10 @@ from epita.models import Student
 from django import forms
 from .models import Attendance, Schedule, Course
 
+class CourseSelect(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.verbose_title()
+
 class AttendanceForm(forms.ModelForm):
 
     class Meta:
@@ -21,11 +25,15 @@ class ScheduleForm(forms.ModelForm):
         model = Schedule
         fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'attendance_closed']
         widgets = {
-            # 'date': forms.DateField(initial=timezone.now() + timezone.timedelta(hours=2)),
-            # 'start_time': datetime.now(),
-            # 'start_time': forms.TimeField(initial=timezone.now()),
-            'attendance_closed': forms.HiddenInput()
+            'attendance_closed': forms.HiddenInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(ScheduleForm, self).__init__(*args, **kwargs)
+        self.fields['course_id'] = CourseSelect(queryset=Course.objects.all())
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'input-group'
+
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -57,11 +65,6 @@ class AssignStudentCourseForm(forms.Form):
         super(AssignStudentCourseForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
-
-
-class CourseSelect(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.verbose_title()
 
 class StudentCourseForm(forms.Form):
     course = CourseSelect(queryset=Course.objects.all())
