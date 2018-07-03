@@ -283,21 +283,36 @@ def dashboard(request):
     # bar graph by country
 
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
-    print(country)
-    # bar graph by program
+
+    program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
-    print(program)
-    print(program.count())
+    for p in program:
+        program_strings = {}
+        program_strings['program'] = Student.program_to_string(None, p['program'])
+        program_strings['count_program'] = p['count_program']
+        program_list.append(program_strings)
+
 
     # bar graph by specialization
-    splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
-        'specialization')
+
+    specialization_list = []
+    specialization = Student.objects.values('specialization').annotate(
+        count_specialization=Count('specialization')).order_by('specialization')
+    for s in specialization:
+        specialization_strings = {}
+        specialization_strings['specialization'] = Student.specialization_to_string(None, s['specialization'])
+        specialization_strings['count_specialization'] = s['count_specialization']
+        specialization_list.append(specialization_strings)
+
 
     # bar graph by intake semester
-    semester = Student.objects.values('intake_season', 'intake_year').annotate(count_intake=Count('intake_year', 'intake_season')).order_by(
-        'intake_year', 'intake_season')
-    print(semester)
+
+    semesters = Student.objects.values('intake_season', 'intake_year').order_by('intake_year', 'intake_season').distinct()
+    for s in semesters:
+        s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
+        s['intake_season'] = Student.season_to_string(None, s['intake_season'])
+    print(semesters)
 
     return render(request, 'dashboardex.html',
-                  {'country': country, 'program': program, 'splgraph': splgraph, 'active_students': active_students,
-                   'intakeSemester': semester})
+                  {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
+                   'intakeSemester': semesters})

@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.dashboard, name='home'),
 
     # Attendance
     path('attendance/course/<slug:slug>/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),

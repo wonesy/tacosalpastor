@@ -90,9 +90,9 @@ class Student(models.Model):
         (NONE, 'None'),
         (SE, 'Software Engineering'),
         (ISM, 'Information Systems Management'),
-        (DSA, 'Data Science & Analytics'),
+        (DSA, 'Data Science and Analytics'),
         (CS, 'Computer Security'),
-        (SDM, 'Software Development & Multimedia'),
+        (SDM, 'Software Development and Multimedia'),
         (SDS, 'Systems Networks & Security'),
         (IGITM, 'Global IT Management (International)'),
         (AI, "Artificial Intelligence"),
@@ -163,6 +163,15 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    def program_to_string(self, program_int):
+        return [x[1] for x in Student.PROGRAM_CHOICES][program_int]
+
+    def specialization_to_string(self, specialization_int) -> object:
+        return [x[1] for x in Student.SPECIALIZATION_CHOICES][specialization_int]
+
+    def season_to_string(self, season_int):
+        return [x[1] for x in Student.SEASON_CHOICES][season_int]
 
 class Professor(models.Model):
     """
