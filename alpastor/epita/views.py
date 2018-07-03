@@ -28,18 +28,35 @@ class CourseView(ListView):
     def get(self, request, **kwargs):
         user_instance = request.user
 
+        courses_by_semester = {}
+
         if user_instance.is_superuser:
-            course_list = Course.objects.all().order_by('title')
+            semesters = Course.objects.values_list('semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
+            for semester in semesters:
+                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                    semester_season=semester[0], semester_year=semester[1]).order_by('title')
 
         elif user_instance.is_staff:
-            course_list = Course.objects.filter(professor_id__user_id=user_instance).order_by('title')
+            semesters = Course.objects.filter(professor_id__user_id=user_instance).values_list(
+                'semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
+            for semester in semesters:
+                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                    semester_season=semester[0], semester_year=semester[1], professor_id__user_id=user_instance).order_by('title')
 
         else:
-            course_list = []
             enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id')
-            [course_list.append(course.course_id) for course in enrolled_in]
+            for course in enrolled_in:
+                key = self.season_to_string(course.course_id.semester_season) + " " + str(course.course_id.semester_year)
+                if not key in courses_by_semester:
+                    courses_by_semester[key] = Course.objects.filter(semester_season=course.course_id.semester_season,
+                            semester_year=course.course_id.semester_year,
+                            title=course.course_id.title
+                    )
 
-        return render(request, self.template_name, {'course_list': course_list})
+        return render(request, self.template_name, {'semester_list': courses_by_semester})
+
+    def season_to_string(self, season_int):
+        return [x[1] for x in Student.SEASON_CHOICES][season_int]
 
 
 class ScheduleView(ListView):
