@@ -32,7 +32,7 @@ class SuccessfulLoginTests(TestCase):
     Specific testing for a successful log on
     """
     def setUp(self):
-        self.user = User.objects.create(email='testuser@epita.fr')
+        self.user = User.objects.create(email='testuser@epita.fr', is_registered=True)
         self.user.set_password('abcdef123456')
         self.user.save()
 
