@@ -149,7 +149,7 @@ class Student(models.Model):
     address_street = models.CharField(max_length=255, null=True, blank=True, help_text="Street")
     address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
     address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
-    address_code = models.IntegerField(blank=True, null=True, help_text="Department code")
+    postal_code = models.IntegerField(blank=True, null=True, help_text="Department postal code")
     dob = models.DateField(null=True, blank=True, help_text="Date of birth")
     enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
     flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
@@ -205,12 +205,12 @@ class Course(models.Model):
         unique_together = (('title', 'semester_season', 'semester_year'),)
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=True)
-    code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123")
+    code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123", null=True)
     title = models.CharField(max_length=127, help_text="Course title")
     description = models.TextField(max_length=1000, blank=True, help_text="Course description")
     semester_season = models.IntegerField(choices=Student.SEASON_CHOICES)
     semester_year = models.IntegerField(blank=False, default=now().year)
-    module = models.CharField(max_length=63, blank=True, help_text="Module or teaching unit")
+    module = models.CharField(max_length=63, null=True, blank=True, help_text="Module or teaching unit")
     credits = models.IntegerField(null=True, blank=True)
     hours = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
@@ -263,32 +263,6 @@ class StudentCourse(models.Model):
 
     def __str__(self):
         return "{}".format(self.course_id)
-
-
-class Grades(models.Model):
-    """
-    Defines the Grades database table
-
-    Args:
-        course_id = FK to a specific course
-        student_id = FK to a specific student
-        assignment = assignment description/title
-        points_earned = the number of points a student has earned on this assignment
-        points_possible = the number of possible points that could be earned on this assignment
-    """
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    assignment = models.CharField(max_length=255)
-    points_earned = models.IntegerField()
-    points_possible = models.IntegerField()
-
-    def __repr__(self):
-        return "Grades(course_id={}, student_id={}, assignment={}, points_earned={}, points_possible={})".format(
-            self.course_id, self.student_id, self.assignment, self.points_earned, self.points_possible)
-
-    def __str__(self):
-        return "{} Scored {} out of {}".format(self.assignment, self.points_earned, self.points_possible)
-
 
 class Schedule(models.Model):
     """
