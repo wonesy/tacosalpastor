@@ -153,13 +153,30 @@ class AttendanceTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'epita/course_list.html')
 
-    def test_schedule_view_status_code_and_template(self):
+    def test_schedule_view_as_student_status_code_and_template(self):
+        self.client.logout()
+        student_instance = User.objects.get(first_name="first0")
+        self.client.login(email=student_instance.email, password="abc")
+
         course = Course.objects.get(title="Sample Course 0")
         url = reverse('schedule_list', kwargs={'slug': course.slug})
+
         schedule_list = Schedule.objects.filter(course_id=course)
         self.response = self.client.get(url, {'schedule_list': schedule_list})
         self.assertEqual(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'epita/schedule_list.html')
+        self.assertTemplateUsed(self.response, 'epita/schedule_student.html')
+
+    def test_schedule_view_as_professor_status_code_and_template(self):
+        self.client.logout()
+        self.client.login(email=self.professor1.user.email, password="abc")
+
+        course = Course.objects.get(title="Sample Course 0")
+        url = reverse('schedule_list', kwargs={'slug': course.slug})
+
+        schedule_list = Schedule.objects.filter(course_id=course)
+        self.response = self.client.get(url, {'schedule_list': schedule_list})
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'epita/schedule_prof.html')
 
     def test_attendance_view_as_student_status_code_and_template(self):
         self.client.logout()
@@ -175,7 +192,7 @@ class AttendanceTest(TestCase):
 
     def test_attendance_view_as_professor_status_code_and_template(self):
         self.client.logout()
-        res = self.client.login(email=self.professor1.user.email, password="abc")
+        self.client.login(email=self.professor1.user.email, password="abc")
 
         course = Course.objects.get(title="Sample Course 0")
         url = reverse('attendance', kwargs={'slug': course.slug})

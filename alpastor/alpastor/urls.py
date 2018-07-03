@@ -53,6 +53,9 @@ urlpatterns = [
     path('quiz/', quiz_views.post_delete, name='delete'),
     path('admin/', admin.site.urls),
 
+    path('dashboardex/', views.dashboard, name='dashboardex'),
+    path('admin/', admin.site.urls),
+
 ]
 
 

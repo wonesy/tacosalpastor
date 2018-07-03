@@ -1,5 +1,5 @@
 from django import forms
-from .models import Attendance
+from .models import Attendance, Schedule
 
 class AttendanceForm(forms.ModelForm):
 
@@ -9,3 +9,10 @@ class AttendanceForm(forms.ModelForm):
         widgets = {
             'upload_time': forms.HiddenInput()
         }
+
+
+class ScheduleForm(forms.ModelForm):
+
+    class Meta:
+        model = Schedule
+        fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'room_id', 'attendance_closed']
