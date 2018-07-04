@@ -16,18 +16,32 @@
 
 {% block content %}
     <div id="users" class="container-fluid">
-        <div class="search-bar">
-            <input class="search" placeholder="Search student name"/>
-            <button class="sort" data-sort="country">
-                Sort by Country
-            </button>
-            <button class="sort" data-sort="intakeSemesterYear">
-                Sort By Year
-            </button>
-            <button class="sort" data-sort="fullname">
-                Sort By Name
-            </button>
-            <button class="csv" onClick="doCsv()">EXPORT to csv</button>
+        <div class="search-bar container">
+            <div class="row">
+                <div class="col-12">
+                    <input class="search input-group" placeholder="Search student name"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                    <button class="sort" data-sort="country">
+                        Sort by Country
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                    <button class="sort" data-sort="intakeSemesterYear">
+                        Sort By Year
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                    <button class="sort" data-sort="fullname">
+                        Sort By Name
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                    <button class="sort csv" onClick="doCsv()">EXPORT to csv</button>
+                </div>
+            </div>
         </div>
         <div class="filters">
             <button class="accordion">Additional filters</button>

@@ -46,6 +46,7 @@ input:focus {
     text-decoration: none;
     background-color: #28a8e0;
     height: 40px;
+    min-width: 210px;
 }
 
 .sort:hover {
@@ -258,10 +259,6 @@ table .status {
     margin-left: 10px;
 }
 
-.search {
-    width: 35%;
-}
-
 #users {
     width: 100%;
 }
@@ -281,4 +278,9 @@ table .status {
 .photo {
     padding-top: 0;
     padding-bottom: 0;
+}
+
+.sort-btn {
+    text-align: center;
+    margin: auto;
 }
