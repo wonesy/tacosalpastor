@@ -18,36 +18,36 @@
     <div id="users" class="container-fluid">
         <div class="search-bar container">
             <div class="row">
-                <div class="col-12">
-                    <input class="search input-group" placeholder="Search student name"/>
+                <div class="col-md-12">
+                    <input class="search input-group" placeholder="Search"/>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                <div class="col-lg-3 col-md-6 col-md-12">
                     <button class="sort" data-sort="country">
                         Sort by Country
                     </button>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                <div class="col-lg-3 col-md-6 col-md-12">
                     <button class="sort" data-sort="intake_semester">
                         Sort By Year
                     </button>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                <div class="col-lg-3 col-md-6 col-md-12">
                     <button class="sort" data-sort="fullname">
                         Sort By Name
                     </button>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
+                <div class="col-lg-3 col-md-6 col-md-12">
                     <button class="sort csv" onClick="doCsv()">EXPORT to csv</button>
                 </div>
             </div>
         </div>
-        <div class="filters">
+        <div class="filters container">
             <button class="accordion">Additional filters</button>
             <div class="panel">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-4">
                         <p>Specialiaztion</p>
                         <div class="specializationContainer"></div>
                     </div>
@@ -55,7 +55,7 @@
                         <p>Program</p>
                         <div class="programContainer"></div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <p>Intake Year</p>
                         <div class="semesterYearContainer"></div>
                     </div>
@@ -66,69 +66,80 @@
                 </div>
             </div>
         </div>
+
         <br>
-        <div class="people-table">
-            <table class="space responsive-table" id="nT">
-                <thead class="table-header">
-                <tr>
-                    <th>Photo</th>
-                    <th>Name</th>
-                    <th>Country</th>
-                    <th>Status</th>
-                    <th>Program</th>
-                    <th>Specialization</th>
-                    <th>Semester Season</th>
-                    <th>Semester Year</th>
-                    <th>Email</th>
-                    <th>EPITA Email</th>
-                    <th>Phone</th>
-                </tr>
-                </thead>
-                <tbody class="list">
-                {% for student in students %}
-                    <tr class="table-row">
-                        <td class="photo">
-                            <div class="people-img"> {% if student.photo_location != "" %}
-                                {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                    <img class="center-block" src="{% static image_static %}"
-                                         alt={{ student.first_name }}>
-                                {% endwith %}
-                            {% else %}
-                                <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
-                                     class="people-img">
-                            {% endif %}
-                            </div>
 
-                        </td>
-                        <td class="fullname"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
-                        <td class="country" style="text-align: center">{{ student.country }}
-                            <div>
-                                {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                                    <img class="tile_image" src="{% static image_static %}"
-                                         alt={{ student.first_name }}>
-                                {% endwith %}
-                            </div>
-                        </td>
-                        <td>{{ student.get_enrollment_status_display }}</td>
-                        <td class="born">  {{ student.get_program_display }} </td>
-                        <td class="name">
-                            {{ student.get_specialization_display }}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
 
-                        </td>
-                        <td class="intake_season"> {{ student.get_intake_season_display }} </td>
-                        <td class="intake_semester"> {{ student.intake_year }} </td>
-                        <td class="email"> {{ student.user.email }} </td>
-                        <td class="extemail">{{ student.user.external_email }} </td>
-                        <td class="phone">{{ student.phone }}</td>
-                    </tr>
-                {% endfor %}
 
-                </tbody>
-            </table>
+                    <div class="people-table">
+                        <table class="space responsive-table" id="nT">
+                            <thead class="table-header">
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Program</th>
+                                <th>Specialization</th>
+                                <th>Semester Season</th>
+                                <th>Semester Year</th>
+                                <th>Email</th>
+                                <th>EPITA Email</th>
+                                <th>Phone</th>
+                            </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for student in students %}
+                                <tr class="table-row">
+                                    <td class="photo">
+                                        <div class="people-img"> {% if student.photo_location != "" %}
+                                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                                <img class="center-block" src="{% static image_static %}"
+                                                     alt={{ student.first_name }}>
+                                            {% endwith %}
+                                        {% else %}
+                                            <img src="{% static 'image/portraits/generic_taco.jpg' %}"
+                                                 alt="Default taco"
+                                                 class="people-img">
+                                        {% endif %}
+                                        </div>
+
+                                    </td>
+                                    <td class="fullname"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
+                                    <td class="country" style="text-align: center">{{ student.country }}
+                                        <div>
+                                            {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                                                <img class="tile_image" src="{% static image_static %}"
+                                                     alt={{ student.first_name }}>
+                                            {% endwith %}
+                                        </div>
+                                    </td>
+                                    <td>{{ student.get_enrollment_status_display }}</td>
+                                    <td class="born">  {{ student.get_program_display }} </td>
+                                    <td class="name">
+                                        {{ student.get_specialization_display }}
+                                    </td>
+                                    <td class="intake_season"> {{ student.get_intake_season_display }} </td>
+                                    <td class="intake_semester"> {{ student.intake_year }} </td>
+                                    <td class="email"> {{ student.user.email }} </td>
+                                    <td class="extemail">{{ student.user.external_email }} </td>
+                                    <td class="phone">{{ student.phone }}</td>
+
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                        <ul class="pagination"></ul>
+                    </div>
+                </div>
+            </div>
         </div>
         <ul class="pagination"></ul>
     </div>
-
 
 
     <script>
@@ -233,7 +244,6 @@
                 }
             });
         }
-
 
 
         function doCsv() {

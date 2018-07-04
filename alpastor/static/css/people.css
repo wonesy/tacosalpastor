@@ -106,6 +106,7 @@ input:focus {
 .pagination li {
     display: inline-block;
     padding: 5px;
+    color: #1e1e1e;
 }
 
 .space {
@@ -119,18 +120,19 @@ tr {
 }
 
 th {
-    background-color: #95A5A6;
-    font-size: 14px;
+    background-color: #698486;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    padding: 25px 20px;
+    letter-spacing: 0.02em;
+    padding: 22px 17px;
 }
 
 td {
     background-color: #ffffff;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-    padding: 25px 20px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    padding: 25px 17px;
+    color: #1e1e1e;
 
 }
 
@@ -157,6 +159,7 @@ input[type="checkbox"] {
     font-size: 15px;
     transition: 0.4s;
     margin-left: 10px;
+    border-radius: 6px;
 }
 
 .active, .accordion:hover {
@@ -264,11 +267,11 @@ table .status {
 }
 
 .people-table {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 .people-table table {
-    width: 100%;
+    /*#width: 100%;*/
 }
 
 .table-row {
@@ -282,5 +285,5 @@ table .status {
 
 .sort-btn {
     text-align: center;
-    margin: auto;
+    padding: -15px;
 }
