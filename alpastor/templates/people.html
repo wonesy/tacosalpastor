@@ -29,7 +29,7 @@
                     </button>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12 sort-btn">
-                    <button class="sort" data-sort="intakeSemesterYear">
+                    <button class="sort" data-sort="intake_semester">
                         Sort By Year
                     </button>
                 </div>
@@ -47,19 +47,19 @@
             <button class="accordion">Additional filters</button>
             <div class="panel">
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-3">
                         <p>Specialiaztion</p>
                         <div class="specializationContainer"></div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <p>Program</p>
                         <div class="programContainer"></div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <p>Intake Year</p>
                         <div class="semesterYearContainer"></div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <p>Intake Season</p>
                         <div class="semesterSeasonContainer"></div>
                     </div>
@@ -115,8 +115,8 @@
                             {{ student.get_specialization_display }}
 
                         </td>
-                        <td class="intakesemester"> {{ student.get_intake_season_display }} </td>
-                        <td class="intakesemester"> {{ student.intake_year }} </td>
+                        <td class="intake_season"> {{ student.get_intake_season_display }} </td>
+                        <td class="intake_semester"> {{ student.intake_year }} </td>
                         <td class="email"> {{ student.user.email }} </td>
                         <td class="extemail">{{ student.user.external_email }} </td>
                         <td class="phone">{{ student.phone }}</td>
@@ -133,7 +133,7 @@
 
     <script>
         let options = {
-            valueNames: ['name', 'country', 'born', 'intake_season', 'intake_year', 'fullname'],
+            valueNames: ['name', 'country', 'born', 'intake_season', 'intake_semester', 'fullname'],
             page: 20,
             pagination: true
         };
@@ -145,6 +145,7 @@
             let names = [];
             let dates = [];
             let semester = [];
+            let season = [];
 
             $("input:checkbox[name=names]:checked").each(function () {
                 names.push($(this).val());
@@ -154,19 +155,25 @@
                 dates.push($(this).val());
             });
 
-            $("input:checkbox[name=semesterYear]:checked").each(function () {
+            $("input:checkbox[name=semester]:checked").each(function () {
                 semester.push($(this).val());
+            });
+
+            $("input:checkbox[name=season]:checked").each(function () {
+                season.push($(this).val());
             });
 
             let values_date = dates.length > 0 ? dates : null;
             let values_name = names.length > 0 ? names : null;
             let values_semester = semester.length > 0 ? semester : null;
+            let values_season = season.length > 0 ? season : null;
 
 
             userList.filter(function (item) {
                 return (_(values_date).contains(item.values().born) || !values_date)
                     && (_(values_name).contains(item.values().name) || !values_name)
-                    && (_(values_semester).contains(item.values().intake_season) || !values_semester)
+                    && (_(values_semester).contains(item.values().intake_semester) || !values_semester)
+                    && (_(values_season).contains(item.values().intake_season) || !values_season)
             });
         };
 
@@ -176,17 +183,21 @@
         $(document).on("change", "input:checkbox[name=names]", updateList);
         $(document).off("change", "input:checkbox[name=semester]");
         $(document).on("change", "input:checkbox[name=semester]", updateList);
+        $(document).off("change", "input:checkbox[name=season]");
+        $(document).on("change", "input:checkbox[name=season]", updateList);
 
         $(function () {
             let all_born = [];
             let all_name = [];
             let all_intakesemester = [];
+            let all_intakeseason = [];
 
             updateList();
             _(userList.items).each(function (item) {
                 all_born.push(item.values().born);
                 all_name.push(item.values().name);
-                all_intakesemester.push(item.values().intakesemester)
+                all_intakesemester.push(item.values().intake_semester)
+                all_intakeseason.push(item.values().intake_season)
             });
 
             _(all_born).uniq().each(function (item) {
@@ -198,8 +209,14 @@
             });
 
             _(all_intakesemester).uniq().each(function (item) {
-                $(".semesterYearContainer").append('<label><input type="checkbox" name="semester_year" value="' + item + '">' + item + '</label><br>')
+                $(".semesterYearContainer").append('<label><input type="checkbox" name="semester" value="' + item + '">' + item + '</label><br>')
             });
+
+            _(all_intakeseason).uniq().each(function (item) {
+                $(".semesterSeasonContainer").append('<label><input type="checkbox" name="season" value="' + item + '">' + item + '</label><br>')
+            });
+
+
         });
 
         let acc = document.getElementsByClassName("accordion");
