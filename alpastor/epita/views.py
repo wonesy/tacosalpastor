@@ -172,18 +172,37 @@ class CourseView(ListView):
     def get(self, request, **kwargs):
         user_instance = request.user
 
+        courses_by_semester = {}
+
         if user_instance.is_superuser:
-            course_list = Course.objects.all().order_by('title')
+            semesters = Course.objects.values_list('semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
+            for semester in semesters:
+                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                    semester_season=semester[0], semester_year=semester[1]).order_by('title')
 
         elif user_instance.is_staff:
-            course_list = Course.objects.filter(professor_id__user_id=user_instance).order_by('title')
+            semesters = Course.objects.filter(professor_id__user_id=user_instance).values_list(
+                'semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
+            for semester in semesters:
+                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                    semester_season=semester[0], semester_year=semester[1], professor_id__user_id=user_instance).order_by('title')
 
         else:
-            course_list = []
-            enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id')
-            [course_list.append(course.course_id) for course in enrolled_in]
+            enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id').order_by(
+                '-course_id__semester_year', '-course_id__semester_season'
+            )
+            for course in enrolled_in:
+                key = self.season_to_string(course.course_id.semester_season) + " " + str(course.course_id.semester_year)
+                if not key in courses_by_semester:
+                    courses_by_semester[key] = Course.objects.filter(semester_season=course.course_id.semester_season,
+                            semester_year=course.course_id.semester_year,
+                            title=course.course_id.title
+                    )
 
-        return render(request, self.template_name, {'course_list': course_list})
+        return render(request, self.template_name, {'semester_list': courses_by_semester})
+
+    def season_to_string(self, season_int):
+        return [x[1] for x in Student.SEASON_CHOICES][season_int]
 
 
 class ScheduleView(ListView):
@@ -215,9 +234,9 @@ class ScheduleView(ListView):
         # Professor/Admin View
         else:
             if request.user.is_superuser:
-                course_queryset = Course.objects.all()
+                course_queryset = Course.objects.all().order_by('-semester_year', '-semester_season')
             else:
-                course_queryset = Course.objects.filter(professor_id__user=request.user)
+                course_queryset = Course.objects.filter(professor_id__user=request.user).order_by('-semester_year', '-semester_season')
 
             form = self.form_class()
             form.fields['course_id'].queryset = course_queryset
@@ -270,37 +289,47 @@ class AttendanceView(ListView):
 
             form = self.form_class(instance=attendance_instance)
             data['attendance'] = attendance_instance
+            data['student'] = student_instance
             data['form'] = form
 
         return render(request, self.template_name, data)
 
     def post(self, request, slug, **kwargs):
-        schedule_id = request.GET.get('schedule_id', )
-        schedule_instance = Schedule.objects.get(pk=schedule_id)
 
-        instance = get_object_or_404(Attendance, pk=request.POST['id'])
-        form = self.form_class(request.POST, request.FILES, instance=instance)
-        file = ""
+        schedule_id = request.GET.get('schedule_id')
 
-        if form.is_valid():
-            # Do not let the user update attendance information if the schedule instance is marked as closed
-            if (schedule_instance.attendance_closed) and (not request.user.is_staff) and (form.cleaned_data['status'] != Attendance.EXCUSED):
-                logger.warning("Student attempting to change attendance status for a locked schedule")
-            else:
-                form.save()
-                file = form.cleaned_data['file_upload']
-        args = {'form': form, 'file': file}
-        url = reverse('schedule_list', kwargs={'slug': slug})
+        instance = get_object_or_404(Attendance, schedule_id=schedule_id,
+                                     student_id__user=request.user)
 
-        return redirect(url)
+        if instance.schedule_id.attendance_closed:
+            return redirect('schedule_list', slug=slug)
+
+        status = request.POST.get('status')
+        file_upload = request.POST.get('file_upload')
+        user = request.user
+
+
+
+        if not status:
+            return redirect('schedule_list', slug=slug)
+
+        if (status == str(Attendance.EXCUSED)) and not file_upload:
+            return redirect('schedule_list', slug=slug)
+
+        Attendance.objects.filter(schedule_id_id=schedule_id, student_id__user=user).update(
+            status=status,
+            file_upload=file_upload
+        )
+
+        return redirect('schedule_list', slug=slug)
 
 
 @login_required()
 def people(request):
     people_dict = {}
 
-    active_students = Student.objects.all()
-
+    active_students = Student.objects.filter(user__is_active=True).order_by(
+        'intake_year', 'intake_season', 'program', 'specialization', 'user__last_name')
     people_dict['students'] = active_students
 
     return render(request, 'people.html', people_dict)
@@ -411,32 +440,32 @@ def dashboard(request):
     # bar graph by country
 
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
-    #print(country)
-    # bar graph by program
+
+    program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
-    # print(program)
-    #print(program.count())
+    for p in program:
+        program_strings = {}
+        program_strings['program'] = Student.program_to_string(None, p['program'])
+        program_strings['count_program'] = p['count_program']
+        program_list.append(program_strings)
 
     # bar graph by specialization
-    splgraph = Student.objects.values('specialization').annotate(count_specialization=Count('specialization')).order_by(
-        'specialization')
 
-    # bar graph by intake semester
-    intakeSemester = Student.objects.values('intakeSemester').annotate(count_intake=Count('intakeSemester')).order_by(
-        'intakeSemester')
-    # print(intakeSemester)
-
-    name = 'Willy0'
-    students = Student.objects.filter(user__first_name=name)[0]
-    allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
-    # print(allcourse)
-
-    status = Attendance.objects.filter(student_id__user__first_name=name,
-                                       schedule_id__course_id__title=allcourse[0].course_id).values('status')
-    print(status)
+    specialization_list = []
+    specialization = Student.objects.values('specialization').annotate(
+        count_specialization=Count('specialization')).order_by('specialization')
+    for s in specialization:
+        specialization_strings = {}
+        specialization_strings['specialization'] = Student.specialization_to_string(None, s['specialization'])
+        specialization_strings['count_specialization'] = s['count_specialization']
+        specialization_list.append(specialization_strings)
 
 
+    semesters = Student.objects.values('intake_season', 'intake_year').order_by('intake_year', 'intake_season').distinct()
+    for s in semesters:
+        s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
+        s['intake_season'] = Student.season_to_string(None, s['intake_season'])
 
     return render(request, 'dashboardex.html',
-                  {'country': country, 'program': program, 'splgraph': splgraph, 'active_students': active_students,
-                   'intakeSemester': intakeSemester})
+                  {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
+                   'intakeSemester': semesters})

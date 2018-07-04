@@ -2,22 +2,36 @@
 
 {% load static %}
 
+{% block additional_links %}
+    <link href="{% static 'css/course_list.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-    <table class="table text-center">
-        <thead class="thead-inverse">
-            <tr>
-                <th>Active Courses</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course in course_list %}
-                <tr>
-                    <th>
-{#                        <a class="btn btn-primary" href="/attendance/course?course_name={{ course.title }}">{{ course.title }}</a>#}
-                        <a class="btn btn-primary" href="/attendance/course/{{ course.slug }}">{{ course.title }}</a>
-                    </th>
-                </tr>
+
+    <div class="accordion-container container">
+        <div id="accordion" class="center-container">
+            {% for semester, course_list in semester_list.items %}
+                <div class="card">
+                    <a data-toggle="collapse" data-target="#{{ semester }}" aria-expanded="false" aria-controls="{{ semester }}">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                {{ semester }}
+                            </h5>
+                        </div>
+                    </a>
+                    <div id="{{ semester }}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+
+                        {%  for course in course_list %}
+
+
+                            <div class="card-body">
+                                <a class="course-btn btn btn-primary" href="/attendance/course/{{ course.slug }}">{{ course.title }}</a>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+    </div>
 {% endblock %}

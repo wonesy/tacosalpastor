@@ -23,7 +23,8 @@ class Student extends User {
         super(firstName, lastName, emailLogin, false);
         this.program = "";
         this.specialization = "";
-        this.intakeSemester = "";
+        this.intakeSeason = "";
+        this.intakeYear = "";
         this.country = "";
     }
 }
@@ -66,7 +67,7 @@ function savePotentialCourse() {
     });
 
     // Show the actions display
-    $("#actions-card-body").toggleClass("show");
+    $("#actions-card-body").addClass("show");
 }
 
 function savePotentialUsers() {
@@ -90,7 +91,7 @@ function savePotentialUsers() {
     });
 
     // Show the actions display
-    $("#actions-card-body").toggleClass("show");
+    $("#actions-card-body").addClass("show");
 
     // Remove csv file
     $('#csv-file').val("");
@@ -108,7 +109,8 @@ function populateModalUserPreview() {
         "<th>Picture</th>" +
         "<th>Program</th>" +
         "<th>Specialization</th>" +
-        "<th>Intake Semester</th>" +
+        "<th>Intake Season</th>" +
+        "<th>Intake Year</th>" +
         "<th>Country</th>" +
         "</tr>";
 
@@ -125,6 +127,7 @@ function populateModalUserPreview() {
         "<td>{8}</td>" +
         "<td>{9}</td>" +
         "<td>{10}</td>" +
+        "<td>{11}</td>" +
         "</tr>";
 
     let modalPreviewElem = document.getElementById('modal-preview-table');
@@ -146,7 +149,8 @@ function populateModalUserPreview() {
             u.pic,
             (u.isProfessor) ? "n/a" : u.program,
             (u.isProfessor) ? "n/a" : u.specialization,
-            (u.isProfessor) ? "n/a" : u.intakeSemester,
+            (u.isProfessor) ? "n/a" : u.intakeSeason,
+            (u.isProfessor) ? "n/a" : u.intakeYear,
             (u.isProfessor) ? "n/a" : u.country
         ));
     }
@@ -160,8 +164,10 @@ function processUserCSVFile(csvFileElem) {
     data.append('file', csvFileElem.files[0]);
 
     // Collect override information
+    data.append('overrideProgram', $('#override-program').val());
     data.append('overrideSpecialization', $('#override-specialization').val());
-    data.append('overrideIntakeSemester', $('#override-intake-semester').val());
+    data.append('overrideIntakeSeason', $('#override-intake-season').val());
+    data.append('overrideIntakeYear', $('#override-intake-year').val());
     data.append('overrideCountry', $('#override-country').val());
 
     $.ajax({
@@ -179,7 +185,8 @@ function processUserCSVFile(csvFileElem) {
                 student.program = data[i].program;
                 student.country = data[i].country;
                 student.specialization = data[i].specialization;
-                student.intakeSemester = data[i].intakeSemester;
+                student.intakeSeason = data[i].intakeSeason;
+                student.intakeYear = data[i].intakeYear;
                 GlobalPotentialUsers.push(student);
             }
             populateModalUserPreview();
@@ -215,12 +222,12 @@ function collectNewUserInfo() {
         return false;
     }
 
-    if (!emailLogin.checkValidity()) {
+    if (!lastName.checkValidity()) {
         errorElem.innerHTML = "Fill out last name";
         return false;
     }
 
-    if (!firstName.checkValidity()) {
+    if (!emailLogin.checkValidity()) {
         errorElem.innerHTML = "Fill out login email field";
         return false;
     }
@@ -246,7 +253,8 @@ function collectNewUserInfo() {
         let programElem = document.getElementById("program");
         let specializationElem = document.getElementById("specialization");
         let country = document.getElementById("country");
-        let intakeSemester = document.getElementById('intake-semester');
+        let intakeSeason = document.getElementById('intake-season');
+        let intakeYear = document.getElementById('intake-year');
 
         // Validate additional student data
         if (!programElem.checkValidity()) {
@@ -259,17 +267,26 @@ function collectNewUserInfo() {
             return false;
         }
 
-        if (!intakeSemester.checkValidity()) {
-            errorElem.innerHTML = "Intake semester must have the form Season Year (Fall 2016, Spring 2017)";
+        if (!intakeSeason.checkValidity()) {
+            errorElem.innerHTML = "Fill out intake semester season";
+            return false;
+        }
+
+        if (!intakeYear.checkValidity()) {
+            errorElem.innerHTML = "Fill out intake semester year";
             return false;
         }
 
         let program = programElem.options[programElem.selectedIndex].value;
         let specialization = specializationElem.options[specializationElem.selectedIndex].value;
+        let season = intakeSeason.options[intakeSeason.selectedIndex].value;
+        let year = intakeYear.value;
 
         newUser.program = program;
         newUser.specialization = specialization;
         newUser.country = country.value;
+        newUser.intakeSeason = season;
+        newUser.intakeYear = year;
     }
 
     GlobalPotentialUsers.push(newUser);
@@ -277,4 +294,46 @@ function collectNewUserInfo() {
     populateModalUserPreview();
 
     return true;
+}
+
+function linkStudentCourse(url) {
+    let formElements = document.getElementById("link-course-form").elements;
+
+    let data = {};
+
+    // Course
+    data['course_id'] = formElements[0].value;
+
+    // Program
+    data['program'] = formElements[1].value;
+
+    // Specialization
+    data['specialization'] = formElements[2].value;
+
+    // Intake season
+    data['intake_season'] = formElements[3].value;
+
+    // Intake year
+    data['intake_year'] = formElements[4].value;
+
+    console.log("here");
+    $.ajax({
+        type: "POST",
+        url: window.location.origin + window.location.pathname + url,
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+            console.log("SUCCESS");
+            writeActions([data.messages]);
+        },
+        error: function (e, data) {
+            console.log("ERROR : ", e);
+            writeActions([e.responseJSON.messages]);
+        }
+    });
+
+    // Show the actions display
+    $("#actions-card-body").addClass("show");
 }

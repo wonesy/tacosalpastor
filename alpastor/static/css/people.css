@@ -12,13 +12,12 @@
 }
 
 .avatar {
-    max-width: 150px;
+    max-width: 75px;
 }
 
 h3 {
     font-size: 16px;
     margin: 0 0 0.3rem;
-    font-weight: normal;
     font-weight: bold;
 }
 
@@ -47,6 +46,7 @@ input:focus {
     text-decoration: none;
     background-color: #28a8e0;
     height: 40px;
+    min-width: 210px;
 }
 
 .sort:hover {
@@ -97,8 +97,8 @@ input:focus {
 .people-img {
     float: left;
     /*min-width: 100px;*/
-    max-width: 100px;
-    min-height: 100px;
+    max-width: 70px;
+    min-height: 70px;
     /*max-height: 100px;*/
 
 }
@@ -250,8 +250,37 @@ input[type="checkbox"] {
     height: 40px;
 }
 
-table status {
+table .status {
     table-layout: auto;
     width: 100%;
 }
 
+.search-bar {
+    margin-left: 10px;
+}
+
+#users {
+    width: 100%;
+}
+
+.people-table {
+    width: 100%;
+}
+
+.people-table table {
+    width: 100%;
+}
+
+.table-row {
+    height: 70px;
+}
+
+.photo {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.sort-btn {
+    text-align: center;
+    margin: auto;
+}

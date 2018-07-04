@@ -27,7 +27,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program=Student.ME,
                                                                      specialization=1,
-                                                                     intakeSemester="Fall 2017", country="USA",
+                                                                     intake_season=Student.FALL, intake_year=2017, country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
@@ -35,7 +35,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program=Student.ME,
                                                                      specialization=1,
-                                                                     intakeSemester="Fall 2017", country="France",
+                                                                     intake_season=Student.FALL, intake_year=2017, country="France",
                                                                      languages="English,French", photo_location="")
 
         User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
@@ -43,7 +43,7 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program=Student.ME,
                                                                      specialization=1,
-                                                                     intakeSemester="Fall 2017", country="USA",
+                                                                     intake_season=Student.FALL, intake_year=2017, country="USA",
                                                                      languages="English", photo_location="")
 
         User.objects.create_user(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
@@ -57,13 +57,13 @@ class AttendanceTest(TestCase):
         student2 = Student.objects.filter(user__email="epita2@epita.fr")[0]
 
         course0 = Course.objects.create(professor_id=self.professor1, title="Sample Course 0", description="Sample Description",
-                                   semester="Spring 2018", module="Advanced Technology", credits=3)
+                                   semester_season=Student.SPRING, semester_year=2018, module="Advanced Technology", credits=3)
 
         course1 = Course.objects.create(professor_id=self.professor1, title="Sample Course 1", description="Sample Description",
-                                   semester="Spring 2018", module="Advanced Technology", credits=3)
+                                    semester_season=Student.SPRING, semester_year=2018, module="Advanced Technology", credits=3)
 
         course2 = Course.objects.create(professor_id=self.professor1, title="Sample Course 2", description="Sample Description",
-                                   semester="Spring 2018", module="Java", credits=3)
+                                    semester_season=Student.SPRING, semester_year=2018, module="Java", credits=3)
 
         # Give student0 both courses
         StudentCourse.objects.create(student_id=student0, course_id=course0)

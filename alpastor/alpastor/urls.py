@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import login_required
 
 # add new URL to this structure in alpastor/urls.py
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.dashboard, name='home'),
 
     # Attendance
     path('attendance/course/<slug:slug>/schedule/update', login_required(GetStudentAttendanceData.as_view()), name='update_attendance'),
@@ -51,10 +51,16 @@ urlpatterns = [
     path('quiz/', quiz_views.quizHomePage, name='quiz_home_page'),
     path('quiz/', quiz_views.delete, name='delete_view'),
 
+     # Password Reset
+    path('generatereset/', accounts_views.GenerateResetToken.as_view(), name='genreset'),
+    path('resetpass/<str:token>/', accounts_views.ResetPassword.as_view(), name='resetpass'),
+
     # Admin/Superuser
     path('login/', accounts_views.login, name='login'),
     path('manageusers/processusercsv/', login_required(accounts_views.ProcessUserCSVData.as_view()), name='processusercsv'),
     path('manageusers/savenewusers/', login_required(accounts_views.SaveNewUsers.as_view()), name='savenewusers'),
+    path('manageusers/addstudentcourse/', login_required(accounts_views.AddStudentCourse.as_view()), name='addstudentcourse'),
+    path('manageusers/deletestudentcourse/', login_required(accounts_views.DeleteStudentCourse.as_view()), name='deletestudentcourse'),
     path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
     path('dashboardex/', views.dashboard, name='dashboardex'),
     path('admin/', admin.site.urls),
