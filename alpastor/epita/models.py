@@ -247,7 +247,7 @@ class Course(models.Model):
         return "{} ({})".format(self.title, self.full_semester())
 
     def full_semester(self):
-        return "{} {}".format(self.season_to_string(), self.semester_year)
+        return "{} {}".format(choice_to_string(Student.SEASON_CHOICES, self.semester_season), self.semester_year)
 
 class StudentCourse(models.Model):
     """
