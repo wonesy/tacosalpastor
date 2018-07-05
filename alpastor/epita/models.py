@@ -171,6 +171,9 @@ class Student(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
+    def student_email(self):
+        return self.user.email
+
 class Professor(models.Model):
     """
     Defines the Professor database table
@@ -189,6 +192,9 @@ class Professor(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
+
+    def professor_email(self):
+        return self.user.email
 
 
 class Course(models.Model):
