@@ -5,12 +5,8 @@
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.0/list.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
 {% endblock %}
 
@@ -20,6 +16,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <input class="search input-group" placeholder="Search"/>
+                <div class="col-md-12">
+                    <input id="searchBar" class="search input-group" placeholder="Search"/>
                 </div>
             </div>
             <div class="row">
@@ -48,20 +46,20 @@
             <div class="panel">
                 <div class="row">
                     <div class="col-4">
-                        <p>Specialiaztion</p>
-                        <div class="specializationContainer"></div>
+                        <p>Specialization</p>
+                        <div id="specializationContainer" class="specializationContainer"></div>
                     </div>
                     <div class="col-3">
                         <p>Program</p>
-                        <div class="programContainer"></div>
+                        <div id="programContainer" class="programContainer"></div>
                     </div>
                     <div class="col-2">
                         <p>Intake Year</p>
-                        <div class="semesterYearContainer"></div>
+                        <div id="semesterYearContainer" class="semesterYearContainer"></div>
                     </div>
                     <div class="col-3">
                         <p>Intake Season</p>
-                        <div class="semesterSeasonContainer"></div>
+                        <div id="semesterSeasonContainer" class="semesterSeasonContainer"></div>
                     </div>
                 </div>
             </div>
@@ -141,7 +139,6 @@
         <ul class="pagination"></ul>
     </div>
 
-
     <script>
         let options = {
             valueNames: ['name', 'country', 'born', 'intake_season', 'intake_semester', 'fullname'],
@@ -212,19 +209,19 @@
             });
 
             _(all_born).uniq().each(function (item) {
-                $(".programContainer").append('<label><input type="checkbox" name="dates" value="' + item + '">' + item + '</label><br>')
+                $(".programContainer").append('<label><input type=\"checkbox\" name=\"dates\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
             _(all_name).uniq().each(function (item) {
-                $(".specializationContainer").append('<label><input type="checkbox" name="names" value="' + item + '">' + item + '</label><br>')
+                $(".specializationContainer").append('<label><input type=\"checkbox\" name=\"names\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
             _(all_intakesemester).uniq().each(function (item) {
-                $(".semesterYearContainer").append('<label><input type="checkbox" name="semester" value="' + item + '">' + item + '</label><br>')
+                $(".semesterYearContainer").append('<label><input type=\"checkbox\" name=\"semester\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
             _(all_intakeseason).uniq().each(function (item) {
-                $(".semesterSeasonContainer").append('<label><input type="checkbox" name="season" value="' + item + '">' + item + '</label><br>')
+                $(".semesterSeasonContainer").append('<label><input type=\"checkbox\" name=\"season\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
 
@@ -248,45 +245,70 @@
 
         function doCsv() {
 
-            let nT = document.getElementById("nT").innerHTML;
-            let dataa = nT.replace(/<thead([\w\W]+?)>/g, '')
-                .replace(/<tbody([\w\W]+?)>/g, '')
-                .replace(/<\/thead>/g, '')
-                .replace(/<\/tbody>/g, '')
-                .replace(/<tr([\w\W]+?)>/g, '')
-                .replace(/<div([\w\W]+?)>/g, '')
-                .replace(/<img([\w\W]+?)>/g, 'img')
-                .replace(/<th>/g, '')
-                .replace(/<\/th>/g, ',')
-                .replace(/<td([\w\W]+?)>/g, '')
-                .replace(/<\/td>/g, ',')
-                .replace(/\s+/g, '')
-                .replace(/<\n>/g, '')
-                .replace(/<\/tr>/g, '\n')
-                .replace(/<\/div>/g, '');
+            let data = {};
 
-            let download = function (content, fileName, mimeType) {
-                let a = document.createElement('a');
-                mimeType = mimeType || 'application/octet-stream';
+            // search
+            data['search'] = document.getElementById("searchBar").value;
 
-                if (navigator.msSaveBlob) { // IE10
-                    navigator.msSaveBlob(new Blob([content], {
-                        type: mimeType
-                    }), fileName);
-                } else if (URL && 'download' in a) { //html5 A[download]
-                    a.href = URL.createObjectURL(new Blob([content], {
-                        type: mimeType
-                    }));
-                    a.setAttribute('download', fileName);
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } else {
-                    location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+            // program
+            let programs = [];
+            let prog_filters = $("#programContainer").find("input");
+            for (let i = 0; i < prog_filters.length; i++) {
+                if (prog_filters[i].checked) {
+                    programs.push(prog_filters[i].value.trim())
                 }
-            };
+            }
+            data['program'] = programs;
 
-            download(dataa, 'Students.csv', 'text/csv;encoding:utf-8');
+            // specialization
+            let specs = [];
+            let spec_filters = $("#specializationContainer").find("input");
+            for (let i = 0; i < spec_filters.length; i++) {
+                if (spec_filters[i].checked) {
+                    specs.push(spec_filters[i].value.trim())
+                }
+            }
+            data.specialization = specs;
+
+            // intake_season
+            let seasons = [];
+            let season_filters = $("#semesterSeasonContainer").find("input");
+            for (let i = 0; i < season_filters.length; i++) {
+                if (season_filters[i].checked) {
+                    seasons.push(season_filters[i].value.trim())
+                }
+            }
+            data.intake_season = seasons;
+
+            // intake_year
+            let years = [];
+            let year_filters = $("#semesterYearContainer").find("input");
+            for (let i = 0; i < year_filters.length; i++) {
+                if (year_filters[i].checked) {
+                    years.push(year_filters[i].value.trim())
+                }
+            }
+            data.intake_year = years;
+
+            let url = window.origin + "/csv/student/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    students: JSON.stringify(data)
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                responseType: "",
+                success: function(data) {
+                    console.log("success");
+                    window.location = window.origin + data['location']
+                },
+                failure: function(errMsg) {
+                    console.log(errMsg);
+                }
+            });
         }
 
 

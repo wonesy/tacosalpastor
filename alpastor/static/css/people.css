@@ -47,6 +47,7 @@ input:focus {
     background-color: #28a8e0;
     height: 40px;
     min-width: 210px;
+    cursor: pointer;
 }
 
 .sort:hover {
@@ -181,7 +182,6 @@ input[type="checkbox"] {
     position: relative;
     padding-left: 30px;
     margin-bottom: 10px;
-    cursor: pointer;
     font-size: 18px;
     -webkit-user-select: none;
     -moz-user-select: none;

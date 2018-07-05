@@ -32,6 +32,4 @@ function sendStatusChange(originalStatus) {
             console.log(errMsg);
         }
     });
-
-    return;
 }

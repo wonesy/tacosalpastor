@@ -6,6 +6,13 @@ import re
 import datetime
 from django.utils.timezone import now
 
+def choice_to_string(choices, index):
+    return [x[1] for x in choices][index]
+
+def string_to_choice(choices, val):
+    for x in choices:
+        if x[1] == val:
+            return x[0]
 
 @receiver(post_save, sender=User)
 def create_user_student_or_prof(sender, instance, created, **kwargs):
@@ -164,15 +171,6 @@ class Student(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
-    def program_to_string(self, program_int):
-        return [x[1] for x in Student.PROGRAM_CHOICES][program_int]
-
-    def specialization_to_string(self, specialization_int) -> object:
-        return [x[1] for x in Student.SPECIALIZATION_CHOICES][specialization_int]
-
-    def season_to_string(self, season_int):
-        return [x[1] for x in Student.SEASON_CHOICES][season_int]
-
 class Professor(models.Model):
     """
     Defines the Professor database table
@@ -231,7 +229,7 @@ class Course(models.Model):
         self.title = re.sub(' +', ' ', self.title)
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
-        slug_season = self.season_to_string()
+        slug_season = choice_to_string(Student.SEASON_CHOICES, self.semester_season)
         self.slug = slug_season.lower() + '-' + str(self.semester_year) + '-' + self.title.lower().replace(' ', '-')
 
     def save(self, **kwargs):
@@ -250,9 +248,6 @@ class Course(models.Model):
 
     def full_semester(self):
         return "{} {}".format(self.season_to_string(), self.semester_year)
-
-    def season_to_string(self):
-        return [x[1] for x in Student.SEASON_CHOICES][self.semester_season]
 
 class StudentCourse(models.Model):
     """

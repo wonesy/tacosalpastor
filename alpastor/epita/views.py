@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.views.generic import ListView
@@ -8,11 +8,11 @@ from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
 from django.http import HttpResponse, JsonResponse
-from .models import Student, StudentCourse, Course, Attendance, Schedule
+from django.shortcuts import render
+from epita.models import Student, StudentCourse, Course, Attendance, Schedule, choice_to_string
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
-from django.urls import reverse
 
 import logging
 
@@ -177,14 +177,14 @@ class CourseView(ListView):
         if user_instance.is_superuser:
             semesters = Course.objects.values_list('semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
             for semester in semesters:
-                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                courses_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(semester[1])] = Course.objects.filter(
                     semester_season=semester[0], semester_year=semester[1]).order_by('title')
 
         elif user_instance.is_staff:
             semesters = Course.objects.filter(professor_id__user_id=user_instance).values_list(
                 'semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
             for semester in semesters:
-                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                courses_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(semester[1])] = Course.objects.filter(
                     semester_season=semester[0], semester_year=semester[1], professor_id__user_id=user_instance).order_by('title')
 
         else:
@@ -192,7 +192,7 @@ class CourseView(ListView):
                 '-course_id__semester_year', '-course_id__semester_season'
             )
             for course in enrolled_in:
-                key = self.season_to_string(course.course_id.semester_season) + " " + str(course.course_id.semester_year)
+                key = choice_to_string(Student.SEASON_CHOICES, course.course_id.semester_season) + " " + str(course.course_id.semester_year)
                 if not key in courses_by_semester:
                     courses_by_semester[key] = Course.objects.filter(semester_season=course.course_id.semester_season,
                             semester_year=course.course_id.semester_year,
@@ -200,10 +200,6 @@ class CourseView(ListView):
                     )
 
         return render(request, self.template_name, {'semester_list': courses_by_semester})
-
-    def season_to_string(self, season_int):
-        return [x[1] for x in Student.SEASON_CHOICES][season_int]
-
 
 class ScheduleView(ListView):
     template_name = 'epita/schedule_prof.html'
@@ -445,7 +441,7 @@ def dashboard(request):
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
     for p in program:
         program_strings = {}
-        program_strings['program'] = Student.program_to_string(None, p['program'])
+        program_strings['program'] = choice_to_string(Student.PROGRAM_CHOICES, p['program'])
         program_strings['count_program'] = p['count_program']
         program_list.append(program_strings)
 
@@ -456,7 +452,7 @@ def dashboard(request):
         count_specialization=Count('specialization')).order_by('specialization')
     for s in specialization:
         specialization_strings = {}
-        specialization_strings['specialization'] = Student.specialization_to_string(None, s['specialization'])
+        specialization_strings['specialization'] = choice_to_string(Student.SPECIALIZATION_CHOICES, s['specialization'])
         specialization_strings['count_specialization'] = s['count_specialization']
         specialization_list.append(specialization_strings)
 
@@ -464,7 +460,7 @@ def dashboard(request):
     semesters = Student.objects.values('intake_season', 'intake_year').order_by('intake_year', 'intake_season').distinct()
     for s in semesters:
         s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
-        s['intake_season'] = Student.season_to_string(None, s['intake_season'])
+        s['intake_season'] = choice_to_string(Student.SEASON_CHOICES, s['intake_season'])
 
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,

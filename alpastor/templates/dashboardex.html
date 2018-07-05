@@ -4,8 +4,6 @@
 
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +20,7 @@
             </div>
             <div class="well">
                 <h4> Select Graph </h4>
-                <select class="div-toggle" data-target=".my-info-1">
+                <select class="input-group div-toggle" data-target=".my-info-1">
                     <option value="country" data-show=".country">Country</option>
                     <option value="program" data-show=".program">Program</option>
                     <option value="specialization" data-show=".specialization">Specialization</option>

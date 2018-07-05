@@ -14,6 +14,10 @@ String.prototype.format = function() {
     return formatted;
 };
 
+String.prototype.trim = function() {
+    return String(this).replace(/^\s+|\s+$/g, '');
+};
+
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from, to) {
   let rest = this.slice((to || from) + 1 || this.length);
