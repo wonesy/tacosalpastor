@@ -7,9 +7,15 @@ from alpastor.settings import MEDIA_ROOT
 import csv
 import json
 import logging
+import os
 from django.db.models import Q
 
 logger = logging.getLogger(__name__)
+
+def csv_mkdir():
+    dir = MEDIA_ROOT + "/csv"
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 def set_if_not_none(mapping, key, value):
     if value is not None:
@@ -21,12 +27,13 @@ def set_if_not_none(mapping, key, value):
 
 class StudentToCSVView(View):
     def post(self, request, *args, **kwargs):
+        csv_mkdir()
+
         students = self.get_queryset(request)
-        print(students)
+
         field_names = [f.name for f in Student._meta.fields]
 
         now = timezone.now()
-
         ajax_download_url = "/csv/students-{}-{}-{}_{}-{}-{}.csv".format(
             now.year, now.month, now.day, now.hour, now.minute, now.second
         )
