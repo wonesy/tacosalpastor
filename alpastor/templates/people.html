@@ -35,7 +35,7 @@
                     </button>
                 </div>
                 <div class="col-lg-3 col-md-6 col-md-12">
-                    <button class="sort csv" onClick="doCsv()">EXPORT to csv</button>
+                    <button class="csvbtn csv" onClick="doCsv()">EXPORT to csv</button>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
                 <div class="col-md-8">
 
 
-                    <div class="people-table">
+                    <div class="table-wrapper-2">
                         <table class="space responsive-table" id="nT">
                             <thead class="table-header">
                             <tr>
@@ -90,7 +90,8 @@
                             <tbody class="list">
                             {% for student in students %}
                                 <tr class="table-row">
-                                    <td class="photo">
+                                    <td class="photo stdpicture content-to-hide" data-column="Photo">
+
                                         <div class="people-img"> {% if student.photo_location != "" %}
                                             {% with 'image/portraits/'|add:student.photo_location as image_static %}
                                                 <img class="center-block" src="{% static image_static %}"
@@ -104,33 +105,38 @@
                                         </div>
 
                                     </td>
-                                    <td class="fullname"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
-                                    <td class="country" style="text-align: center">{{ student.country }}
+                                    <td class="fullname"
+                                        data-column="Name"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
+                                    <td class="country" data-column="Country">{{ student.country }}
                                         <div>
                                             {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                                                <img class="tile_image" src="{% static image_static %}"
+                                                <img class="tile_image content-to-hide" src="{% static image_static %}"
                                                      alt={{ student.first_name }}>
                                             {% endwith %}
                                         </div>
                                     </td>
-                                    <td>{{ student.get_enrollment_status_display }}</td>
-                                    <td class="born">  {{ student.get_program_display }} </td>
-                                    <td class="name">
+                                    <td data-column="Status">{{ student.get_enrollment_status_display }}</td>
+                                    <td class="born" data-column="Program">  {{ student.get_program_display }} </td>
+                                    <td class="name" data-column="Specialization">
                                         {{ student.get_specialization_display }}
                                     </td>
-                                    <td class="intake_season"> {{ student.get_intake_season_display }} </td>
-                                    <td class="intake_semester"> {{ student.intake_year }} </td>
-                                    <td class="email"> {{ student.user.email }} </td>
-                                    <td class="extemail">{{ student.user.external_email }} </td>
-                                    <td class="phone">{{ student.phone }}</td>
+                                    <td class="intake_season"
+                                        data-column="Semester Season"> {{ student.get_intake_season_display }} </td>
+                                    <td class="intake_semester"
+                                        data-column="Semester Year"> {{ student.intake_year }} </td>
+                                    <td class="email" data-column="Email"> {{ student.user.email }} </td>
+                                    <td class="extemail"
+                                        data-column="EPITA Email">{{ student.user.external_email }} </td>
+                                    <td class="phone content-to-hide" data-column="Phone">{{ student.phone }}</td>
 
                                 </tr>
                             {% endfor %}
 
                             </tbody>
                         </table>
-                        <ul class="pagination"></ul>
+
                     </div>
+                    <ul class="pagination"></ul>
                 </div>
             </div>
         </div>

@@ -114,6 +114,16 @@ input:focus {
     margin-left: 10px;
 }
 
+.responsive-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
 tr {
 
     box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
@@ -136,6 +146,59 @@ td {
     color: #1e1e1e;
 
 }
+
+@media only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px) {
+
+    table {
+        width: 100%;
+    }
+
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        border: 1px solid #ccc;
+    }
+
+    td {
+        /* Behave  like a "row" */
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 40%;
+        height: 60px;
+
+    }
+
+    table td:before {
+        /* Now like a table header */
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-column);
+        color: #000;
+        font-weight: bold;
+    }
+
+    .content-to-hide {
+        display: none;
+    }
+}
+
+
+
 
 label {
     color: white;
@@ -266,17 +329,6 @@ table .status {
     width: 100%;
 }
 
-.people-table {
-    /*width: 100%;*/
-}
-
-.people-table table {
-    /*#width: 100%;*/
-}
-
-.table-row {
-    height: 70px;
-}
 
 .photo {
     padding-top: 0;
@@ -287,3 +339,26 @@ table .status {
     text-align: center;
     padding: -15px;
 }
+
+.csvbtn {
+    padding: 8px 30px;
+    border-radius: 6px;
+    border: none;
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+    background-color: #28a8e0;
+    height: 40px;
+    min-width: 210px;
+    cursor: pointer;
+}
+
+.csvbtn:hover {
+    text-decoration: none;
+    background-color: #1b8aba;
+}
+
+.csvbtn:focus {
+    outline: none;
+}
+
