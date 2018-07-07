@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.conf import settings
+from django_countries import countries
 import json
 import re
 import enum
@@ -52,7 +53,8 @@ def manageusers(request):
         'specializations': Student.SPECIALIZATION_CHOICES,
         'seasons': Student.SEASON_CHOICES,
         'course_form': course_form,
-        'student_course_form': student_course_form
+        'student_course_form': student_course_form,
+        'countries': list(countries)
     })
 
 class SaveNewCourse(View):

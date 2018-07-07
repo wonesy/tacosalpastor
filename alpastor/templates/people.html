@@ -105,9 +105,9 @@
 
                                     </td>
                                     <td class="fullname"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
-                                    <td class="country" style="text-align: center">{{ student.country }}
+                                    <td class="country" style="text-align: center">{{ student.country.name }}
                                         <div>
-                                            {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
+                                            {% with 'image/flags/'|add:student.country.code|lower|add:'.jpg' as image_static %}
                                                 <img class="tile_image" src="{% static image_static %}"
                                                      alt={{ student.first_name }}>
                                             {% endwith %}

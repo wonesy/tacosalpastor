@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django_countries.fields import CountryField
 import re
 import datetime
 from django.utils.timezone import now
@@ -148,8 +149,7 @@ class Student(models.Model):
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
     intake_year = models.IntegerField(blank=False, default=now().year)
-    country = models.CharField(max_length=127)
-    country_code = models.CharField(max_length=2, blank=True)
+    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="image/flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, null=True, blank=True)
@@ -157,15 +157,15 @@ class Student(models.Model):
     address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
     address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
     postal_code = models.IntegerField(blank=True, null=True, help_text="Department postal code")
-    dob = models.DateField(null=True, blank=True, help_text="Date of birth")
+    dob = models.DateField(null=True, blank=True, help_text="Date of birth", verbose_name="Date of Birth")
     enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
     flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
 
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
-               "specialization={}, intake_season={}, intake_year={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               "specialization={}, intake_season={}, intake_year={}, country={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
-                          self.program, self.specialization, self.intake_season, self.intake_year, self.country, self.country_code, self.city,
+                          self.program, self.specialization, self.intake_season, self.intake_year, self.country.name, self.city,
                           self.languages, self.photo_location)
 
     def __str__(self):

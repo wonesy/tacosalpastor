@@ -27,24 +27,24 @@ class AttendanceTest(TestCase):
 
         Student.objects.filter(user__email="epita0@epita.fr").update(phone="123", program=Student.ME,
                                                                      specialization=1,
-                                                                     intake_season=Student.FALL, intake_year=2017, country="USA",
-                                                                     languages="English", photo_location="")
+                                                                     intake_season=Student.FALL, intake_year=2017,
+                                                                     photo_location="")
 
         User.objects.create_user(first_name="first1", last_name="last1", external_email="external1@gmail.com", password="abc",
                             email="epita1@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita1@epita.fr").update(phone="456", program=Student.ME,
                                                                      specialization=1,
-                                                                     intake_season=Student.FALL, intake_year=2017, country="France",
-                                                                     languages="English,French", photo_location="")
+                                                                     intake_season=Student.FALL, intake_year=2017,
+                                                                     photo_location="")
 
         User.objects.create_user(first_name="first2", last_name="last2", external_email="external2@gmail.com", password="abc",
                             email="epita2@epita.fr", is_staff=False, is_active=True, is_superuser=False)
 
         Student.objects.filter(user__email="epita2@epita.fr").update(phone="789", program=Student.ME,
                                                                      specialization=1,
-                                                                     intake_season=Student.FALL, intake_year=2017, country="USA",
-                                                                     languages="English", photo_location="")
+                                                                     intake_season=Student.FALL, intake_year=2017,
+                                                                     photo_location="")
 
         User.objects.create_user(first_name="prof", last_name="proflast", external_email="externalprof@gmail.com",
                             email="epitaprof@epita.fr", password="abc", is_staff=True, is_active=True, is_superuser=False)

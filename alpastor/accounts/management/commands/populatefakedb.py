@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from epita.models import StudentCourse, Student, Professor, Course
 from accounts.models import User
+from django_countries import countries
 import random
 
 
@@ -65,41 +66,40 @@ class Command(BaseCommand):
         #                                         POPULATE THE STUDENTS                                                    #
         ####################################################################################################################
 
-        country_list = ["USA", "India", "Canada", "France", "Brazil", "Mexico", "Germany", "China", "Spain",
-                        "Italy", "Vietnam"]
+        country_list = list(countries)
 
         # create FALL 2016 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, 10)
+            country_idx = random.randint(0, len(country_list))
             user = User.objects.create_user(email="student{}_fall2016@epita.fr".format(i), first_name="John{}".format(i),
                                             last_name="Johnson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.ME, specialization=Student.SE,
                                                                intake_season=Student.FALL, intake_year=2016,
-                                                               country=country_list[country_idx])
+                                                               country=country_list[country_idx][0])
             student = Student.objects.get(user=user)
             StudentCourse.objects.create(student_id=student, course_id=advc_f16)
             StudentCourse.objects.create(student_id=student, course_id=mgmt_s17)
 
         # create SPRING 2017 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, 10)
+            country_idx = random.randint(0, len(country_list))
             user = User.objects.create_user(email="student{}_spring2017@epita.fr".format(i), first_name="Will{}".format(i),
                                             last_name="Wilson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.MSc, specialization=Student.DSA,
                                                                intake_season=Student.SPRING, intake_year=2017,
-                                                               country=country_list[country_idx])
+                                                               country=country_list[country_idx][0])
             student = Student.objects.get(user=user)
             StudentCourse.objects.create(student_id=student, course_id=advc_s17)
             StudentCourse.objects.create(student_id=student, course_id=mgmt_f17)
 
         # create FALL 2017 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, 10)
+            country_idx = random.randint(0, len(country_list))
             user = User.objects.create_user(email="student{}_fall2017@epita.fr".format(i), first_name="Peter{}".format(i),
                                             last_name="Peterson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.MSc, specialization=Student.DSA,
                                                                intake_season=Student.SPRING, intake_year=2017,
-                                                               country=country_list[country_idx])
+                                                               country=country_list[country_idx][0])
             student = Student.objects.get(user=user)
             StudentCourse.objects.create(student_id=student, course_id=advc_f17)
             StudentCourse.objects.create(student_id=student, course_id=mgmt_f18)

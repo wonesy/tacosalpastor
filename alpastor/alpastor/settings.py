@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_countries',
     'epita',
     'accounts',
     'quiz',
@@ -98,7 +99,12 @@ else:
             'PASSWORD': os.getenv('MYSQL_USER_PASSWORD'),
             'HOST': 'localhost',
             'PORT': '',
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci',
+            'TEST_CHARSET': "utf8",
+            'TEST_COLLATION': "utf8_general_ci",
         }
+
     }
 
 
