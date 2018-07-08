@@ -37,7 +37,7 @@ class AttendanceGraphs(ListView):
         specialization = Student.SE
         # all_data = self.whole_semester_by_student_by_class(email, course)
         # all_data = self.whole_semester_by_specialization(semester, specialization)
-        all_data = self.whole_semester_by_program(semester)
+        all_data = self.default_graph_by_program(semester)
         # all_data = self.whole_semester_by_class(course, semester)
         # all_data = self.individual_student_allclass(student)
         all_data_json = json.dumps(all_data)
@@ -58,16 +58,30 @@ class AttendanceGraphs(ListView):
                 excused += 1
         return {'present': present, 'absent': absent, 'excused': excused}
 
-    def whole_semester_by_program(self, semester):
+    def default_graph_by_program(self, semester):
         programs = Student.PROGRAM_CHOICES
         program_list = []
+        specialization_list = []
+        course_list = []
+
         for program in programs:
             attendances = list(Attendance.objects.filter(student_id__program=program[0],
                                                          schedule_id__course_id__semester=semester).values('status'))
             attendance_results = self.build_attendance_results(attendances)
             attendance_results['program'] = program[1]
             program_list.append(attendance_results)
-        attendance_data = {"semester": semester, "attendance": program_list}
+        for specialization in Student.SPECIALIZATION_CHOICES:
+            specialization_list.append(specialization[1])
+        for course in Course.objects.filter(semester=semester):
+            print(course.title)
+            course_list.append(course.title)
+
+        attendance_data = {
+            "semester": semester,
+            "attendance": program_list,
+            "specialization": specialization_list,
+            "course": course_list
+        }
 
         return attendance_data
 

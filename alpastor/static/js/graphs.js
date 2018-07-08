@@ -7,9 +7,9 @@ const programs = {
 };
 
 function getRandomColorHex() {
-    var hex = "0123456789ABCDEF",
-        color = "#";
-    for (var i = 1; i <= 6; i++) {
+    const hex = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 1; i <= 6; i++) {
         color += hex[Math.floor(Math.random() * 16)];
     }
     return color;
@@ -22,8 +22,29 @@ function getAttendance(present, absent, excused, list, program) {
     title = program;
 }
 
+function populateDropdowns() {
+    const programBtn = document.getElementById('programBtn');
+    const specializationBtn = document.getElementById('specializationBtn');
+    const courseBtn = document.getElementById('courseBtn');
+    for (let i = 0; i < chart_data['attendance'].length; i++) {
+
+        // Only add programs that have a value for present/absent/excused
+        if ((chart_data['attendance'][i]['present'] !== 0)
+            || (chart_data['attendance'][i]['absent'] !== 0)
+            || (chart_data['attendance'][i]['excused'] !== 0)) {
+            programBtn.innerHTML += '<a class="dropdown-item" href="#">' + chart_data['attendance'][i]['program'] + '</a>';
+        }
+    }
+    for (let i = 1; i < chart_data['specialization'].length; i++) {
+        specializationBtn.innerHTML += '<a class="dropdown-item" href="#">' + chart_data['specialization'][i] + '</a>';
+
+    }
+    for (let i = 0; i < chart_data['course'].length; i++)
+        courseBtn.innerHTML += '<a class="dropdown-item" href="#">' + chart_data['course'][i] + '</a>';
+}
 
 window.onload = function () {
+    populateDropdowns();
     console.log(chart_data);
     defaultChart();
 };

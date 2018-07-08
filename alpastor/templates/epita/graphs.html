@@ -9,14 +9,26 @@
     </head>
     <div class="container">
         <div class="row text-center">
-            <div class="drop-downs col">
-                <button class="btn btn-md btn-outline-secondary">Program</button>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Program
+                </button>
+                <div class="dropdown-menu" id="programBtn" aria-labelledby="dropdownMenuButton"></div>
             </div>
-            <div class="drop-downs col">
-                <button class="btn btn-md btn-outline-secondary">Specialization</button>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Specialization
+                </button>
+                <div class="dropdown-menu" id="specializationBtn" aria-labelledby="dropdownMenuButton"></div>
             </div>
-            <div class="drop-downs col">
-                <button class="btn btn-md btn-outline-secondary">Course</button>
+             <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Course
+                </button>
+                <div class="dropdown-menu" id="courseBtn" aria-labelledby="dropdownMenuButton"></div>
             </div>
             <div class="drop-downs col">
                 <input type="text" placeholder="Student Search">
@@ -24,20 +36,36 @@
         </div>
 
         <div id="dataDiv" hidden>{{ all_data }}</div>
-        <div id="allChartsDiv">
-            <div class="charts" id="chartDiv">
+        <div class="row" id="allChartsDiv">
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="chartDiv">
                 <canvas id="mscChart"></canvas>
             </div>
-            <div class="charts" id="middleChart">
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="middleChart">
                 <canvas id="meChart"></canvas>
-            </div>
-            <div class="charts" id="rightChart">
-                <canvas id="exchangeChart"></canvas>
             </div>
         </div>
     </div>
     <script>
         let raw_data = document.getElementById('dataDiv').innerText;
         let chart_data = JSON.parse(raw_data);
+
     </script>
+    {#    <script>#}
+    {#        console.log("test");#}
+    {##}
+    {#        let endpoint = '/graphs/';#}
+    {#        $(document).ready(function () {#}
+    {#            $.ajax({#}
+    {#                method: "GET",#}
+    {#                url: endpoint,#}
+    {#                success: function (data) {#}
+    {#                    console.log(data);#}
+    {#                },#}
+    {#                error: function (error_data) {#}
+    {#                    console.log("error");#}
+    {#                    console.log(error_data);#}
+    {#                }#}
+    {#            });#}
+    {#        });#}
+    {#    </script>#}
 {% endblock %}
