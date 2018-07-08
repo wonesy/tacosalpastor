@@ -1,0 +1,42 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+    <head>
+        <script src="{% static 'js/graphs.js' %}"></script>
+    </head>
+    <h5 id="popData">{{ all_data }}</h5>
+
+{#    <form method="post" enctype="multipart/form-data"> {% csrf_token %}#}
+{#        {{ form.as_p }}#}
+{#        <button type="submit" id="formSubmit">Submit</button>#}
+{##}
+{#    </form>#}
+    <script>
+        {#let attendance_stuff = {{ attendance_data }}#}
+        {#document.getElementById('popData').innerText = {{ attendance_data }};#}
+        {#console.log({{ attendance_data }});#}
+        let url = window.href;
+        $('#formSubmit').on('submit', function (e) {
+            let id_status = $('#id_status').val();
+            let schedule_id = $('#id_schedule_id').val();
+            let student_id = $('#id_student_id').val();
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    'status': id_status,
+                    'schedule_id': schedule_id,
+                    'student_id': student_id
+                },
+                dataType: 'json',
+                success: function (data) {
+                    alert('This worked!!');
+                }
+
+            })
+            e.preventDefault();
+        });
+    </script>
+{% endblock %}

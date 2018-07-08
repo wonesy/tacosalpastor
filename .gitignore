@@ -107,3 +107,5 @@ migrations/
 
 secrets.env
 logfile
+
+*/media

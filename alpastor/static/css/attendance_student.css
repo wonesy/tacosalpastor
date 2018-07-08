@@ -1,6 +1,6 @@
 .status-card {
-    max-width: 15rem;
-    min-width: 15rem;
+    max-width: 23rem;
+    min-width: 23rem;
 }
 
 .status-card img {
@@ -46,16 +46,20 @@
     background: #17a2b8;
 }
 
-.btn-present, .btn-absent {
+.btn-present, .btn-absent, .btn-excused {
     background: #AAAAAA;
 }
 
-.btn-present.active {
+.btn-present.marked {
     background: #28a745;
 }
 
-.btn-absent.active{
+.btn-absent.marked{
     background: #dc3545;
+}
+
+.btn-excused.marked{
+    background: #ffc107;
 }
 
 .override-submit {
@@ -82,4 +86,14 @@
 
 .locked:hover {
     background: #000000;
+}
+
+#student-card {
+    margin: auto;
+}
+
+.file-container {
+    margin: auto;
+    text-align: center;
+    color: black;
 }

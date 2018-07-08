@@ -5,118 +5,152 @@
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.0/list.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
 {% endblock %}
 
 {% block content %}
     <div id="users" class="container-fluid">
-        <div class="search-bar">
-            <input class="search" placeholder="Search student name"/>
-            <button class="sort" data-sort="country">
-                Sort by Country
-            </button>
-            <button class="sort" data-sort="intakesemester">
-                Sort By Year
-            </button>
-            <button class="sort" data-sort="fullname">
-                Sort By Name
-            </button>
-            <button class="csv" onClick="doCsv()">EXPORT to csv</button>
+        <div class="search-bar container">
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="searchBar" class="search input-group" placeholder="Search"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-md-12">
+                    <button class="sort" data-sort="fullname">
+                        Sort By Name
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-md-12">
+                    <button class="sort" data-sort="country">
+                        Sort by Country
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-md-12">
+                    <button class="sort" data-sort="intake_semester">
+                        Sort By Year
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-md-12">
+                    <button class="csvbtn csv" onClick="doCsv()">EXPORT to csv</button>
+                </div>
+            </div>
         </div>
-        <div class="filters">
+        <div class="filters container">
             <button class="accordion">Additional filters</button>
             <div class="panel">
                 <div class="row">
                     <div class="col-4">
-                        <p>Specialiaztion</p>
-                        <div class="specializationContainer"></div>
+                        <p>Specialization</p>
+                        <div id="specializationContainer" class="specializationContainer"></div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <p>Program</p>
-                        <div class="programContainer"></div>
+                        <div id="programContainer" class="programContainer"></div>
                     </div>
-                    <div class="col-4">
-                        <p>Intake semester</p>
-                        <div class="semesterContainer"></div>
+                    <div class="col-2">
+                        <p>Intake Year</p>
+                        <div id="semesterYearContainer" class="semesterYearContainer"></div>
+                    </div>
+                    <div class="col-3">
+                        <p>Intake Season</p>
+                        <div id="semesterSeasonContainer" class="semesterSeasonContainer"></div>
                     </div>
                 </div>
             </div>
         </div>
+
         <br>
-        <div class="people-table">
-            <table class="space responsive-table" id="nT">
-                <thead class="table-header">
-                <tr>
-                    <th>Photo</th>
-                    <th>Name</th>
-                    <th>Country</th>
-                    <th>Status</th>
-                    <th>Program</th>
-                    <th>Specialization</th>
-                    <th>Semester</th>
-                    <th>Email</th>
-                    <th>EPITA Email</th>
-                    <th>Phone</th>
-                </tr>
-                </thead>
-                <tbody class="list">
-                {% for student in students %}
-                    <tr class="table-row">
-                        <td class="photo">
-                            <div class="people-img"> {% if student.photo_location != "" %}
-                                {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                    <img class="center-block" src="{% static image_static %}"
-                                         alt={{ student.first_name }}>
-                                {% endwith %}
-                            {% else %}
-                                <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
-                                     class="people-img">
-                            {% endif %}
-                            </div>
 
-                        </td>
-                        <td class="fullname"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
-                        <td class="country" style="text-align: center">{{ student.country }}
-                            <div>
-                                {% with 'image/flags/'|add:student.country_code|add:'.jpg' as image_static %}
-                                    <img class="tile_image" src="{% static image_static %}"
-                                         alt={{ student.first_name }}>
-                                {% endwith %}
-                            </div>
-                        </td>
-                        <td>{{ student.get_enrollment_status_display }}</td>
-                        <td class="born">  {{ student.get_program_display }} </td>
-                        <td class="name">
-                            {{ student.get_specialization_display }}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
 
-                        </td>
-                        <td class="intakesemester"> {{ student.intakeSemester }} </td>
-                        <td class="email"> {{ student.user.email }} </td>
-                        <td class="extemail">{{ student.user.external_email }} </td>
-                        <td class="phone">{{ student.phone }}</td>
-                    </tr>
-                {% endfor %}
 
-                </tbody>
-            </table>
+                    <div class="table-wrapper-2">
+                        <table class="space responsive-table" id="nT">
+                            <thead class="table-header">
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Program</th>
+                                <th>Specialization</th>
+                                <th>Semester Season</th>
+                                <th>Semester Year</th>
+                                <th>Email</th>
+                                <th>EPITA Email</th>
+                                <th>Phone</th>
+                            </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for student in students %}
+                                <tr class="table-row">
+                                    <td class="photo stdpicture content-to-hide" data-column="Photo">
+
+                                        <div class="people-img"> {% if student.photo_location != "" %}
+                                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                                <img class="center-block" src="{% static image_static %}"
+                                                     alt={{ student.first_name }}>
+                                            {% endwith %}
+                                        {% else %}
+                                            <img src="{% static 'image/portraits/generic_taco.jpg' %}"
+                                                 alt="Default taco"
+                                                 class="people-img">
+                                        {% endif %}
+                                        </div>
+
+                                    </td>
+
+                                    <td class="fullname"
+                                        data-column="Name"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
+                                    <td class="country" data-column="Country">{{ student.country.name }}
+                                        <div>
+                                            {% with 'image/flags/'|add:student.country.code|lower|add:'.jpg' as image_static %}
+                                                <img class="tile_image content-to-hide" src="{% static image_static %}"
+                                                     alt={{ student.first_name }}>
+                                            {% endwith %}
+                                        </div>
+                                    </td>
+                                    <td data-column="Status">{{ student.get_enrollment_status_display }}</td>
+                                    <td class="born" data-column="Program">  {{ student.get_program_display }} </td>
+                                    <td class="name" data-column="Specialization">
+                                        {{ student.get_specialization_display }}
+                                    </td>
+                                    <td class="intake_season"
+                                        data-column="Semester Season"> {{ student.get_intake_season_display }} </td>
+                                    <td class="intake_semester"
+                                        data-column="Semester Year"> {{ student.intake_year }} </td>
+                                    <td class="email" data-column="Email"> {{ student.user.email }} </td>
+                                    <td class="extemail"
+                                        data-column="EPITA Email">{{ student.user.external_email }} </td>
+                                    <td class="phone content-to-hide" data-column="Phone">{{ student.phone }}</td>
+
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <ul class="pagination"></ul>
+                </div>
+            </div>
         </div>
         <ul class="pagination"></ul>
     </div>
 
-
-
     <script>
         let options = {
-            valueNames: ['name', 'country', 'born', 'intakesemester', 'fullname'],
+            valueNames: ['name', 'country', 'born', 'intake_season', 'intake_semester', 'fullname'],
             page: 20,
             pagination: true
         };
+
         let userList = new List('users', options);
 
 
@@ -124,6 +158,7 @@
             let names = [];
             let dates = [];
             let semester = [];
+            let season = [];
 
             $("input:checkbox[name=names]:checked").each(function () {
                 names.push($(this).val());
@@ -137,15 +172,21 @@
                 semester.push($(this).val());
             });
 
+            $("input:checkbox[name=season]:checked").each(function () {
+                season.push($(this).val());
+            });
+
             let values_date = dates.length > 0 ? dates : null;
             let values_name = names.length > 0 ? names : null;
             let values_semester = semester.length > 0 ? semester : null;
+            let values_season = season.length > 0 ? season : null;
 
 
             userList.filter(function (item) {
                 return (_(values_date).contains(item.values().born) || !values_date)
                     && (_(values_name).contains(item.values().name) || !values_name)
-                    && (_(values_semester).contains(item.values().intakesemester) || !values_semester)
+                    && (_(values_semester).contains(item.values().intake_semester) || !values_semester)
+                    && (_(values_season).contains(item.values().intake_season) || !values_season)
             });
         };
 
@@ -155,30 +196,40 @@
         $(document).on("change", "input:checkbox[name=names]", updateList);
         $(document).off("change", "input:checkbox[name=semester]");
         $(document).on("change", "input:checkbox[name=semester]", updateList);
+        $(document).off("change", "input:checkbox[name=season]");
+        $(document).on("change", "input:checkbox[name=season]", updateList);
 
         $(function () {
             let all_born = [];
             let all_name = [];
             let all_intakesemester = [];
+            let all_intakeseason = [];
 
             updateList();
             _(userList.items).each(function (item) {
                 all_born.push(item.values().born);
                 all_name.push(item.values().name);
-                all_intakesemester.push(item.values().intakesemester)
+                all_intakesemester.push(item.values().intake_semester)
+                all_intakeseason.push(item.values().intake_season)
             });
 
             _(all_born).uniq().each(function (item) {
-                $(".programContainer").append('<label><input type="checkbox" name="dates" value="' + item + '">' + item + '</label><br>')
+                $(".programContainer").append('<label><input type=\"checkbox\" name=\"dates\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
             _(all_name).uniq().each(function (item) {
-                $(".specializationContainer").append('<label><input type="checkbox" name="names" value="' + item + '">' + item + '</label><br>')
+                $(".specializationContainer").append('<label><input type=\"checkbox\" name=\"names\" value=\"' + item + '\">' + item + '</label><br>')
             });
 
             _(all_intakesemester).uniq().each(function (item) {
-                $(".semesterContainer").append('<label><input type="checkbox" name="semester" value="' + item + '">' + item + '</label><br>')
+                $(".semesterYearContainer").append('<label><input type=\"checkbox\" name=\"semester\" value=\"' + item + '\">' + item + '</label><br>')
             });
+
+            _(all_intakeseason).uniq().each(function (item) {
+                $(".semesterSeasonContainer").append('<label><input type=\"checkbox\" name=\"season\" value=\"' + item + '\">' + item + '</label><br>')
+            });
+
+
         });
 
         let acc = document.getElementsByClassName("accordion");
@@ -197,48 +248,72 @@
         }
 
 
-
         function doCsv() {
 
-            let nT = document.getElementById("nT").innerHTML;
-            let dataa = nT.replace(/<thead([\w\W]+?)>/g, '')
-                .replace(/<tbody([\w\W]+?)>/g, '')
-                .replace(/<\/thead>/g, '')
-                .replace(/<\/tbody>/g, '')
-                .replace(/<tr([\w\W]+?)>/g, '')
-                .replace(/<div([\w\W]+?)>/g, '')
-                .replace(/<img([\w\W]+?)>/g, 'img')
-                .replace(/<th>/g, '')
-                .replace(/<\/th>/g, ',')
-                .replace(/<td([\w\W]+?)>/g, '')
-                .replace(/<\/td>/g, ',')
-                .replace(/\s+/g, '')
-                .replace(/<\n>/g, '')
-                .replace(/<\/tr>/g, '\n')
-                .replace(/<\/div>/g, '');
+            let data = {};
 
-            let download = function (content, fileName, mimeType) {
-                let a = document.createElement('a');
-                mimeType = mimeType || 'application/octet-stream';
+            // search
+            data['search'] = document.getElementById("searchBar").value;
 
-                if (navigator.msSaveBlob) { // IE10
-                    navigator.msSaveBlob(new Blob([content], {
-                        type: mimeType
-                    }), fileName);
-                } else if (URL && 'download' in a) { //html5 A[download]
-                    a.href = URL.createObjectURL(new Blob([content], {
-                        type: mimeType
-                    }));
-                    a.setAttribute('download', fileName);
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } else {
-                    location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+            // program
+            let programs = [];
+            let prog_filters = $("#programContainer").find("input");
+            for (let i = 0; i < prog_filters.length; i++) {
+                if (prog_filters[i].checked) {
+                    programs.push(prog_filters[i].value.trim())
                 }
-            };
+            }
+            data['program'] = programs;
 
-            download(dataa, 'Students.csv', 'text/csv;encoding:utf-8');
+            // specialization
+            let specs = [];
+            let spec_filters = $("#specializationContainer").find("input");
+            for (let i = 0; i < spec_filters.length; i++) {
+                if (spec_filters[i].checked) {
+                    specs.push(spec_filters[i].value.trim())
+                }
+            }
+            data.specialization = specs;
+
+            // intake_season
+            let seasons = [];
+            let season_filters = $("#semesterSeasonContainer").find("input");
+            for (let i = 0; i < season_filters.length; i++) {
+                if (season_filters[i].checked) {
+                    seasons.push(season_filters[i].value.trim())
+                }
+            }
+            data.intake_season = seasons;
+
+            // intake_year
+            let years = [];
+            let year_filters = $("#semesterYearContainer").find("input");
+            for (let i = 0; i < year_filters.length; i++) {
+                if (year_filters[i].checked) {
+                    years.push(year_filters[i].value.trim())
+                }
+            }
+            data.intake_year = years;
+
+            let url = window.origin + "/csv/student/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    students: JSON.stringify(data)
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                responseType: "",
+                success: function(data) {
+                    console.log("success");
+                    window.location = window.origin + data['location']
+                },
+                failure: function(errMsg) {
+                    console.log(errMsg);
+                }
+            });
         }
 
 

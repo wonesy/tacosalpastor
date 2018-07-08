@@ -2,47 +2,98 @@
 
 {% load static %}
 
+{%  block additional_links %}
+    <link href="{% static 'css/attendance_student.css' %}" rel="stylesheet">
+    <script src="{% static 'js/attendance_student.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-    <head>
-        <link href="{% static 'css/attendance_student.css' %}" rel="stylesheet">
-        <script src="{% static 'js/attendance_student.js' %}"></script>
-    </head>
-    <body>
-    <div class="attendance-container text-center">
-        <form method="post" enctype="multipart/form-data">{% csrf_token %}
-            <div class="title-container">
-                <h1>{{ attendance.schedule_id.course_id }}</h1>
-                <h1>{{ form.schedule_id.as_hidden }}</h1>
-                <h3>{{ attendance.schedule_id.date }}</h3>
-                <h5>{{ attendance.schedule_id.start_time|time:"H:i" }}
-                    - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
-            </div>
-            <div id="1" class="col-lg-2 col-md-6 col-sm-12 status-card mx-auto">
+
+    <div class="attendance-container text-center container">
+        <div class="title-container">
+            <h1>{{ attendance.schedule_id.course_id }}</h1>
+            <h3>{{ attendance.schedule_id.date }}</h3>
+            <h5>{{ attendance.schedule_id.start_time|time:"H:i" }} - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
+        </div>
+        <div id="student-card" class="status-card">
+            <form method="post">
+                {% csrf_token %}
                 <div class="card text-white mb-3">
-                    <div class="card-header bg-danger">
-                        <h6 id="studentName">{{ form.instance.student_id }}</h6>
-                        {{ form.student_id.as_hidden }}
-                    </div>
+                    <div id="studentHeader" class="card-header">{{ student }}</div>
                     <div class="card-body">
-                        <img src="/static/image/portraits/generic_avatar.jpg">
+                        <div class="people-img">
+                            {% if student.photo_location != null %}
+                                {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                                    <img class="center-block" src="{% static image_static %}"
+                                         alt={{ student.first_name }}>
+                                {% endwith %}
+                            {% else %}
+                                <img src="{% static 'image/portraits/generic_taco.jpg' %}" alt="Default taco"
+                                     class="people-img">
+                            {% endif %}
+                        </div>
+                        <p class="card-text">{{ attendance.get_status_display }}</p>
                     </div>
                     <div class="card-footer">
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-present active">
-                                <input type="radio" name="status" id="option1" value="1" autocomplete="off" checked="">
-                                Present</label>
-                            <label class="btn btn-absent">
-                                <input type="radio" name="status" value="3" id="option2" autocomplete="off"
-                                       onchange="addFileUploadButton()"> Excused</label>
+                            <label id="presentLabel" class="btn btn-present">
+                                <input type="radio" name="status" id="option1" autocomplete="off"
+                                       onchange="updateActiveStatus(StatusEnum.present);" value="1"> Present
+                            </label>
+                            <label id="excusedLabel" class="btn btn-excused">
+                                <input type="radio" name="status" id="option3" autocomplete="off"
+                                       onchange="updateActiveStatus(StatusEnum.excused);" value="3"> Excused
+                            </label>
+                            <label id="absentLabel" class="btn btn-absent">
+                                <input type="radio" name="status" id="option2" autocomplete="off"
+                                       onchange="updateActiveStatus(StatusEnum.absent);" value="2"> Absent
+                            </label>
                         </div>
-                        <input type="hidden" name="course_id" value="{{ attendance.schedule_id.course_id }}">
-                        <input type="text" value="{{ form.instance.id }}" name="id" hidden>
-                        <button class="btn-present" type="submit">Submit</button>
+                        <div class="container file-container">
+                            <label for="id_file_upload">Upload excuse document:</label>
+                            <input id="id_file_upload" type="file" name="file_upload">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="fileUpload"></div>
-        </form>
+                <button class="btn btn-info">Submit Changes</button>
+            </form>
+        </div>
     </div>
-    </body>
+
+    <script type="text/javascript">
+        window.onload = updateActiveStatus({{ attendance.status }});
+
+        function updateActiveStatus(status) {
+            let header = $('#studentHeader');
+            let presentElem = $("#presentLabel");
+            let absentElem = $("#absentLabel");
+            let excusedElem = $("#excusedLabel");
+
+            if (status === StatusEnum.present) {
+                header.removeClass('bg-danger');
+                header.removeClass('bg-warning');
+                header.addClass('bg-success');
+
+                absentElem.removeClass('marked');
+                excusedElem.removeClass('marked');
+                presentElem.addClass('marked');
+            } else if (status === StatusEnum.absent) {
+                header.removeClass('bg-success');
+                header.removeClass('bg-warning');
+                header.addClass('bg-danger');
+
+                excusedElem.removeClass('marked');
+                presentElem.removeClass('marked');
+                absentElem.addClass('marked');
+            } else {
+                header.removeClass('bg-danger');
+                header.removeClass('bg-success');
+                header.addClass('bg-warning');
+
+                absentElem.removeClass('marked');
+                presentElem.removeClass('marked');
+                excusedElem.addClass('marked');
+            }
+        }
+    </script>
 {% endblock %}

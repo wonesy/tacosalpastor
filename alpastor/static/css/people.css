@@ -46,6 +46,8 @@ input:focus {
     text-decoration: none;
     background-color: #28a8e0;
     height: 40px;
+    min-width: 210px;
+    cursor: pointer;
 }
 
 .sort:hover {
@@ -105,10 +107,21 @@ input:focus {
 .pagination li {
     display: inline-block;
     padding: 5px;
+    color: #1e1e1e;
 }
 
 .space {
     margin-left: 10px;
+}
+
+.responsive-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 tr {
@@ -118,20 +131,74 @@ tr {
 }
 
 th {
-    background-color: #95A5A6;
-    font-size: 14px;
+    background-color: #698486;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    padding: 25px 20px;
+    letter-spacing: 0.02em;
+    padding: 22px 17px;
 }
 
 td {
     background-color: #ffffff;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-    padding: 25px 20px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    padding: 25px 17px;
+    color: #1e1e1e;
 
 }
+
+@media only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px) {
+
+    table {
+        width: 100%;
+    }
+
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        border: 1px solid #ccc;
+    }
+
+    td {
+        /* Behave  like a "row" */
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 40%;
+        height: 60px;
+
+    }
+
+    table td:before {
+        /* Now like a table header */
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-column);
+        color: #000;
+        font-weight: bold;
+    }
+
+    .content-to-hide {
+        display: none;
+    }
+}
+
+
+
 
 label {
     color: white;
@@ -155,6 +222,7 @@ input[type="checkbox"] {
     outline: none;
     font-size: 15px;
     transition: 0.4s;
+    border-radius: 6px;
     margin-left: 10px;
 }
 
@@ -177,7 +245,6 @@ input[type="checkbox"] {
     position: relative;
     padding-left: 30px;
     margin-bottom: 10px;
-    cursor: pointer;
     font-size: 18px;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -258,27 +325,40 @@ table .status {
     margin-left: 10px;
 }
 
-.search {
-    width: 35%;
-}
-
 #users {
     width: 100%;
 }
 
-.people-table {
-    width: 100%;
-}
-
-.people-table table {
-    width: 100%;
-}
-
-.table-row {
-    height: 70px;
-}
 
 .photo {
     padding-top: 0;
     padding-bottom: 0;
 }
+
+.sort-btn {
+    text-align: center;
+    padding: -15px;
+}
+
+.csvbtn {
+    padding: 8px 30px;
+    border-radius: 6px;
+    border: none;
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+    background-color: #28a8e0;
+    height: 40px;
+    min-width: 210px;
+    cursor: pointer;
+}
+
+.csvbtn:hover {
+    text-decoration: none;
+    background-color: #1b8aba;
+}
+
+.csvbtn:focus {
+    outline: none;
+}
+

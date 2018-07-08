@@ -2,10 +2,18 @@ from django.db import models
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django_countries.fields import CountryField
 import re
 import datetime
 from django.utils.timezone import now
 
+def choice_to_string(choices, index):
+    return [x[1] for x in choices][index]
+
+def string_to_choice(choices, val):
+    for x in choices:
+        if x[1] == val:
+            return x[0]
 
 @receiver(post_save, sender=User)
 def create_user_student_or_prof(sender, instance, created, **kwargs):
@@ -84,16 +92,18 @@ class Student(models.Model):
     SDM = 5
     SDS = 6
     IGITM = 7
+    AI = 8
 
     SPECIALIZATION_CHOICES = [
         (NONE, 'None'),
         (SE, 'Software Engineering'),
         (ISM, 'Information Systems Management'),
-        (DSA, 'Data Science & Analytics'),
+        (DSA, 'Data Science and Analytics'),
         (CS, 'Computer Security'),
-        (SDM, 'Software Development & Multimedia'),
+        (SDM, 'Software Development and Multimedia'),
         (SDS, 'Systems Networks & Security'),
         (IGITM, 'Global IT Management (International)'),
+        (AI, "Artificial Intelligence"),
     ]
 
     # Enrollment status
@@ -120,38 +130,49 @@ class Student(models.Model):
         (ATTENDANCE_WARNING, "Attendance warning"),
     ]
 
+    # Seasons
+    WINTER = 0
+    SPRING = 1
+    SUMMER = 2
+    FALL = 3
 
+    SEASON_CHOICES = [
+        (WINTER, "Winter"),
+        (SPRING, "Spring"),
+        (SUMMER, "Summer"),
+        (FALL, "Fall"),
+    ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
     program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
-    intakeSemester = models.CharField(max_length=31)
-    country = models.CharField(max_length=127)
-    country_code = models.CharField(max_length=2, blank=True)
+    intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
+    intake_year = models.IntegerField(blank=False, default=now().year)
+    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="image/flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, null=True, blank=True)
     address_street = models.CharField(max_length=255, null=True, blank=True, help_text="Street")
     address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
     address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
-    address_code = models.IntegerField(blank=True, null=True, help_text="Department code")
-    dob = models.DateField(null=True, blank=True, help_text="Date of birth")
+    postal_code = models.IntegerField(blank=True, null=True, help_text="Department postal code")
+    dob = models.DateField(null=True, blank=True, help_text="Date of birth", verbose_name="Date of Birth")
     enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
     flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
 
-
-
-
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
-               "specialization={}, intakeSemester={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               "specialization={}, intake_season={}, intake_year={}, country={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
-                          self.program, self.specialization, self.intakeSemester, self.country, self.country_code, self.city,
+                          self.program, self.specialization, self.intake_season, self.intake_year, self.country.name, self.city,
                           self.languages, self.photo_location)
 
     def __str__(self):
         return self.user.get_full_name()
+
+    def student_email(self):
+        return self.user.email
 
 class Professor(models.Model):
     """
@@ -172,6 +193,9 @@ class Professor(models.Model):
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
+    def professor_email(self):
+        return self.user.email
+
 
 class Course(models.Model):
     """
@@ -181,23 +205,25 @@ class Course(models.Model):
         professor_id = FK to the Professor table, indicating who is teaching it
         title = title of the course
         description = fuller description of the course
-        semester = the semester in which the course will be taught, form Season Year (Spring 2020)
+        semester_season = the semester season in which the course will be taught (Spring)
+        semester_year = the semester year in which the course will be taught (2020)
         module = the grading module that this course falls under (Technical, Business, etc)
         credits = the number of credits that will be offered for this course
 
     Note:
-         columns 'title' and 'semester' must be unique as a pair, meaning you cannot have the same course title
-         during the same semester
+         columns 'title' and 'semester_year' and 'semester_season' must be unique as a pair, meaning you cannot have the same course title
+         during the same semester (year + season)
     """
     class Meta:
-        unique_together = (('title', 'semester'),)
+        unique_together = (('title', 'semester_season', 'semester_year'),)
 
     professor_id = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=True)
-    code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123")
+    code = models.CharField(max_length=127, blank=True, help_text="Course code e.g. ADVC123123", null=True)
     title = models.CharField(max_length=127, help_text="Course title")
     description = models.TextField(max_length=1000, blank=True, help_text="Course description")
-    semester = models.CharField(max_length=31, help_text="Season Year (e.g. Fall 2017)")
-    module = models.CharField(max_length=63, blank=True, help_text="Module or teaching unit")
+    semester_season = models.IntegerField(choices=Student.SEASON_CHOICES)
+    semester_year = models.IntegerField(blank=False, default=now().year)
+    module = models.CharField(max_length=63, null=True, blank=True, help_text="Module or teaching unit")
     credits = models.IntegerField(null=True, blank=True)
     hours = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=158, blank=False, default='course-slug')
@@ -209,22 +235,25 @@ class Course(models.Model):
         self.title = re.sub(' +', ' ', self.title)
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
-        self.slug = self.semester.lower().replace(' ', '-') + '-' + self.title.lower().replace(' ', '-')
+        slug_season = choice_to_string(Student.SEASON_CHOICES, self.semester_season)
+        self.slug = slug_season.lower() + '-' + str(self.semester_year) + '-' + self.title.lower().replace(' ', '-')
 
     def save(self, **kwargs):
         self.full_clean()
         super(Course, self).save()
 
     def __repr__(self):
-        return "Course(professor_id={}, title={}, description={}, semester={}, module={}, credits={})".format(
-            self.professor_id, self.title, self.description, self.semester, self.module, self.credits)
+        return "Course(professor_id={}, title={}, description={}, full_semester={}, module={}, credits={})".format(
+            self.professor_id, self.title, self.description, self.full_semester(), self.module, self.credits)
 
     def __str__(self):
         return "{}".format(self.title)
 
     def verbose_title(self):
-        return "{} ({})".format(self.title, self.semester)
+        return "{} ({})".format(self.title, self.full_semester())
 
+    def full_semester(self):
+        return "{} {}".format(choice_to_string(Student.SEASON_CHOICES, self.semester_season), self.semester_year)
 
 class StudentCourse(models.Model):
     """
@@ -244,32 +273,6 @@ class StudentCourse(models.Model):
 
     def __str__(self):
         return "{}".format(self.course_id)
-
-
-class Grades(models.Model):
-    """
-    Defines the Grades database table
-
-    Args:
-        course_id = FK to a specific course
-        student_id = FK to a specific student
-        assignment = assignment description/title
-        points_earned = the number of points a student has earned on this assignment
-        points_possible = the number of possible points that could be earned on this assignment
-    """
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    assignment = models.CharField(max_length=255)
-    points_earned = models.IntegerField()
-    points_possible = models.IntegerField()
-
-    def __repr__(self):
-        return "Grades(course_id={}, student_id={}, assignment={}, points_earned={}, points_possible={})".format(
-            self.course_id, self.student_id, self.assignment, self.points_earned, self.points_possible)
-
-    def __str__(self):
-        return "{} Scored {} out of {}".format(self.assignment, self.points_earned, self.points_possible)
-
 
 class Schedule(models.Model):
     """
