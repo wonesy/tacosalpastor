@@ -41,7 +41,7 @@ urlpatterns = [
     path('attendance/course/<slug:slug>', login_required(ScheduleView.as_view()), name='schedule_list'),
     path('attendance/', login_required(CourseView.as_view()), name='course_list'),
 
-    # Graphs
+    # graphs
     path('graphs/', login_required(AttendanceGraphs.as_view()), name='graphs'),
 
     # People

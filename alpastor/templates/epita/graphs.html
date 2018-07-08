@@ -4,39 +4,68 @@
 
 {% block content %}
     <head>
+        <link rel="stylesheet" href="../../static/css/graphs.css">
         <script src="{% static 'js/graphs.js' %}"></script>
     </head>
-    <h5 id="popData">{{ all_data }}</h5>
+    <div class="container">
+        <div class="row text-center">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Program
+                </button>
+                <div class="dropdown-menu" id="programBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Specialization
+                </button>
+                <div class="dropdown-menu" id="specializationBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+             <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Course
+                </button>
+                <div class="dropdown-menu" id="courseBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="drop-downs col">
+                <input type="text" placeholder="Student Search">
+            </div>
+        </div>
 
-{#    <form method="post" enctype="multipart/form-data"> {% csrf_token %}#}
-{#        {{ form.as_p }}#}
-{#        <button type="submit" id="formSubmit">Submit</button>#}
-{##}
-{#    </form>#}
+        <div id="dataDiv" hidden>{{ all_data }}</div>
+        <div class="row" id="allChartsDiv">
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="chartDiv">
+                <canvas id="mscChart"></canvas>
+            </div>
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="middleChart">
+                <canvas id="meChart"></canvas>
+            </div>
+        </div>
+    </div>
     <script>
-        {#let attendance_stuff = {{ attendance_data }}#}
-        {#document.getElementById('popData').innerText = {{ attendance_data }};#}
-        {#console.log({{ attendance_data }});#}
-        let url = window.href;
-        $('#formSubmit').on('submit', function (e) {
-            let id_status = $('#id_status').val();
-            let schedule_id = $('#id_schedule_id').val();
-            let student_id = $('#id_student_id').val();
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: {
-                    'status': id_status,
-                    'schedule_id': schedule_id,
-                    'student_id': student_id
-                },
-                dataType: 'json',
-                success: function (data) {
-                    alert('This worked!!');
-                }
+        let raw_data = document.getElementById('dataDiv').innerText;
+        let chart_data = JSON.parse(raw_data);
 
-            })
-            e.preventDefault();
-        });
     </script>
+    {#    <script>#}
+    {#        console.log("test");#}
+    {##}
+    {#        let endpoint = '/graphs/';#}
+    {#        $(document).ready(function () {#}
+    {#            $.ajax({#}
+    {#                method: "GET",#}
+    {#                url: endpoint,#}
+    {#                success: function (data) {#}
+    {#                    console.log(data);#}
+    {#                },#}
+    {#                error: function (error_data) {#}
+    {#                    console.log("error");#}
+    {#                    console.log(error_data);#}
+    {#                }#}
+    {#            });#}
+    {#        });#}
+    {#    </script>#}
 {% endblock %}
