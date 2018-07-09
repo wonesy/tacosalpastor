@@ -479,8 +479,8 @@ class SaveNewUsers(View):
         if specializationLower in sds_options:
             return Student.SDS
 
-
         return Student.NONE
+
 
 class GenerateResetToken(View):
     def post(self, request, *args, **kwargs):
@@ -526,6 +526,7 @@ class GenerateResetToken(View):
 
     def get(self, request, token, *args, **kwargs):
         return bad_request(request, exception="Forbidden")
+
 
 class ResetPassword(View):
     def post(self, request, token, *args, **kwargs):

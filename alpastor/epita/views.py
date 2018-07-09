@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.views.generic import ListView
 from rest_framework.exceptions import bad_request
-from .forms import AttendanceForm, ScheduleForm
+from .forms import AttendanceForm, ScheduleForm, AccountUpdateForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
@@ -310,8 +310,6 @@ class ScheduleView(ListView):
         return render(request, self.template_name, args)
 
 
-
-
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
     form_class = AttendanceForm
@@ -520,4 +518,35 @@ def dashboard(request):
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
                    'intakeSemester': semesters})
+
+
+class AccountUpdateView(ListView):
+    template_name = 'epita/accounts.html'
+    form_class = AccountUpdateForm
+
+    def get(self, request, *args, **kwargs):
+        logged_in_user = request.user
+        student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+        data = {}
+        print(student_instance.user)
+        print(student_instance.user.email)
+        print(student_instance.user.external_email)
+        form = self.form_class(instance=student_instance)
+        data['student'] = student_instance
+        data['form'] = form
+
+        return render(request, self.template_name, data)
+
+    def post(self, request, **kwargs):
+        logged_in_user = request.user
+        student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+        data = {}
+
+        instance = get_object_or_404(Student, pk=request.POST['id'])
+        form = self.form_class(request.POST, instance=instance)
+
+        data['student'] = student_instance
+        data['form'] = form
+
+        return render(request, self.template_name, data)
 

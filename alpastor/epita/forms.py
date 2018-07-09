@@ -1,23 +1,28 @@
 from django.utils import timezone
 from datetime import datetime
 from epita.models import Student
+from epita.models import Student as UpdateStudent
+from accounts.models import User as UpdateUser
 
 from django import forms
 from .models import Attendance, Schedule, Course
 
+<<<<<<< Updated upstream
 class CourseSelect(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.verbose_title()
 
 class AttendanceForm(forms.ModelForm):
+=======
+>>>>>>> Stashed changes
 
+class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
         fields = ['status', 'schedule_id', 'student_id', 'file_upload']
 
 
 class ScheduleForm(forms.ModelForm):
-
     class Meta:
         model = Schedule
         fields = ['id', 'course_id', 'date', 'start_time', 'end_time', 'attendance_closed']
@@ -25,12 +30,15 @@ class ScheduleForm(forms.ModelForm):
             'attendance_closed': forms.HiddenInput(),
         }
 
+<<<<<<< Updated upstream
     def __init__(self, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
         self.fields['course_id'] = CourseSelect(queryset=Course.objects.all())
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 
+=======
+>>>>>>> Stashed changes
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -63,6 +71,7 @@ class AssignStudentCourseForm(forms.Form):
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 
+
 class StudentCourseForm(forms.Form):
     course = CourseSelect(queryset=Course.objects.all())
     program = forms.ChoiceField(choices=Student.PROGRAM_CHOICES)
@@ -74,6 +83,24 @@ class StudentCourseForm(forms.Form):
         super(StudentCourseForm, self).__init__(*args, **kwargs)
         year = timezone.now().year
         self.fields['course'].queryset = Course.objects.filter(semester_year__gt=year-2).order_by('-semester_year', '-semester_season')
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'input-group'
+
+
+class AccountUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UpdateStudent
+        fields = ['user', 'get' 'phone', 'program', 'specialization', 'intakeSemester', 'country',
+                  'city', 'address_street', 'address_city', 'address_misc', 'address_code',
+                  'dob']
+        widgets = {
+            'specialization': forms.Select(attrs={
+                'disabled': True
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AccountUpdateForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 
