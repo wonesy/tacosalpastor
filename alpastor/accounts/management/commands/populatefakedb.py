@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
         # create FALL 2016 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list))
+            country_idx = random.randint(0, len(country_list)-1)
             user = User.objects.create_user(email="student{}_fall2016@epita.fr".format(i), first_name="John{}".format(i),
                                             last_name="Johnson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.ME, specialization=Student.SE,
@@ -82,7 +82,7 @@ class Command(BaseCommand):
 
         # create SPRING 2017 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list))
+            country_idx = random.randint(0, len(country_list)-1)
             user = User.objects.create_user(email="student{}_spring2017@epita.fr".format(i), first_name="Will{}".format(i),
                                             last_name="Wilson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.MSc, specialization=Student.DSA,
@@ -94,7 +94,7 @@ class Command(BaseCommand):
 
         # create FALL 2017 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list))
+            country_idx = random.randint(0, len(country_list)-1)
             user = User.objects.create_user(email="student{}_fall2017@epita.fr".format(i), first_name="Peter{}".format(i),
                                             last_name="Peterson", is_registered=True, password="asdf")
             Student.objects.filter(user=user).update(program=Student.MSc, specialization=Student.DSA,
