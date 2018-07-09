@@ -3,6 +3,7 @@ from datetime import datetime
 from epita.models import Student
 
 from django import forms
+from django.forms import ValidationError
 from .models import Attendance, Schedule, Course
 
 class CourseSelect(forms.ModelChoiceField):
@@ -30,6 +31,13 @@ class ScheduleForm(forms.ModelForm):
         self.fields['course_id'] = CourseSelect(queryset=Course.objects.all())
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
+
+    def clean(self):
+        start = self.cleaned_data['start_time']
+        end = self.cleaned_data['end_time']
+
+        if (start > end):
+            raise ValidationError("Start time cannot be after the end time")
 
 
 class CourseForm(forms.ModelForm):
