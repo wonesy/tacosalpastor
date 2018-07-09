@@ -33,6 +33,7 @@ class ScheduleForm(forms.ModelForm):
             visible.field.widget.attrs['class'] = 'input-group'
 
     def clean(self):
+        super(ScheduleForm, self).clean()
         start = self.cleaned_data['start_time']
         end = self.cleaned_data['end_time']
 
