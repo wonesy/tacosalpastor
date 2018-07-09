@@ -1,4 +1,5 @@
 from django.db import models
+from alpastor import settings
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -297,6 +298,8 @@ class Schedule(models.Model):
     def __str__(self):
         return "{} {}".format(self.course_id, self.date)
 
+def excuse_file_path(instance, filename):
+    return "excuse_documents/student_id_{0}/{1}".format(instance.student_id.id, filename)
 
 class Attendance(models.Model):
     """
@@ -322,7 +325,7 @@ class Attendance(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField(choices=ATTENDANCE_CHOICES, default=ABSENT)
-    file_upload = models.FileField(null=True, blank=True)
+    file_upload = models.FileField(null=True, blank=True, upload_to=excuse_file_path)
     upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):

@@ -352,25 +352,32 @@ class AttendanceView(ListView):
         instance = get_object_or_404(Attendance, schedule_id=schedule_id,
                                      student_id__user=request.user)
 
-        if instance.schedule_id.attendance_closed:
-            return redirect('schedule_list', slug=slug)
-
         status = request.POST.get('status')
-        file_upload = request.POST.get('file_upload')
         user = request.user
 
+        try:
+            file_upload = request.FILES['file_upload']
+        except:
+            file_upload = None
 
+        # Only changes to EXCUSED state are accepted after the attendance is closed
+        if (instance.schedule_id.attendance_closed) and (status != str(Attendance.EXCUSED)):
+            return redirect('schedule_list', slug=slug)
 
+        # There must be a status to change for there to be anything saved
         if not status:
             return redirect('schedule_list', slug=slug)
 
+        # If the change is to EXCUSED, there must be an accompanying document
         if (status == str(Attendance.EXCUSED)) and not file_upload:
             return redirect('schedule_list', slug=slug)
 
-        Attendance.objects.filter(schedule_id_id=schedule_id, student_id__user=user).update(
-            status=status,
-            file_upload=file_upload
-        )
+        form = AttendanceForm(instance=instance, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            logger.info("Updating attendance information: {} now marked as {}".format(user.get_full_name(), status))
+            form.save()
+        else:
+            logger.info("Failed up update attendance information")
 
         return redirect('schedule_list', slug=slug)
 

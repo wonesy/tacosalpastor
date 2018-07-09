@@ -16,7 +16,7 @@
             <h5>{{ attendance.schedule_id.start_time|time:"H:i" }} - {{ attendance.schedule_id.end_time|time:"H:i" }}</h5>
         </div>
         <div id="student-card" class="status-card">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="card text-white mb-3">
                     <div id="studentHeader" class="card-header">{{ student }}</div>
@@ -53,6 +53,8 @@
                             <label for="id_file_upload">Upload excuse document:</label>
                             <input id="id_file_upload" type="file" name="file_upload">
                         </div>
+                        <input name="student_id" hidden value="{{ student.id }}">
+                        <input name="schedule_id" hidden value="{{ attendance.schedule_id.id }}">
                     </div>
                 </div>
                 <button class="btn btn-info">Submit Changes</button>
