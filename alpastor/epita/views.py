@@ -12,6 +12,10 @@ from .models import Student, StudentCourse, Course, Attendance, Schedule, Profes
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
+from alpastor import settings
+from django.template.loader import get_template, render_to_string
+from django.core.mail import EmailMultiAlternatives
+from accounts.models import User
 
 import logging
 
@@ -375,7 +379,25 @@ class AttendanceView(ListView):
         form = AttendanceForm(instance=instance, data=request.POST, files=request.FILES)
         if form.is_valid():
             logger.info("Updating attendance information: {} now marked as {}".format(user.get_full_name(), status))
-            form.save()
+            saved_instance = form.save()
+
+            if file_upload and status == str(Attendance.EXCUSED):
+                template_name = 'attendance/excuse_doc_email.html'
+                admin_emails = User.objects.filter(is_superuser=True).values_list('email')
+                # Send email here
+                subject = "EPITA attendance excuse document uploaded"
+                from_email = settings.EMAIL_HOST_USER
+                d = {
+                    "doc_url": saved_instance.file_upload.url,
+                    "domain": request.get_host(),
+                    "protocol": "http",
+                    "attendance": instance
+                }
+                html_template = get_template(template_name)
+                html_content = html_template.render(d)
+                msg = EmailMultiAlternatives(subject, render_to_string(template_name, d), from_email, admin_emails)
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
         else:
             logger.info("Failed up update attendance information")
 
