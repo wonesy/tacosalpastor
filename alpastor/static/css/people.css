@@ -117,6 +117,8 @@ input:focus {
 .responsive-table {
     border-collapse: collapse;
     width: 100%;
+    overflow-x: auto;
+    height: 100%;
 }
 
 table {
@@ -174,7 +176,6 @@ td {
         /* Behave  like a "row" */
         border: none;
         border-bottom: 1px solid #eee;
-        position: relative;
         padding-left: 40%;
         height: 60px;
 

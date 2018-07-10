@@ -519,6 +519,27 @@ def dashboard(request):
 
     # bar graph by country
 
+    sem = '2018'
+    # bar graph by country
+
+    country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    new = Student.objects.filter(intake_year=sem).values('country').annotate(the_count=Count('country')).order_by(
+        'country')
+    # print(new)
+
+    semesters = Student.objects.values_list('intake_season', 'intake_year').distinct().order_by('-intake_season',
+                                                                                                '-intake_year')
+    # print(semesters)
+
+    country_by_semester = {}
+
+    for semester in semesters:
+        country_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(
+            semester[1])] = Student.objects.filter(intake_season=semester[0], intake_year=semester[1]).values(
+            'country').annotate(the_count=Count('country')).order_by('country')
+    print(country_by_semester)
+
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
 
     program_list = []
@@ -548,5 +569,4 @@ def dashboard(request):
 
     return render(request, 'dashboardex.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
-                   'intakeSemester': semesters})
-
+                   'intakeSemester': semesters, 'countrysemester': country_by_semester})
