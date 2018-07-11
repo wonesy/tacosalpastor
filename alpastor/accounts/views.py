@@ -536,7 +536,7 @@ class ResetPassword(View):
 
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
-            logger.info("Reset password form was valid, saving new password")
+            logger.info("Reset password form for {} was valid, saving new password".format(reset_token.user.email))
             form.save(user=reset_token.user)
             return redirect('home')
 
