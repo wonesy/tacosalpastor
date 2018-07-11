@@ -101,7 +101,7 @@
 
                                         <div class="people-img"> {% if student.photo_location != "" %}
                                             {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                                <img style="max-width: 80px;" class="center-block"
+                                                <img class="center-block" style="max-width: 80px;"
                                                      src="{% static image_static %}"
                                                      alt={{ student.first_name }}>
                                             {% endwith %}
