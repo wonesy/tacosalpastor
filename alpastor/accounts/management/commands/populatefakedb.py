@@ -142,12 +142,15 @@ class Command(BaseCommand):
 
         all_attendance = Attendance.objects.all()
         attendance_count = all_attendance.count()
-        print("MAX ATTENDANCE VALUES: %d", attendance_count)
+        print("MAX ATTENDANCE VALUES: {}", attendance_count)
         rand_range1 = random.randrange(0, attendance_count)
-        print("CHANGING %d VALUES TO PRESENT", rand_range1)
+        print("CHANGING {} VALUES TO PRESENT".format(rand_range1))
+        last_val = 0
         for i in range(rand_range1):
             Attendance.objects.filter(id=i).update(status=1)
-        rand_range2 = random.randrange(0, (int(attendance_count / 5)))
-        print("CHANGING %d VALUES TO EXCUSED", rand_range2)
+            last_val += 1
+        rand_range2 = random.randrange(0, int(attendance_count / 5))
+        print("CHANGING {} VALUES TO EXCUSED".format(rand_range2))
         for i in range(0, rand_range2):
-            Attendance.objects.filter(id=i).update(status=3)
+            Attendance.objects.filter(id=last_val).update(status=3)
+            last_val += 1
