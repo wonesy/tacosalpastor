@@ -509,7 +509,7 @@ class ToggleAttendanceLock(View):
 
         return HttpResponse(200)
 
-
+@login_required()
 def dashboard(request):
     people_dict = {}
 
