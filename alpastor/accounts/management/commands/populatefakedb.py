@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
-from epita.models import StudentCourse, Student, Professor, Course
+from epita.models import StudentCourse, Student, Professor, Course, Schedule
 from accounts.models import User
 from django_countries import countries
+from django.utils import timezone
+from datetime import date
 import random
 
 
@@ -37,16 +39,16 @@ class Command(BaseCommand):
         ####################################################################################################################
 
         advc_s16 = Course.objects.create(title="Advanced C", professor_id=prof_john, credits=3,
-                                         semester_season=Student.FALL,
+                                         semester_season=Student.SPRING,
                                          semester_year=2016)
         advc_f16 = Course.objects.create(title="Advanced C", professor_id=prof_john, credits=3,
-                                         semester_season=Student.SPRING,
+                                         semester_season=Student.FALL,
                                          semester_year=2016)
         advc_s17 = Course.objects.create(title="Advanced C", professor_id=prof_john, credits=3,
-                                         semester_season=Student.FALL,
+                                         semester_season=Student.SPRING,
                                          semester_year=2017)
         advc_f17 = Course.objects.create(title="Advanced C", professor_id=prof_john, credits=3,
-                                         semester_season=Student.SPRING,
+                                         semester_season=Student.FALL,
                                          semester_year=2017)
 
         mgmt_f17 = Course.objects.create(title="Project Management", professor_id=prof_bill, credits=1,
@@ -105,3 +107,18 @@ class Command(BaseCommand):
             StudentCourse.objects.create(student_id=student, course_id=mgmt_f18)
             StudentCourse.objects.create(student_id=student, course_id=java)
             StudentCourse.objects.create(student_id=student, course_id=pri)
+
+        ####################################################################################################################
+        #                                         POPULATE THE SCHEDULES                                                   #
+        ####################################################################################################################
+
+        # for i in range(0, random.randrange(20, 85)):
+        #     time = timezone.now()
+        #     schedule_list = Schedule.objects.create(course_id=advc_f17)
+        #     pass
+
+        course = advc_f17
+        for i in range(1, 28):
+                # Creates courses with date of Fall 2019
+                Schedule.objects.create(course_id=course, date=date(2017, 10, i), start_time=timezone.now(),
+                                        end_time=timezone.now())
