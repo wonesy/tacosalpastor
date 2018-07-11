@@ -99,19 +99,15 @@
                                     {% endif %}
                                     <td class="photo stdpicture content-to-hide" data-column="Photo">
 
-                                        <div class="people-img"> {% if student.photo_location != "" %}
-                                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                                <img class="center-block" style="max-width: 80px;"
-                                                     src="{% static image_static %}"
-                                                     alt={{ student.first_name }}>
-                                            {% endwith %}
-                                        {% else %}
-                                            <img src="{% static 'image/portraits/generic_taco.jpg' %}"
-                                                 alt="Default taco"
-                                                 class="people-img">
-                                        {% endif %}
+                                        <div class="people-img"> 
+                                            {% if student.photo.name != "" %}
+                                                <img class="center-block" style="max-width: 80px;" src="{{ student.photo.url }}">
+                                            {% else %}
+                                                <img src="{% static 'image/portraits/generic_taco.jpg' %}"
+                                                     alt="Default taco"
+                                                     class="people-img">
+                                            {% endif %}
                                         </div>
-
                                     </td>
 
                                     <td class="fullname"

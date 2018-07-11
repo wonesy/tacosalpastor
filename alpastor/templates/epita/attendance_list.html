@@ -16,8 +16,8 @@
             <form id="rGroup1" class="form-group" method="post" enctype="multipart/form-data">{% csrf_token %}
                     <tr>
                         <td>
-                            {% if form_item.student_id.photo_location != None %}
-                                {% with 'image/portraits/'|add:form_item.student_id.photo_location as image_static %}
+                            {% if form_item.student_id.photo != None %}
+                                {% with 'image/portraits/'|add:form_item.student_id.photo as image_static %}
                                     <img src="{% static image_static %}" alt={{ form_item.student_id.user }}>
                                 {% endwith %}
                             {% else %}
