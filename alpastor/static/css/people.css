@@ -143,6 +143,7 @@ td {
     padding: 25px 17px;
     color: #1e1e1e;
 
+
 }
 
 @media only screen and (max-width: 760px),
@@ -174,7 +175,7 @@ td {
         border-bottom: 1px solid #eee;
         padding-left: 40%;
         height: 60px;
-
+        position: relative;
     }
 
     table td:before {
@@ -187,6 +188,7 @@ td {
         content: attr(data-column);
         color: #000;
         font-weight: bold;
+
     }
 
     .content-to-hide {
@@ -350,4 +352,3 @@ table .status {
 .csvbtn:focus {
     outline: none;
 }
-
