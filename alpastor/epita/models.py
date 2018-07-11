@@ -52,6 +52,8 @@ def save_user_student(sender, instance, **kwargs):
     elif not instance.is_superuser:
         instance.professor.save()
 
+def photo_file_path(instance, filename):
+    return "photos/{0}_{1}/{2}".format(instance.id, instance.user.get_full_name().replace(' ', '_'), filename)
 
 class Student(models.Model):
     """
@@ -145,7 +147,7 @@ class Student(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=31)
+    phone = models.CharField(max_length=31, blank=True, null=True)
     program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
@@ -153,7 +155,7 @@ class Student(models.Model):
     country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
-    photo_location = models.CharField(max_length=511, null=True, blank=True)
+    photo = models.ImageField(null=True, blank=True, upload_to=photo_file_path)
     address_street = models.CharField(max_length=255, null=True, blank=True)
     address_city = models.CharField(max_length=255, null=True, blank=True)
     address_misc = models.CharField(max_length=255, null=True, blank=True)
@@ -167,7 +169,7 @@ class Student(models.Model):
                "specialization={}, intake_season={}, intake_year={}, country={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
                           self.program, self.specialization, self.intake_season, self.intake_year, self.country.name, self.city,
-                          self.languages, self.photo_location)
+                          self.languages, self.photo.name)
 
     def __str__(self):
         return self.user.get_full_name()
@@ -188,7 +190,7 @@ class Professor(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
-    photo_location = models.CharField(max_length=511, blank=True)
+    photo = models.ImageField(blank=True, upload_to=photo_file_path)
 
     def __repr__(self):
         return "Professor(first_name={}, last_name={}, external_email={}, epita_email={}, phone={})".format(

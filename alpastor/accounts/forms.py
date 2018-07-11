@@ -58,11 +58,6 @@ class CustomUserChangeForm(forms.ModelForm):
         fields = ['email', 'password', 'first_name', 'last_name', 'external_email', 'is_active', 'is_staff',
                   'is_superuser']
 
-    def save(self, commit=False):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])
-        user.save()
-        return user
 
 
 class ResetPasswordForm(forms.Form):

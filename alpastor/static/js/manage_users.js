@@ -8,13 +8,26 @@ class User {
         this.isProfessor = isProfessor;
         this.externalEmail = "";
         this.phone = "";
-        this.pic = "";
+        this.photo = "";
     }
 }
 
 class Professor extends User {
     constructor(firstName, lastName, emailLogin) {
         super(firstName, lastName, emailLogin, true);
+    }
+
+    toDict() {
+        let _dict = {};
+
+        _dict['firstName'] = this.firstName;
+        _dict['lastName'] = this.lastName;
+        _dict['emailLogin'] = this.emailLogin;
+        _dict['isProfessor'] = this.isProfessor;
+        _dict['externalEmail'] = this.externalEmail;
+        _dict['phone'] = this.phone;
+
+        return _dict;
     }
 }
 
@@ -26,6 +39,24 @@ class Student extends User {
         this.intakeSeason = "";
         this.intakeYear = "";
         this.country = "";
+    }
+
+    toDict() {
+        let _dict = {};
+
+        _dict['firstName'] = this.firstName;
+        _dict['lastName'] = this.lastName;
+        _dict['emailLogin'] = this.emailLogin;
+        _dict['isProfessor'] = this.isProfessor;
+        _dict['externalEmail'] = this.externalEmail;
+        _dict['phone'] = this.phone;
+        _dict['program'] = this.program;
+        _dict['specialization'] = this.specialization;
+        _dict['intakeSeason'] = this.intakeSeason;
+        _dict['intakeYear'] = this.intakeYear;
+        _dict['country'] = this.country;
+
+        return _dict;
     }
 }
 
@@ -41,13 +72,6 @@ function writeActions(actions) {
 }
 
 function savePotentialCourse() {
-    let formData = new FormData();
-
-    inputElems = $('#add-course-form').find('input');
-
-    inputElems.each(function(idx) {
-        formData.append(this.name, this.value);
-    });
 
     $.ajax({
         type: "POST",
@@ -71,13 +95,31 @@ function savePotentialCourse() {
 }
 
 function savePotentialUsers() {
+
+    let data = new FormData();
+
+    data.append('length', GlobalPotentialUsers.length);
+
+    for (let i = 0; i < GlobalPotentialUsers.length; i++) {
+        console.log(i);
+        console.log(GlobalPotentialUsers[i]);
+        console.log(GlobalPotentialUsers[i].toDict());
+        data.append('{0}'.format(i), JSON.stringify(GlobalPotentialUsers[i].toDict()));
+        data.append('photo{0}'.format(i), GlobalPotentialUsers[i].photo)
+    }
+
+    for (let pair of data.entries()) {
+        console.log(pair[0]);
+        console.log(pair[1]);
+    }
+
     $.ajax({
         type: "POST",
         url: window.location.origin + window.location.pathname + "savenewusers/",
-        data: {
-            users: JSON.stringify(GlobalPotentialUsers),
-        },
-        contentType: "application/json; charset=utf-8",
+        data: data,
+        enctype: 'multipart/form-data',
+        processData: false,
+        contentType: false,
         cache: false,
         timeout: 600000,
         success: function (data) {
@@ -146,7 +188,7 @@ function populateModalUserPreview() {
             u.externalEmail,
             (u.isProfessor) ? "Professor" : "Student",
             u.phone,
-            u.pic,
+            u.photo,
             (u.isProfessor) ? "n/a" : u.program,
             (u.isProfessor) ? "n/a" : u.specialization,
             (u.isProfessor) ? "n/a" : u.intakeSeason,
@@ -214,7 +256,7 @@ function collectNewUserInfo() {
     let emailLogin = document.getElementById('email');
     let externalEmail = document.getElementById('external_email');
     let phone = document.getElementById('phone');
-    let pic = document.getElementById('pic');
+    let photo = document.getElementById('photo');
 
     // Validate form
     if (!firstName.checkValidity()) {
@@ -241,13 +283,13 @@ function collectNewUserInfo() {
         // Save a potential professor
         newUser = new Professor(firstName.value, lastName.value, emailLogin.value);
         newUser.phone = phone.value;
-        newUser.pic = pic.files;
+        newUser.photo = photo.files[0];
         newUser.externalEmail = externalEmail.value;
     } else {
         // Save a potential student
         newUser = new Student(firstName.value, lastName.value, emailLogin.value);
         newUser.phone = phone.value;
-        newUser.pic = pic.files;
+        newUser.photo = photo.files[0];
         newUser.externalEmail = externalEmail.value;
 
         let programElem = document.getElementById("program");

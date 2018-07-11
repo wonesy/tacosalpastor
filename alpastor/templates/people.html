@@ -4,6 +4,10 @@
 
 {% block additional_links %}
     <link rel="stylesheet" href="{% static 'css/people.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
@@ -75,45 +79,32 @@
                         <table id="nT">
                             <thead class="table-header">
                             <tr>
-                                {% if request.user.is_superuser %}
-                                    <th>Warning</th>
-                                {% endif %}
                                 <th>Photo</th>
                                 <th>Name</th>
                                 <th>Country</th>
-                                <th>Status</th>
                                 <th>Program</th>
                                 <th>Specialization</th>
                                 <th>Semester Season</th>
                                 <th>Semester Year</th>
                                 <th>Email</th>
-                                <th>External Email</th>
-                                <th>Phone</th>
+                                <th>More Info</th>
                             </tr>
                             </thead>
                             <tbody class="list">
                             {% for student in students %}
                                 <tr class="table-row">
-                                    {% if request.user.is_superuser %}
-                                        <td>{{ student.get_flags_display }}</td>
-                                    {% endif %}
+
                                     <td class="photo stdpicture content-to-hide" data-column="Photo">
-
-                                        <div class="people-img"> {% if student.photo_location != "" %}
-                                            {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                                <img class="center-block" style="max-width: 80px;"
-                                                     src="{% static image_static %}"
-                                                     alt={{ student.first_name }}>
-                                            {% endwith %}
-                                        {% else %}
-                                            <img src="{% static 'image/portraits/generic_taco.jpg' %}"
-                                                 alt="Default taco"
-                                                 class="people-img">
-                                        {% endif %}
+                                        <div class="people-img">
+                                            {% if student.photo.name != "" %}
+                                                <img class="center-block" style="max-width: 80px;" src="{{ student.photo.url }}">
+                                            {% else %}
+                                                <img src="{% static 'image/portraits/generic_taco.jpg' %}"
+                                                     alt="Default taco"
+                                                     class="people-img">
+                                            {% endif %}
                                         </div>
-
                                     </td>
-
                                     <td class="fullname"
                                         data-column="Name"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
                                     <td class="country" data-column="Country">{{ student.country.name }}
@@ -121,7 +112,6 @@
                                             <i class="flag2x {{ student.country.flag_css }}"></i>
                                         </div>
                                     </td>
-                                    <td data-column="Status">{{ student.get_enrollment_status_display }}</td>
                                     <td class="born" data-column="Program">  {{ student.get_program_display }} </td>
                                     <td class="name" data-column="Specialization">
                                         {{ student.get_specialization_display }}
@@ -131,11 +121,24 @@
                                     <td class="intake_semester"
                                         data-column="Semester Year"> {{ student.intake_year }} </td>
                                     <td class="email" data-column="Email"> {{ student.user.email }} </td>
-                                    <td class="extemail"
-                                        data-column="EPITA Email">{{ student.user.external_email }} </td>
-                                    <td class="phone content-to-hide" data-column="Phone">{{ student.phone }}</td>
-
+                                    <td>
+                                        <a href="#myModal" style="background-color: #28a8e0;" class="btn btn-sm"
+                                           data-toggle="modal" data-phone="{{ student.phone }}"
+                                           data-address="{{ student.address_street }}"
+                                           data-addressmore="{{ student.address_city }}, {{ student.address_misc }}"
+                                           data-pc="{{ student.postal_code }}" data-city="{{ student.city }}"
+                                           data-lng="{{ student.languages }}" data-dob="{{ student.dob }}"
+                                           data-warning="{{ student.get_flags_display }}"
+                                           data-enrollment="{{ student.get_enrollment_status_display }}"
+                                           data-eemail="{{ student.user.external_email }}">
+                                            More info
+                                        </a>
+                                    </td>
                                 </tr>
+
+
+
+
                             {% endfor %}
 
                             </tbody>
@@ -148,6 +151,65 @@
         </div>
         <ul class="pagination"></ul>
     </div>
+
+    <div class="modal fade bs-example-modal-md" tabindex="-1" id="myModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-3"><h6>Phone</h6></div>
+                        <div class="col-md-3"><input type="text" id="phone" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>Addresss</h6></div>
+                        <div class="col-md-3"><input type="text" id="address" readonly/></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3"><h6>Addresss</h6></div>
+                        <div class="col-md-3"><input type="text" id="addressmore" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3"><h6>Postal Code</h6></div>
+                        <div class="col-md-3"><input type="text" id="pc" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>Origin City</h6></div>
+                        <div class="col-md-3"><input type="text" id="city" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>Language </h6></div>
+                        <div class="col-md-3"><input type="text" id="lng" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>Date Of Birth</h6></div>
+                        <div class="col-md-3"><input type="text" id="dob" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>Warning</h6></div>
+                        <div class="col-md-3"><input type="text" id="warning" readonly/></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3"><h6>Status</h6></div>
+                        <div class="col-md-3"><input type="text" id="enrollment" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><h6>External Email</h6></div>
+                        <div class="col-md-3"><input type="text" id="eemail" readonly/></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <script>
         let options = {
@@ -320,6 +382,35 @@
                 }
             });
         }
+
+
+        $(function () {
+            $('#myModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var phone = button.data('phone');
+                var address = button.data('address');
+                var city = button.data('city');
+                var pc = button.data('pc');
+                var lng = button.data('lng');
+                var dob = button.data('dob');
+                var warning = button.data('warning');
+                var enrollment = button.data('enrollment');
+                var eemail = button.data('eemail');
+                var addressmore = button.data('addressmore')
+
+                var modal = $(this);
+                modal.find('#phone').val(phone);
+                modal.find('#address').val(address);
+                modal.find('#city').val(city);
+                modal.find('#dob').val(dob);
+                modal.find('#pc').val(pc);
+                modal.find('#lng').val(lng);
+                modal.find('#warning').val(warning);
+                modal.find('#enrollment').val(enrollment);
+                modal.find('#eemail').val(eemail);
+                modal.find('#addressmore').val(addressmore);
+            });
+        });
 
 
     </script>

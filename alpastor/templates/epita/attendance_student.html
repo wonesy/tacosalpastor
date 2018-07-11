@@ -22,8 +22,8 @@
                     <div id="studentHeader" class="card-header">{{ student }}</div>
                     <div class="card-body">
                         <div class="people-img">
-                            {% if student.photo_location != null %}
-                                {% with 'image/portraits/'|add:student.photo_location as image_static %}
+                            {% if student.photo != null %}
+                                {% with 'image/portraits/'|add:student.photo as image_static %}
                                     <img class="center-block" src="{% static image_static %}"
                                          alt={{ student.first_name }}>
                                 {% endwith %}

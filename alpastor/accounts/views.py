@@ -6,7 +6,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
 from accounts.forms import LoginForm, ResetPasswordForm
 from accounts.models import User, ResetToken
-from epita.models import Student, Course, StudentCourse, Professor
+from epita.models import Student, Course, StudentCourse, Professor, string_to_choice, choice_to_string
 from epita.forms import CourseForm, StudentCourseForm
 from rest_framework import generics
 from rest_framework.exceptions import bad_request
@@ -18,6 +18,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.conf import settings
 from django_countries import countries
+from django.core.files import File
 import json
 import re
 import enum
@@ -291,17 +292,21 @@ class SaveNewUsers(View):
         return bad_request(request, exception="Forbidden")
 
     def post(self, request, *args, **kwargs):
-        users_json = QueryDict(request.body).get('users')
-        users = json.loads(users_json)
+        length = int(request.POST.get('length'))
+        #users = json.loads(users_json)
 
         response_code = 200
         response_messages = []
 
-        for user in users:
+        for i in range(0,length):
+            # the key will be just the integer offset
+            user = json.loads(request.POST.get(str(i)))
+            file_key = "photo{0}".format(i)
+            file = request.FILES[file_key]
             if user['isProfessor'] == True:
-                (rc, msg) = self.processNewProfessor(user)
+                (rc, msg) = self.processNewProfessor(user, file)
             else:
-                (rc, msg) = self.processNewStudent(user)
+                (rc, msg) = self.processNewStudent(user, file)
 
             response_messages.append(msg)
             if rc != ReturnCodes.OK:
@@ -309,7 +314,7 @@ class SaveNewUsers(View):
 
         return JsonResponse(status=response_code, data={'messages': response_messages})
 
-    def processNewProfessor(self, professor):
+    def processNewProfessor(self, professor, file):
         err_msg_template = "[FAIL] {} - [first_name={}, last_name={}, email_login={}]"
         success_msg_template = "[PASS] Created professor - [first_name={}, last_name={}, email_login={}]"
 
@@ -318,7 +323,6 @@ class SaveNewUsers(View):
         email_login = professor['emailLogin']
         external_email = professor['externalEmail']
         phone = professor['phone']
-        pic = professor['pic']
 
         # Ensure all required data is there first
         if first_name == "" or last_name == "":
@@ -341,35 +345,42 @@ class SaveNewUsers(View):
                 is_registered=False,
                 is_staff=True
             )
+
         except IntegrityError:
             logger.warning("Attempted to create new user that appears to already exist: {}".format(email_login))
             return (ReturnCodes.ERR_USER_EXISTS, err_msg_template.format(
                 "User exists already", first_name, last_name, email_login))
 
         try:
-            Professor.objects.filter(user=newUser).update(phone=phone)
+            prof = Professor.objects.get(user=newUser)
+
+            prof.phone = phone
+
+            if file != "":
+                prof.photo.save(file.name, file)
+
+            prof.save()
+
         except MultipleObjectsReturned:
             logger.warning("Found multiple professors for the same user={}".format(newUser))
-            Student.objects.filter(user=newUser)[0].update(phone=phone)
 
         logger.info("Created new professor with email={}".format(email_login))
 
         return (ReturnCodes.OK, success_msg_template.format(first_name, last_name, email_login))
 
-    def processNewStudent(self, student):
+    def processNewStudent(self, student, file):
         err_msg_template = "[FAIL] {} - [first_name={}, last_name={}, email_login={}]"
         success_msg_template = "[PASS] Created student - [first_name={}, last_name={}, email_login={}]"
 
         first_name = student['firstName']
         last_name = student['lastName']
         email_login = student['emailLogin']
-        program = self.programStringToValue(student['program'])
+        program = int(student['program'])
         external_email = student['externalEmail']
         phone = student['phone']
-        pic = student['pic']
-        specialization = self.specializationStringToValue(student['specialization'])
+        specialization = int(student['specialization'])
         intake_season = student['intakeSeason']
-        intake_year = student['intakeYear']
+        intake_year = int(student['intakeYear'])
         country = student['country']
 
         # Ensure all required data is there first
@@ -401,30 +412,29 @@ class SaveNewUsers(View):
                 last_name=last_name,
                 external_email=external_email
             )
+
         except IntegrityError:
             logger.warning("Attempted to create new user that appears to already exist: {}".format(email_login))
             return (ReturnCodes.ERR_USER_EXISTS, err_msg_template.format(
                 "User exists already", first_name, last_name, email_login))
 
         try:
-            Student.objects.filter(user=newUser).update(
-                phone=phone,
-                country=country,
-                program=program,
-                specialization=specialization,
-                intake_season=intake_season,
-                intake_year=intake_year
-            )
+            student = Student.objects.get(user=newUser)
+
+            student.phone = phone
+            student.country = country
+            student.program = program
+            student.specialization = specialization
+            student.intake_season = intake_season
+            student.intake_year = intake_year
+
+            if file != "":
+                student.photo.save(file.name, file.file)
+
+            student.save()
+
         except MultipleObjectsReturned:
             logger.warning("Found multiple students for the same user={}".format(newUser))
-            Student.objects.filter(user=newUser)[0].update(
-                phone=phone,
-                country=country,
-                program=int(program),
-                specialization=specialization,
-                intake_season=intake_season,
-                intake_year=intake_year
-            )
 
         logger.info("Created new student with email={}".format(email_login))
 
