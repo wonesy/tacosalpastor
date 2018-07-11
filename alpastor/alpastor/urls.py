@@ -19,15 +19,10 @@ from django.urls import path
 from accounts import views as accounts_views
 from quiz import views as quiz_views
 from epita import views
-<<<<<<< Updated upstream
 from epita import csv_views
 from epita.views import (
     CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData,
-    OverrideStudentAttendanceData, ToggleAttendanceLock, AttendanceGraphs)
-
-=======
-from epita.views import CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData, OverrideStudentAttendanceData, ToggleAttendanceLock, AccountUpdateView
->>>>>>> Stashed changes
+    OverrideStudentAttendanceData, ToggleAttendanceLock, AttendanceGraphs, AccountUpdateView)
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
