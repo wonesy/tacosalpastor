@@ -23,6 +23,7 @@ from epita import csv_views
 from epita.views import (
     CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData,
     OverrideStudentAttendanceData, ToggleAttendanceLock, AttendanceGraphs, AccountUpdateView)
+
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns

@@ -2,7 +2,9 @@ from django.utils import timezone
 from datetime import datetime
 from epita.models import Student
 from epita.models import Student as UpdateStudent
-from accounts.models import User as UpdateUser
+from epita.models import Professor as UpdateProfessor
+from accounts.models import User
+
 
 from django import forms
 from django.forms import ValidationError
@@ -28,13 +30,11 @@ class ScheduleForm(forms.ModelForm):
             'attendance_closed': forms.HiddenInput(),
         }
 
-
     def __init__(self, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
         self.fields['course_id'] = CourseSelect(queryset=Course.objects.all())
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
-
 
     def clean(self):
         super(ScheduleForm, self).clean()
@@ -93,14 +93,23 @@ class StudentCourseForm(forms.Form):
 
 
 class AccountUpdateForm(forms.ModelForm):
+    email = forms.CharField(widget=forms.TextInput(attrs={
+                'readonly': True
+            }))
+    external_email = forms.CharField(widget=forms.TextInput())
+
     class Meta:
         model = UpdateStudent
-        fields = ['user', 'get' 'phone', 'program', 'specialization', 'intakeSemester', 'country',
-                  'city', 'address_street', 'address_city', 'address_misc', 'address_code',
-                  'dob']
+        fields = ['phone', 'city',
+                  'address_street', 'address_city',
+                  'address_misc', 'postal_code']
+        # user program specialization intake_season country
         widgets = {
-            'specialization': forms.Select(attrs={
-                'disabled': True
+            # 'intake_year': forms.NumberInput(attrs={
+            #     'readonly': True
+            # }),
+            'city': forms.TextInput(attrs={
+                'readonly': True
             })
         }
 
@@ -108,4 +117,49 @@ class AccountUpdateForm(forms.ModelForm):
         super(AccountUpdateForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
+        self.fields['email'].initial = self.instance.user.email
+        self.fields['external_email'].initial = self.instance.user.external_email
+        order_list = ['email', 'external_email', 'phone', 'city',
+                      'address_street', 'address_city',
+                      'address_misc', 'postal_code']
+        # order_list = ['user', 'email', 'phone', 'program', 'specialization', 'intake_season',
+        #               'intake_year', 'country',
+        #               'city', 'address_street', 'address_city', 'address_misc', 'postal_code',
+        #               'dob']
+        print(order_list)
+        self.order_fields(order_list)
+        print(self.instance.user.email)
+        # print(self.instance.user.external_email)
+
+    def save(self, commit=True):
+        instance = super(AccountUpdateForm, self).save()
+        instance.user.external_email = self.cleaned_data['external_email']
+        instance.user.save()
+
+
+class ProfessorAccountUpdateForm(forms.ModelForm):
+    email = forms.CharField(widget=forms.TextInput(attrs={
+                'readonly': True
+            }))
+    external_email = forms.CharField(widget=forms.TextInput())
+
+    class Meta:
+        model = UpdateProfessor
+        fields = ['phone']
+        # user
+        widgets = {
+            # 'user': forms.Select(attrs={
+            #     'readonly': True
+            # })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ProfessorAccountUpdateForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'input-group'
+        self.fields['email'].initial = self.instance.user.email
+        self.fields['external_email'].initial = self.instance.user.external_email
+        order_list = ['email', 'external_email', 'phone']
+        # print(order_list)
+        self.order_fields(order_list)
 

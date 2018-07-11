@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.views.generic import ListView
 from rest_framework.exceptions import bad_request
-from .forms import AttendanceForm, ScheduleForm, AccountUpdateForm
+from .forms import AttendanceForm, ScheduleForm, AccountUpdateForm, ProfessorAccountUpdateForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
@@ -576,31 +576,50 @@ def dashboard(request):
 
 class AccountUpdateView(ListView):
     template_name = 'epita/accounts.html'
-    form_class = AccountUpdateForm
 
     def get(self, request, *args, **kwargs):
         logged_in_user = request.user
-        student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
         data = {}
-        print(student_instance.user)
-        print(student_instance.user.email)
-        print(student_instance.user.external_email)
-        form = self.form_class(instance=student_instance)
-        data['student'] = student_instance
-        data['form'] = form
+        if logged_in_user.is_staff:
+            professor_instance = Professor.objects.filter(user_id=logged_in_user.id)[0]
+            data['professor'] = professor_instance
+            data['form'] = ProfessorAccountUpdateForm(instance=professor_instance)
+        else:
+            student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+            data['student'] = student_instance
+            data['form'] = AccountUpdateForm(instance=student_instance)
+        # student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+        # data = {}
+        # data['student'] = student_instance
+        # data['form'] = AccountUpdateForm(instance=student_instance)
 
         return render(request, self.template_name, data)
 
     def post(self, request, **kwargs):
         logged_in_user = request.user
-        student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
         data = {}
-
-        instance = get_object_or_404(Student, pk=request.POST['id'])
-        form = self.form_class(request.POST, instance=instance)
-
-        data['student'] = student_instance
-        data['form'] = form
-
+        if logged_in_user.is_staff:
+            # professor_instance = Professor.objects.filter(user_id=logged_in_user.id)[0]
+            instance = get_object_or_404(Professor, user=logged_in_user)
+            form = ProfessorAccountUpdateForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
+            data['professor'] = instance
+            data['form'] = form
+        else:
+            # student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+            instance = get_object_or_404(Student, user=logged_in_user)
+            form = AccountUpdateForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
+            data['student'] = instance
+            data['form'] = form
+        # student_instance = Student.objects.filter(user_id=logged_in_user.id)[0]
+        # instance = get_object_or_404(Student, user=logged_in_user)
+        # form = AccountUpdateForm(request.POST, instance=instance)
+        # if form.is_valid():
+        #     form.save()
+        # data['student'] = student_instance
+        # data['form'] = form
         return render(request, self.template_name, data)
 

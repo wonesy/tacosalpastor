@@ -154,13 +154,13 @@ class Student(models.Model):
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, null=True, blank=True)
-    address_street = models.CharField(max_length=255, null=True, blank=True, help_text="Street")
-    address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
-    address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
-    postal_code = models.IntegerField(blank=True, null=True, help_text="Department postal code")
-    dob = models.DateField(null=True, blank=True, help_text="Date of birth", verbose_name="Date of Birth")
-    enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
-    flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
+    address_street = models.CharField(max_length=255, null=True, blank=True)
+    address_city = models.CharField(max_length=255, null=True, blank=True)
+    address_misc = models.CharField(max_length=255, null=True, blank=True)
+    postal_code = models.IntegerField(blank=True, null=True)
+    dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
+    enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False)
+    flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False)
 
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
@@ -259,6 +259,7 @@ class Course(models.Model):
     def full_semester(self):
         return "{} {}".format(choice_to_string(Student.SEASON_CHOICES, self.semester_season), self.semester_year)
 
+
 class StudentCourse(models.Model):
     """
     Defines the StudentCourse database table
@@ -277,6 +278,7 @@ class StudentCourse(models.Model):
 
     def __str__(self):
         return "{}".format(self.course_id)
+
 
 class Schedule(models.Model):
     """
@@ -303,6 +305,7 @@ class Schedule(models.Model):
 
 def excuse_file_path(instance, filename):
     return "excuse_documents/student_id_{0}/{1}".format(instance.student_id.id, filename)
+
 
 class Attendance(models.Model):
     """
