@@ -95,6 +95,7 @@ class Command(BaseCommand):
             StudentCourse.objects.create(student_id=student, course_id=mgmt_f17)
 
         # create FALL 2017 population
+        # MSC students
         for i in range(0, random.randrange(20, 85)):
             country_idx = random.randint(0, len(country_list)-1)
             msc_user = User.objects.create_user(email="student{}_fall2017@epita.fr".format(i), first_name="Peter{}".format(i),
@@ -108,6 +109,7 @@ class Command(BaseCommand):
             StudentCourse.objects.create(student_id=student, course_id=java)
             StudentCourse.objects.create(student_id=student, course_id=pri)
 
+        # ME students
         for i in range(0, random.randrange(20, 85)):
             country_idx = random.randint(0, len(country_list) - 1)
             me_user = User.objects.create_user(email="student_me{}_fall2017@epita.fr".format(i),
@@ -129,8 +131,8 @@ class Command(BaseCommand):
 
         # Every month has at least 28 days
         for i in range(1, 28):
-                # Creates courses with date of Fall 2019
-                Schedule.objects.create(course_id=advc_f17, date=date(2019, 10, i), start_time=timezone.now(),
+                # Creates courses with date of Fall 2017
+                Schedule.objects.create(course_id=advc_f17, date=date(2017, 10, i), start_time=timezone.now(),
                                         end_time=timezone.now())
 
         ####################################################################################################################
@@ -149,17 +151,3 @@ class Command(BaseCommand):
         print("CHANGING %d VALUES TO EXCUSED", rand_range2)
         for i in range(0, rand_range2):
             Attendance.objects.filter(id=i).update(status=3)
-
-        # # Get students from specialization
-        # all_students_of_specialization = Student.objects.filter(specialization=Student.SE)
-        #
-        # # Get lowest student.id to know where to start increments in next loop
-        # get_min = []
-        # [get_min.append(i.id) for i in all_students_of_specialization]
-        # first_student_id = min(get_min)
-        #
-        # # number of students to change status
-        # for i in range(num_of_students.count()):
-        #     for j in range(28):  # Number of scheduled days to adjust (Every month has at least 28 days)
-        #         Attendance.objects.filter(schedule_id=first_schedule_id.id + j, student_id=i + first_student_id).update(
-        #             status=1)
