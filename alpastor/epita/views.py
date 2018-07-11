@@ -29,21 +29,23 @@ class AttendanceGraphs(ListView):
     def get(self, request, *args):
         student = 'Willy0'
         course = 'Advanced C Programming'
-        intake = 'Fall 2017'
-        semester = 'Fall 2019'
+        intake_season = Student.FALL
+        intake_year = '2017'
+        semester_season = Student.FALL
+        semester_year = '2017'
         email = 'me_student0@epita.fr'
         professor = 'John'
         specialization = Student.SE
         # all_data = self.whole_semester_by_student_by_class(email, course)
         # all_data = self.whole_semester_by_specialization(semester, specialization)
-        all_data = self.default_graph_by_program(semester)
+        all_data = self.default_graph_by_program(semester_season, semester_year)
         # all_data = self.whole_semester_by_class(course, semester)
         # all_data = self.individual_student_allclass(student)
-        all_data = self.individual_professor_allclass(professor)
+        # all_data = self.individual_professor_allclass(professor)
         # all_data = self.individual_professor_allclass_by_semester(professor, semester)
-        # all_data_json = json.dumps(all_data)
-        # return render(request, self.template_name, {'all_data': all_data_json})
-        return JsonResponse(all_data)
+        all_data_json = json.dumps(all_data)
+        return render(request, self.template_name, {'all_data': all_data_json})
+        # return JsonResponse(all_data)
 
     def build_attendance_results(self, attendance_list):
         present = 0
@@ -59,7 +61,7 @@ class AttendanceGraphs(ListView):
                 excused += 1
         return {'present': present, 'absent': absent, 'excused': excused}
 
-    def default_graph_by_program(self, semester):
+    def default_graph_by_program(self, semester_season, semester_year):
         programs = Student.PROGRAM_CHOICES
         program_list = []
         specialization_list = []
@@ -67,18 +69,19 @@ class AttendanceGraphs(ListView):
 
         for program in programs:
             attendances = list(Attendance.objects.filter(student_id__program=program[0],
-                                                         schedule_id__course_id__semester=semester).values('status'))
+                                                         schedule_id__course_id__semester_year=semester_year,
+                                                         schedule_id__course_id__semester_season=semester_season).values('status'))
             attendance_results = self.build_attendance_results(attendances)
             attendance_results['program'] = program[1]
             program_list.append(attendance_results)
         for specialization in Student.SPECIALIZATION_CHOICES:
             specialization_list.append(specialization[1])
-        for course in Course.objects.filter(semester=semester):
-            print(course.title)
+        for course in Course.objects.filter(semester_season=semester_season, semester_year=semester_year):
             course_list.append(course.title)
 
         attendance_data = {
-            "semester": semester,
+            "season": semester_season,
+            "year": semester_year,
             "attendance": program_list,
             "specialization": specialization_list,
             "course": course_list
@@ -263,7 +266,7 @@ class ScheduleView(ListView):
     def get(self, request, slug):
         logged_in_user = request.user
         course = get_object_or_404(Course, slug=slug)
-        schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
+        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
 
         # Student view
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
