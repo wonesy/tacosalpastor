@@ -95,13 +95,6 @@ function defaultChart() {
     createChart(exchangeChart, 'pie', labels, titles[programs['EXCHANGE']], exchangeAttendance, colors);
 }
 
-function emptyDataCheck(data) {
-    let noValues = 0;
-    for (let i = 0; i < data.length; i++)
-        noValues += data[i];
-    return (noValues === 0) ? [1, 0, 0] : data;
-}
-
 function createChart(location, type, labels, title, data, colors) {
     console.log(data);
     new Chart(location, {
@@ -110,7 +103,7 @@ function createChart(location, type, labels, title, data, colors) {
             labels: labels,
             datasets: [{
                 // label: 'Insert Label Here',
-                data: emptyDataCheck(data),
+                data: data,
                 backgroundColor: colors,
                 borderWidth: 4,
                 borderColor: 'grey'
