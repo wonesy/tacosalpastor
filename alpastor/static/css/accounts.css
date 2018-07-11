@@ -1,0 +1,61 @@
+.manage-card {
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: #AAAAAA;
+}
+
+.add-users-card {
+    width: 100%;
+}
+
+.add-single-user-form {
+    float: left;
+    width: 80%;
+    min-width: 200px;
+    height: 100%;
+}
+
+.add-users-csv {
+    border-left: 1px solid black;
+}
+
+.required-field {
+    color: red;
+}
+
+label {
+    margin-bottom: 0;
+    margin-top: 5px;
+
+}
+
+#form-errors {
+    color: red;
+}
+
+#modal-preview-table th {
+    padding:0 15px 0 15px;
+}
+
+#modal-preview-table td {
+    padding:0 15px 0 15px;
+}
+
+.modal-dialog{
+    overflow-y: initial !important
+}
+.modal-body{
+    height: 300px;
+    min-width: 745px;
+    overflow-y: auto;
+}
+
+.modal-dialog {
+    min-width: 750px;
+}
+
+form {
+    width: 100%;
+}

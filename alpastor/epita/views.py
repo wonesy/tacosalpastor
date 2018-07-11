@@ -12,6 +12,11 @@ from .models import Student, StudentCourse, Course, Attendance, Schedule, Profes
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
+from alpastor import settings
+from django.template.loader import get_template, render_to_string
+from django.core.mail import EmailMultiAlternatives
+from accounts.models import User
+from django_countries import countries
 
 import logging
 
@@ -350,25 +355,50 @@ class AttendanceView(ListView):
         instance = get_object_or_404(Attendance, schedule_id=schedule_id,
                                      student_id__user=request.user)
 
-        if instance.schedule_id.attendance_closed:
-            return redirect('schedule_list', slug=slug)
-
         status = request.POST.get('status')
-        file_upload = request.POST.get('file_upload')
         user = request.user
 
+        try:
+            file_upload = request.FILES['file_upload']
+        except:
+            file_upload = None
 
+        # Only changes to EXCUSED state are accepted after the attendance is closed
+        if (instance.schedule_id.attendance_closed) and (status != str(Attendance.EXCUSED)):
+            return redirect('schedule_list', slug=slug)
 
+        # There must be a status to change for there to be anything saved
         if not status:
             return redirect('schedule_list', slug=slug)
 
+        # If the change is to EXCUSED, there must be an accompanying document
         if (status == str(Attendance.EXCUSED)) and not file_upload:
             return redirect('schedule_list', slug=slug)
 
-        Attendance.objects.filter(schedule_id_id=schedule_id, student_id__user=user).update(
-            status=status,
-            file_upload=file_upload
-        )
+        form = AttendanceForm(instance=instance, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            logger.info("Updating attendance information: {} now marked as {}".format(user.get_full_name(), status))
+            saved_instance = form.save()
+
+            if file_upload and status == str(Attendance.EXCUSED):
+                template_name = 'attendance/excuse_doc_email.html'
+                admin_emails = User.objects.filter(is_superuser=True).values_list('email')
+                # Send email here
+                subject = "EPITA attendance excuse document uploaded"
+                from_email = settings.EMAIL_HOST_USER
+                d = {
+                    "doc_url": saved_instance.file_upload.url,
+                    "domain": request.get_host(),
+                    "protocol": "http",
+                    "attendance": instance
+                }
+                html_template = get_template(template_name)
+                html_content = html_template.render(d)
+                msg = EmailMultiAlternatives(subject, render_to_string(template_name, d), from_email, admin_emails)
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+        else:
+            logger.info("Failed up update attendance information")
 
         return redirect('schedule_list', slug=slug)
 
@@ -478,7 +508,7 @@ class ToggleAttendanceLock(View):
 
         return HttpResponse(200)
 
-
+@login_required()
 def dashboard(request):
     people_dict = {}
 
@@ -488,7 +518,31 @@ def dashboard(request):
 
     # bar graph by country
 
+    sem = '2018'
+    # bar graph by country
+
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    new = Student.objects.filter(intake_year=sem).values('country').annotate(the_count=Count('country')).order_by(
+        'country')
+    # print(new)
+
+    semesters = Student.objects.values_list('intake_season', 'intake_year').distinct().order_by('-intake_season',
+                                                                                                '-intake_year')
+    # print(semesters)
+
+    country_by_semester = {}
+
+    for semester in semesters:
+        country_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(
+            semester[1])] = Student.objects.filter(intake_season=semester[0], intake_year=semester[1]).values(
+            'country').annotate(the_count=Count('country')).order_by('country')
+
+    country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    country_dict = dict(countries)
+    for c in country:
+        c['country_name'] = country_dict[c['country']]
 
     program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
@@ -515,9 +569,9 @@ def dashboard(request):
         s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
         s['intake_season'] = choice_to_string(Student.SEASON_CHOICES, s['intake_season'])
 
-    return render(request, 'dashboardex.html',
+    return render(request, 'dashboard.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
-                   'intakeSemester': semesters})
+                    'intakeSemester': semesters, 'countrysemester': country_by_semester})
 
 
 class AccountUpdateView(ListView):

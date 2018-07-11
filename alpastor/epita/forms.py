@@ -5,16 +5,14 @@ from epita.models import Student as UpdateStudent
 from accounts.models import User as UpdateUser
 
 from django import forms
+from django.forms import ValidationError
 from .models import Attendance, Schedule, Course
 
-<<<<<<< Updated upstream
+
 class CourseSelect(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.verbose_title()
 
-class AttendanceForm(forms.ModelForm):
-=======
->>>>>>> Stashed changes
 
 class AttendanceForm(forms.ModelForm):
     class Meta:
@@ -30,15 +28,22 @@ class ScheduleForm(forms.ModelForm):
             'attendance_closed': forms.HiddenInput(),
         }
 
-<<<<<<< Updated upstream
+
     def __init__(self, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
         self.fields['course_id'] = CourseSelect(queryset=Course.objects.all())
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'input-group'
 
-=======
->>>>>>> Stashed changes
+
+    def clean(self):
+        super(ScheduleForm, self).clean()
+        start = self.cleaned_data['start_time']
+        end = self.cleaned_data['end_time']
+
+        if (start > end):
+            raise ValidationError("Start time cannot be after the end time")
+
 
 class CourseForm(forms.ModelForm):
     class Meta:

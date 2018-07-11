@@ -77,7 +77,7 @@ urlpatterns = [
     path('manageusers/addstudentcourse/', login_required(accounts_views.AddStudentCourse.as_view()), name='addstudentcourse'),
     path('manageusers/deletestudentcourse/', login_required(accounts_views.DeleteStudentCourse.as_view()), name='deletestudentcourse'),
     path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
-    path('dashboardex/', views.dashboard, name='dashboardex'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('admin/', admin.site.urls),
 
 ]

@@ -7,6 +7,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <link rel="stylesheet" href="{% static 'flags/sprite-hq.css' %}">
 
 {% endblock %}
 
@@ -67,13 +68,16 @@
 
         <div class="container">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
 
 
-                    <div class="table-wrapper-2">
-                        <table class="space responsive-table" id="nT">
+                    <div class="table-wrapper-2 table-responsive space">
+                        <table id="nT">
                             <thead class="table-header">
                             <tr>
+                                {% if request.user.is_superuser %}
+                                    <th>Warning</th>
+                                {% endif %}
                                 <th>Photo</th>
                                 <th>Name</th>
                                 <th>Country</th>
@@ -83,18 +87,22 @@
                                 <th>Semester Season</th>
                                 <th>Semester Year</th>
                                 <th>Email</th>
-                                <th>EPITA Email</th>
+                                <th>External Email</th>
                                 <th>Phone</th>
                             </tr>
                             </thead>
                             <tbody class="list">
                             {% for student in students %}
                                 <tr class="table-row">
+                                    {% if request.user.is_superuser %}
+                                        <td>{{ student.get_flags_display }}</td>
+                                    {% endif %}
                                     <td class="photo stdpicture content-to-hide" data-column="Photo">
 
                                         <div class="people-img"> {% if student.photo_location != "" %}
                                             {% with 'image/portraits/'|add:student.photo_location as image_static %}
-                                                <img class="center-block" src="{% static image_static %}"
+                                                <img class="center-block" style="max-width: 80px;"
+                                                     src="{% static image_static %}"
                                                      alt={{ student.first_name }}>
                                             {% endwith %}
                                         {% else %}
@@ -109,11 +117,8 @@
                                     <td class="fullname"
                                         data-column="Name"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
                                     <td class="country" data-column="Country">{{ student.country.name }}
-                                        <div>
-                                            {% with 'image/flags/'|add:student.country.code|lower|add:'.jpg' as image_static %}
-                                                <img class="tile_image content-to-hide" src="{% static image_static %}"
-                                                     alt={{ student.first_name }}>
-                                            {% endwith %}
+                                        <div class="content-to-hide">
+                                            <i class="flag2x {{ student.country.flag_css }}"></i>
                                         </div>
                                     </td>
                                     <td data-column="Status">{{ student.get_enrollment_status_display }}</td>

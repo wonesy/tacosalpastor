@@ -1,4 +1,5 @@
 from django.db import models
+from alpastor import settings
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -149,7 +150,7 @@ class Student(models.Model):
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
     intake_year = models.IntegerField(blank=False, default=now().year)
-    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="image/flags/{code}.jpg")
+    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, null=True, blank=True)
@@ -173,6 +174,9 @@ class Student(models.Model):
 
     def student_email(self):
         return self.user.email
+
+    def country_name(self):
+        return self.country.name
 
 class Professor(models.Model):
     """
@@ -297,6 +301,8 @@ class Schedule(models.Model):
     def __str__(self):
         return "{} {}".format(self.course_id, self.date)
 
+def excuse_file_path(instance, filename):
+    return "excuse_documents/student_id_{0}/{1}".format(instance.student_id.id, filename)
 
 class Attendance(models.Model):
     """
@@ -322,7 +328,7 @@ class Attendance(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField(choices=ATTENDANCE_CHOICES, default=ABSENT)
-    file_upload = models.FileField(null=True, blank=True)
+    file_upload = models.FileField(null=True, blank=True, upload_to=excuse_file_path)
     upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):

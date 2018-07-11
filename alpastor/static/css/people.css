@@ -110,13 +110,11 @@ input:focus {
     color: #1e1e1e;
 }
 
-.space {
-    margin-left: 10px;
-}
-
 .responsive-table {
     border-collapse: collapse;
     width: 100%;
+    overflow-x: auto;
+    height: 100%;
 }
 
 table {
@@ -144,6 +142,7 @@ td {
     letter-spacing: 0.02em;
     padding: 25px 17px;
     color: #1e1e1e;
+
 
 }
 
@@ -174,10 +173,9 @@ td {
         /* Behave  like a "row" */
         border: none;
         border-bottom: 1px solid #eee;
-        position: relative;
         padding-left: 40%;
         height: 60px;
-
+        position: relative;
     }
 
     table td:before {
@@ -190,6 +188,7 @@ td {
         content: attr(data-column);
         color: #000;
         font-weight: bold;
+
     }
 
     .content-to-hide {
@@ -223,7 +222,6 @@ input[type="checkbox"] {
     font-size: 15px;
     transition: 0.4s;
     border-radius: 6px;
-    margin-left: 10px;
 }
 
 .active, .accordion:hover {
@@ -231,19 +229,17 @@ input[type="checkbox"] {
 }
 
 .panel {
-    padding: 0 18px;
     display: none;
     background-color: #1e1e1e;
     overflow: hidden;
-    margin-left: 10px;
     width: 100%;
 }
+
 
 /* The container */
 .container {
     display: block;
     position: relative;
-    padding-left: 30px;
     margin-bottom: 10px;
     font-size: 18px;
     -webkit-user-select: none;
@@ -253,9 +249,8 @@ input[type="checkbox"] {
     color: #fff;
     top: 0;
     left: 0;
-    float: left;
-
 }
+
 
 .subclass {
     margin-left: 30px;
@@ -321,14 +316,10 @@ table .status {
     width: 100%;
 }
 
-.search-bar {
-    margin-left: 10px;
-}
 
 #users {
     width: 100%;
 }
-
 
 .photo {
     padding-top: 0;
@@ -361,4 +352,3 @@ table .status {
 .csvbtn:focus {
     outline: none;
 }
-
