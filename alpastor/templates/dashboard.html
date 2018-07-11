@@ -137,7 +137,7 @@
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: [{% for item in country %} "{{ item.country }}", {% endfor %}],
+                labels: [{% for item in country %} "{{ item.country_name }}", {% endfor %}],
 
                 datasets: [{
 

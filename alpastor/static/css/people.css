@@ -110,10 +110,6 @@ input:focus {
     color: #1e1e1e;
 }
 
-.space {
-    margin-left: 10px;
-}
-
 .responsive-table {
     border-collapse: collapse;
     width: 100%;
@@ -224,7 +220,6 @@ input[type="checkbox"] {
     font-size: 15px;
     transition: 0.4s;
     border-radius: 6px;
-    margin-left: 10px;
 }
 
 .active, .accordion:hover {
@@ -240,11 +235,11 @@ input[type="checkbox"] {
     width: 100%;
 }
 
+
 /* The container */
 .container {
     display: block;
     position: relative;
-    padding-left: 30px;
     margin-bottom: 10px;
     font-size: 18px;
     -webkit-user-select: none;
@@ -254,9 +249,8 @@ input[type="checkbox"] {
     color: #fff;
     top: 0;
     left: 0;
-    float: left;
-
 }
+
 
 .subclass {
     margin-left: 30px;
@@ -322,14 +316,10 @@ table .status {
     width: 100%;
 }
 
-.search-bar {
-    margin-left: 10px;
-}
 
 #users {
     width: 100%;
 }
-
 
 .photo {
     padding-top: 0;

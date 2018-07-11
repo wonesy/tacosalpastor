@@ -175,6 +175,9 @@ class Student(models.Model):
     def student_email(self):
         return self.user.email
 
+    def country_name(self):
+        return self.country.name
+
 class Professor(models.Model):
     """
     Defines the Professor database table

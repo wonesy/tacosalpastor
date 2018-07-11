@@ -16,6 +16,7 @@ from alpastor import settings
 from django.template.loader import get_template, render_to_string
 from django.core.mail import EmailMultiAlternatives
 from accounts.models import User
+from django_countries import countries
 
 import logging
 
@@ -538,9 +539,12 @@ def dashboard(request):
         country_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(
             semester[1])] = Student.objects.filter(intake_season=semester[0], intake_year=semester[1]).values(
             'country').annotate(the_count=Count('country')).order_by('country')
-    print(country_by_semester)
 
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    country_dict = dict(countries)
+    for c in country:
+        c['country_name'] = country_dict[c['country']]
 
     program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
@@ -567,6 +571,6 @@ def dashboard(request):
         s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
         s['intake_season'] = choice_to_string(Student.SEASON_CHOICES, s['intake_season'])
 
-    return render(request, 'dashboardex.html',
+    return render(request, 'dashboard.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
                    'intakeSemester': semesters, 'countrysemester': country_by_semester})
