@@ -7,6 +7,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <link rel="stylesheet" href="{% static 'flags/sprite-hq.css' %}">
 
 {% endblock %}
 
@@ -74,6 +75,9 @@
                         <table id="nT">
                             <thead class="table-header">
                             <tr>
+                                {% if request.user.is_superuser %}
+                                    <th>Warning</th>
+                                {% endif %}
                                 <th>Photo</th>
                                 <th>Name</th>
                                 <th>Country</th>
@@ -90,6 +94,9 @@
                             <tbody class="list">
                             {% for student in students %}
                                 <tr class="table-row">
+                                    {% if request.user.is_superuser %}
+                                        <td>{{ student.get_flags_display }}</td>
+                                    {% endif %}
                                     <td class="photo stdpicture content-to-hide" data-column="Photo">
 
                                         <div class="people-img"> {% if student.photo_location != "" %}
@@ -110,10 +117,7 @@
                                         data-column="Name"> {{ student.user.first_name }} {{ student.user.last_name }} </td>
                                     <td class="country" data-column="Country">{{ student.country.name }}
                                         <div>
-                                            {% with 'image/flags/'|add:student.country.code|lower|add:'.jpg' as image_static %}
-                                                <img class="tile_image content-to-hide" src="{% static image_static %}"
-                                                     alt={{ student.first_name }}>
-                                            {% endwith %}
+                                            <i class="flag2x {{ student.country.flag_css }}"></i>
                                         </div>
                                     </td>
                                     <td data-column="Status">{{ student.get_enrollment_status_display }}</td>

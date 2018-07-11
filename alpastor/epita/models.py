@@ -150,7 +150,7 @@ class Student(models.Model):
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
     intake_year = models.IntegerField(blank=False, default=now().year)
-    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="image/flags/{code}.jpg")
+    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
     photo_location = models.CharField(max_length=511, null=True, blank=True)
