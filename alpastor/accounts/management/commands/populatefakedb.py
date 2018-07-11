@@ -72,7 +72,7 @@ class Command(BaseCommand):
 
         # create FALL 2016 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list)-1)
+            country_idx = random.randint(100, 120)
             msc_user = User.objects.create_user(email="student{}_fall2016@epita.fr".format(i), first_name="John{}".format(i),
                                             last_name="Johnson", is_registered=True, password="asdf")
             Student.objects.filter(user=msc_user).update(program=Student.ME, specialization=Student.SE,
@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
         # create SPRING 2017 population
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list)-1)
+            country_idx = random.randint(100, 120)
             msc_user = User.objects.create_user(email="student{}_spring2017@epita.fr".format(i), first_name="Will{}".format(i),
                                             last_name="Wilson", is_registered=True, password="asdf")
             Student.objects.filter(user=msc_user).update(program=Student.MSc, specialization=Student.DSA,
@@ -97,7 +97,7 @@ class Command(BaseCommand):
         # create FALL 2017 population
         # MSC students
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list)-1)
+            country_idx = random.randint(100, 120)
             msc_user = User.objects.create_user(email="student{}_fall2017@epita.fr".format(i), first_name="Peter{}".format(i),
                                             last_name="Peterson", is_registered=True, password="asdf")
             Student.objects.filter(user=msc_user).update(program=Student.MSc, specialization=Student.DSA,
@@ -111,7 +111,7 @@ class Command(BaseCommand):
 
         # ME students
         for i in range(0, random.randrange(20, 85)):
-            country_idx = random.randint(0, len(country_list) - 1)
+            country_idx = random.randint(100, 120)
             me_user = User.objects.create_user(email="student_me{}_fall2017@epita.fr".format(i),
                                                 first_name="Joey{}".format(i),
                                                 last_name="Joseph", is_registered=True, password="asdf")
