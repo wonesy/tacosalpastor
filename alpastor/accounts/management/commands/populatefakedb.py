@@ -130,7 +130,7 @@ class Command(BaseCommand):
         ####################################################################################################################
 
         # Every month has at least 28 days
-        for i in range(1, 28):
+        for i in range(1, 8):
                 # Creates courses with date of Fall 2017
                 Schedule.objects.create(course_id=advc_f17, date=date(2017, 10, i), start_time=timezone.now(),
                                         end_time=timezone.now())

@@ -8,7 +8,7 @@ from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
 from django.http import HttpResponse, JsonResponse
-from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor, choice_to_string
+from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor, choice_to_string, string_to_choice
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
@@ -17,6 +17,8 @@ from django.template.loader import get_template, render_to_string
 from django.core.mail import EmailMultiAlternatives
 from accounts.models import User
 from django_countries import countries
+from django.utils import timezone
+
 
 import logging
 
@@ -36,8 +38,8 @@ class AttendanceGraphs(ListView):
         course = 'Advanced C Programming'
         intake_season = Student.FALL
         intake_year = '2017'
+        semester_year = timezone.now().year - 1
         semester_season = Student.FALL
-        semester_year = '2017'
         email = 'me_student0@epita.fr'
         professor = 'John'
         specialization = Student.SE
@@ -51,6 +53,18 @@ class AttendanceGraphs(ListView):
         all_data_json = json.dumps(all_data)
         return render(request, self.template_name, {'all_data': all_data_json})
         # return JsonResponse(all_data)
+
+    def post(self, request):
+        season = QueryDict(request.body)['season']
+        year = QueryDict(request.body)['year']
+        program = QueryDict(request.body)['program']
+        specialization = QueryDict(request.body)['specialization']
+        print(specialization)
+
+        data = self.whole_semester_by_specialization(semester_season=season, semester_year=year,
+                                              specialization_val=string_to_choice(Student.SPECIALIZATION_CHOICES, specialization))
+        return JsonResponse(data)
+
 
     def build_attendance_results(self, attendance_list):
         present = 0
@@ -84,6 +98,7 @@ class AttendanceGraphs(ListView):
         for course in Course.objects.filter(semester_season=semester_season, semester_year=semester_year):
             course_list.append(course.title)
 
+
         attendance_data = {
             "season": semester_season,
             "year": semester_year,
@@ -94,14 +109,15 @@ class AttendanceGraphs(ListView):
 
         return attendance_data
 
-    def whole_semester_by_specialization(self, semester, specialization_val):
+    def whole_semester_by_specialization(self, semester_season, semester_year, specialization_val):
         specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
         courses = Course.objects.values('title').distinct()
         course_list = []
 
         for course in courses:
             attendances = list(Attendance.objects.filter(schedule_id__course_id__title=course['title'],
-                                                         schedule_id__course_id__semester=semester).values('status'))
+                                                         schedule_id__course_id__semester_season=semester_season,
+                                                         schedule_id__course_id__semester_year=semester_year).values('status'))
             attendance_results = self.build_attendance_results(attendances)
             attendance_results['title'] = course['title']
             course_list.append(attendance_results)

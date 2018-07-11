@@ -46,29 +46,4 @@
             </div>
         </div>
     </div>
-{#    <script>#}
-{#        $("#submitBtn").on('submit', function (event) {#}
-{#            event.preventDefault();#}
-{##}
-{#            console.log("form submitted!");#}
-{#            create_post();#}
-{#        });#}
-{##}
-{#        function create_post() {#}
-{#            $.ajax({#}
-{#                type: "POST",#}
-{#                url: baseUrl,#}
-{#                data: {#}
-{#                    course_id: parseGET()['course_id'],#}
-{#                    date: parseGET()['date'],#}
-{#                    start_time: parseGET()['start_time'],#}
-{#                    end_time: parseGET()['end_time'],#}
-{#                    room_id: parseGET()['room_id'],#}
-{#                    attendance_closed: parseGET()['attendance_closed']#}
-{#                },#}
-{#                contentType: "application/json; charset=utf-8",#}
-{#                dataType: "json"#}
-{#            });#}
-{#        }#}
-{#    </script>#}
 {% endblock %}

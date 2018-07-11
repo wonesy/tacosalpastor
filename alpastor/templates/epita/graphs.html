@@ -12,6 +12,20 @@
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Season
+                </button>
+                <div class="dropdown-menu" id="seasonBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Year
+                </button>
+                <div class="dropdown-menu" id="yearBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Program
                 </button>
                 <div class="dropdown-menu" id="programBtn" aria-labelledby="dropdownMenuButton"></div>
@@ -23,7 +37,7 @@
                 </button>
                 <div class="dropdown-menu" id="specializationBtn" aria-labelledby="dropdownMenuButton"></div>
             </div>
-             <div class="dropdown">
+            <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Course
@@ -48,24 +62,5 @@
     <script>
         let raw_data = document.getElementById('dataDiv').innerText;
         let chart_data = JSON.parse(raw_data);
-
     </script>
-    {#    <script>#}
-    {#        console.log("test");#}
-    {##}
-    {#        let endpoint = '/graphs/';#}
-    {#        $(document).ready(function () {#}
-    {#            $.ajax({#}
-    {#                method: "GET",#}
-    {#                url: endpoint,#}
-    {#                success: function (data) {#}
-    {#                    console.log(data);#}
-    {#                },#}
-    {#                error: function (error_data) {#}
-    {#                    console.log("error");#}
-    {#                    console.log(error_data);#}
-    {#                }#}
-    {#            });#}
-    {#        });#}
-    {#    </script>#}
 {% endblock %}
