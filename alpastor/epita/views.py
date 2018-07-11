@@ -138,12 +138,12 @@ class AttendanceGraphs(ListView):
         allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
         student_name = student.user.get_full_name()
         attendance_data = {'name': student_name, 'student': []}
-        for y in range(len(allcourse)):
-            b = Attendance.objects.filter(student_id__user__first_name=name,
-                                          schedule_id__course_id__title=allcourse[y].course_id).values(
+        for course in range(len(allcourse)):
+            data = Attendance.objects.filter(student_id__user__first_name=name,
+                                             schedule_id__course_id__title=allcourse[course].course_id).values(
                 'status').annotate(status_count=Count('status'))
-            status_list = list(b)
-            attendance_data['student'].append({'course': allcourse[y].course_id.title, 'status': status_list})
+            status_list = list(data)
+            attendance_data['student'].append({'course': allcourse[course].course_id.title, 'status': status_list})
         return attendance_data
 
     def individual_student_allclass(self, name):
