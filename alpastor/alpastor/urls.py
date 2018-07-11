@@ -28,6 +28,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 # add new URL to this structure in alpastor/urls.py
 
@@ -53,7 +54,7 @@ urlpatterns = [
     path('people/', views.people, name='people'),
 
     # CSV
-    path('csv/student/', login_required(csv_views.StudentToCSVView.as_view()), name='studentcsv'),
+    path('csv/student/', csrf_exempt(login_required(csv_views.StudentToCSVView.as_view())), name='studentcsv'),
 
     # Quiz paths
     path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
