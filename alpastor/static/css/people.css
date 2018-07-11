@@ -227,11 +227,9 @@ input[type="checkbox"] {
 }
 
 .panel {
-    padding: 0 18px;
     display: none;
     background-color: #1e1e1e;
     overflow: hidden;
-    margin-left: 10px;
     width: 100%;
 }
 
