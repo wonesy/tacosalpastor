@@ -428,7 +428,9 @@ class AttendanceView(ListView):
 
             if file_upload and status == str(Attendance.EXCUSED):
                 template_name = 'attendance/excuse_doc_email.html'
-                admin_emails = User.objects.filter(is_superuser=True).values_list('email')
+                admin = User.objects.filter(is_superuser=True)
+                admin_emails = [x.email for x in admin]
+
                 # Send email here
                 subject = "EPITA attendance excuse document uploaded"
                 from_email = settings.EMAIL_HOST_USER
