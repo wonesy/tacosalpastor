@@ -15,7 +15,7 @@ function read_secrets()
 }
 
 
-find */migrations -type f \( -iname "*.py" ! -iname "__init__.py" \) -exec rm -f {} \;
+#find */migrations -type f \( -iname "*.py" ! -iname "__init__.py" \) -exec rm -f {} \;
 
 read_secrets
 
