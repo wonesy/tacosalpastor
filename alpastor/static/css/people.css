@@ -357,3 +357,11 @@ table .status {
     background-color: #17a2b8;
     border-color: #17a2b8;
 }
+
+.filters {
+    font-size: small;
+}
+
+.filter-opt p {
+    margin-left: 5px;
+}
