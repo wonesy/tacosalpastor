@@ -126,7 +126,7 @@ class StudentAttendance {
         this.statusOverride = null;
 
         if (image === "" || image === null) {
-            image = "/static/image/portraits/generic_avatar.jpg";
+            image = "https://tacosmedia.s3.amazonaws.com/static/image/portraits/generic_avatar.jpg";
         }
 
         this.image = image;
