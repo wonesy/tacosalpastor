@@ -15,92 +15,36 @@
                 {% if request.user.is_staff == False %}
                     <label for="first_name">First names:</label>
                     <input class="input-group" type="text" id="first_name" name="first_name" disabled="True" placeholder="{{ student.user.first_name }}" value="{{ student.user.first_name }}">
-                    <br>
 
                     <label for="last_name">Last name:</label>
                     <input class="input-group" type="text" id="last_name" name="last_name" disabled="True" placeholder="{{ student.user.last_name }}" value="{{ student.user.last_name }}">
-                    <br>
 
                     <label for="program">Program:</label><br>
                     <input class="input-group" type="text" id="program" name="program" placeholder="{{ student.get_program_display }}" value="{{ student.get_program_display }}" disabled="True">
-                    <br>
 
                     <label for="specialization">Specialization:</label><br>
                     <input class="input-group" type="text" id="specialization" name="specialization" placeholder="{{ student.get_specialization_display }}" value="{{ student.get_specialization_display }}" disabled="True">
-                    <br>
 
                     <label for="intake-season">Intake Season:</label><br>
                     <input class="input-group" type="text" id="intake-season" name="intake-season" placeholder="{{ student.get_intake_season_display }}" value="{{ student.get_intake_season_display }}" disabled="True">
-                    <br>
 
                     <label for="intake-year">Intake Year:</label><br>
                     <input class="input-group" type="text" id="intake-year" name="intake-year" placeholder="{{ student.intake_year }}" value="{{ student.intake_year }}" disabled="True">
-                    <br>
 
 
                 {% endif %}
                 {% if request.user.is_staff == True %}
                     <label for="first_name">First names:</label>
                     <input class="input-group" type="text" id="first_name" name="first_name" disabled="True" placeholder="{{ professor.user.first_name }}" value="{{ professor.user.first_name }}">
-                    <br>
 
                     <label for="last_name">Last name:</label>
                     <input class="input-group" type="text" id="last_name" name="last_name" disabled="True" placeholder="{{ professor.user.last_name }}" value="{{ professor.user.last_name }}">
-                    <br>
                 {% endif %}
                 <form class="update-student" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form }}
-                    {#                #}
-                    {#                <div class="add-single-user-form col-8">#}
-                    {##}
-                    {#                    <p>Update your data as needed, for additional requirements please contact the international#}
-                    {#                        office.</p>#}
-                    {#                    <div class="input-group" id="form-errors"></div>#}
-                    {#                    <br>#}
-                    {#                    <label for="email">Login email address:</label>#}
-                    {#                    <input class="input-group" type="email" id="email" name="email" disabled="True" placeholder="{{ student.user.email }}" value="{{ student.user.email }}">#}
-                    {##}
-                    {#                    <label for="email"><span class="required-field">*</span>External email address:</label>#}
-                    {#                    <input class="input-group" type="email" id="external_email" name="external_email" placeholder="{{ student.user.external_email }}" value="{{ student.user.external_email }}"><br>#}
-                    {##}
-                    {#                    <label for="phone">Phone number:</label>#}
-                    {#                    <input class="input-group" type="text" id="phone" name="phone" placeholder="{{ student.phone }}" value="{{ student.phone }}">#}
-                    {##}
-                    {#                    onchange="toggleStudentForm(this)#}
-                    {#                    onchange="toggleStudentForm(this)#}
-                    {#                    {% if request.user.isStudent %}#}
-                    {##}
-                    {#                    <div id="student-specific-data" class="input-group">#}
-                    {#                        <label for="program">Program:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="program" name="program" placeholder="{{ student.program }}" value="{{ student.program }}" disabled="True"><br>#}
-                    {##}
-                    {#                        <label for="specialization">Specialization:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="specialization" name="specialization" placeholder="{{ student.specialization }}" value="{{ student.specialization }}" disabled="True"><br>#}
-                    {##}
-                    {#                        <label for="intake-semester">Intake Semester:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="intake-semester" name="intake-semester" placeholder="{{ student.intakeSemester }}" value="{{ student.intakeSemester }}" disabled="True"><br>#}
-                    {##}
-                    {#                        <label for="country">Country:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="country" name="country" placeholder="{{ student.country }}" value="{{ student.country }}" disabled="True"><br>#}
-                    {##}
-                    {#                        <label for="address_street"><span class="required-field">*</span>Street Address:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="address_street" name="address_street" placeholder="{{ student.address_street }}" value="{{ student.address_street }}" required><br>#}
-                    {##}
-                    {#                        <label for="address_city"><span class="required-field">*</span>City:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="address_city" name="address_city" placeholder="{{ student.address_city }}" value="{{ student.address_city }}" required><br>#}
-                    {##}
-                    {#                        <label for="address_code"><span class="required-field">*</span>Code:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="address_code" name="address_code" placeholder="{{ student.address_code }}" value="{{ student.address_code }}" required><br>#}
-                    {##}
-                    {#                        <label for="address_misc">Miscellaneous information:</label><br>#}
-                    {#                        <input class="input-group" type="text" id="address_misc" name="address_misc" placeholder="{{ student.address_misc }}" value="{{ student.address_misc }}"><br>#}
-                    {##}
-                    {#                    </div>#}
-                    {#                    {% endif %}#}
-                    {##}
-                    {#                    <br>#}
                     <div style="text-align: center;">
+                        <br>
                         <button class="btn btn-info" type="submit" value="OK"> Update</button>
                     </div>
                     {#                </div>#}
