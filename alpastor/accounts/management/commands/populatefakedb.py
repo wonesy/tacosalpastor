@@ -143,8 +143,8 @@ class Command(BaseCommand):
 
         all_attendance = Attendance.objects.all()
         attendance_count = all_attendance.count()
-        print("MAX ATTENDANCE VALUES: {}", attendance_count)
-        rand_range1 = random.randrange(0, attendance_count)
+        print("MAX ATTENDANCE VALUES: {}".format(attendance_count))
+        rand_range1 = random.randrange(0, int(attendance_count / 2))
         print("CHANGING {} VALUES TO PRESENT".format(rand_range1))
         last_val = 0
         for i in range(rand_range1):

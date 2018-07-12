@@ -66,8 +66,6 @@ function populateDropdowns() {
     const seasonBtn = document.getElementById('seasonBtn');
     const yearBtn = document.getElementById('yearBtn');
     const studentBtn = document.getElementById('studentBtn');
-    let d = new Date();
-    const year = d.getFullYear();
     for (let i = year - 5; i < year; i++) {
         yearBtn.innerHTML += '<a class="dropdown-item" onclick="setYearQuery(i)" href="#">' + i + '</a>';
     }
@@ -88,6 +86,19 @@ function populateDropdowns() {
     for (let i = 0; i < programBtn.children.length; i++) {
         aTag = programBtn.children[i].addEventListener('click', function (e) {
             setProgramQuery(e.srcElement.innerHTML);
+            feedMeData();
+        });
+    }
+
+
+    for (let i = 0; i < chart_data['season'].length; i++) {
+        season_name = chart_data['season'][i];
+        seasonBtn.innerHTML += '<a class="dropdown-item" href="#">' + season_name + '</a>';
+    }
+
+    for (let i = 0; i < seasonBtn.children.length; i++) {
+        aTag = seasonBtn.children[i].addEventListener('click', function (e) {
+            setSeasonQuery(e.srcElement.innerHTML);
             feedMeData();
         });
     }
@@ -113,7 +124,7 @@ function populateDropdowns() {
         });
     }
 
-    for (let i = 0; i < student_data['names'].length; i++) {
+    for (let i = 0; i < student_data.length; i++) {
         studentName = student_data['names'][i];
         studentBtn.innerHTML += '<a class="dropdown-item" href="#">' + studentName + '</a>';
     }
@@ -124,118 +135,116 @@ function populateDropdowns() {
             feedMeData();
         });
     }
-}
+    }
 
-function feedMeData(isTrue) {
-    $.ajax({
-        type: 'POST',
-        url: window.href,
-        data: {
-            'chartData': JSON.stringify(globalChartData),
-            'getNames': isTrue
-        },
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function (data) {
-            if (isTrue) {
-                console.log(data);
-                console.log(data["names"]);
+    function feedMeData(isTrue) {
+        $.ajax({
+            type: 'POST',
+            url: window.href,
+            data: {
+                'chartData': JSON.stringify(globalChartData),
+                'getNames': isTrue
+            },
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                if (isTrue) {
+                    console.log(data);
+                    console.log(data["names"]);
 
-                let nameList = JSON.parse(data["names"]);
+                    let nameList = JSON.parse(data["names"]);
 
-                for (let i = 0; i < nameList.length; i++) {
-                    console.log(nameList[i]);
+                    for (let i = 0; i < nameList.length; i++) {
+                        console.log(nameList[i]);
+                    }
                 }
+
+                // here
+                // console.log(data);
             }
-
-            // here
-            // console.log(data);
-        }
-    });
-}
+        });
+    }
 
 
-window.onload = function () {
-    feedMeData(true);
-    populateDropdowns();
-    console.log(student_data);
-    console.log(chart_data);
-    defaultChart();
-};
+    window.onload = function () {
+        feedMeData(true);
+        populateDropdowns();
+        defaultChart();
+    };
 
-function defaultChart() {
-    let attendanceList = chart_data['attendance'];
-    let labels = ['present', 'absent', 'excused'];
-    let titles = [];
-    let noneAttendance = [];
-    let meAttendance = [];
-    let mscAttendance = [];
-    let fgitmAttendance = [];
-    let exchangeAttendance = [];
+    function defaultChart() {
+        let attendanceList = chart_data['attendance'];
+        let labels = ['present', 'absent', 'excused'];
+        let titles = [];
+        let noneAttendance = [];
+        let meAttendance = [];
+        let mscAttendance = [];
+        let fgitmAttendance = [];
+        let exchangeAttendance = [];
 
-    attendanceList.forEach(function (i) {
-        titles.push(i['program']);
-        if (i['program'] === "None")
-            getAttendance(i['present'], i['absent'], i['excused'], noneAttendance);
+        attendanceList.forEach(function (i) {
+            titles.push(i['program']);
+            if (i['program'] === "None")
+                getAttendance(i['present'], i['absent'], i['excused'], noneAttendance);
 
-        if (i['program'] === "Master of Engineering")
-            getAttendance(i['present'], i['absent'], i['excused'], meAttendance);
+            if (i['program'] === "Master of Engineering")
+                getAttendance(i['present'], i['absent'], i['excused'], meAttendance);
 
-        if (i['program'] === "Master of Science")
-            getAttendance(i['present'], i['absent'], i['excused'], mscAttendance);
+            if (i['program'] === "Master of Science")
+                getAttendance(i['present'], i['absent'], i['excused'], mscAttendance);
 
-        if (i['program'] === "Global IT Management (French)")
-            getAttendance(i['present'], i['absent'], i['excused'], fgitmAttendance);
+            if (i['program'] === "Global IT Management (French)")
+                getAttendance(i['present'], i['absent'], i['excused'], fgitmAttendance);
 
-        if (i['program'] === "Exchange")
-            getAttendance(i['present'], i['absent'], i['excused'], exchangeAttendance);
-    });
+            if (i['program'] === "Exchange")
+                getAttendance(i['present'], i['absent'], i['excused'], exchangeAttendance);
+        });
 
-    colors = [];
-    mscAttendance.forEach(function () {
-        colors.push(getRandomColorHex());
-    });
+        colors = [];
+        mscAttendance.forEach(function () {
+            colors.push(getRandomColorHex());
+        });
 
-    // MSC Chart
-    let mscChart = document.getElementById('mscChart').getContext('2d');
-    createChart(mscChart, 'pie', labels, titles[programs['MSc']], mscAttendance, colors);
+        // MSC Chart
+        let mscChart = document.getElementById('mscChart').getContext('2d');
+        createChart(mscChart, 'pie', labels, titles[programs['MSc']], mscAttendance, colors);
 
-    // ME Chart
-    let meChart = document.getElementById('meChart').getContext('2d');
-    createChart(meChart, 'pie', labels, titles[programs['ME']], meAttendance, colors);
+        // ME Chart
+        let meChart = document.getElementById('meChart').getContext('2d');
+        createChart(meChart, 'pie', labels, titles[programs['ME']], meAttendance, colors);
 
-    // Exchange
-    let exchangeChart = document.getElementById('exchangeChart').getContext('2d');
-    createChart(exchangeChart, 'pie', labels, titles[programs['EXCHANGE']], exchangeAttendance, colors);
-}
+        // Exchange
+        let exchangeChart = document.getElementById('exchangeChart').getContext('2d');
+        createChart(exchangeChart, 'pie', labels, titles[programs['EXCHANGE']], exchangeAttendance, colors);
+    }
 
 
 // function getChartData() {
 //
 // }
 
-function createChart(location, type, labels, title, data, colors) {
-    console.log(data);
-    new Chart(location, {
-        type: type, // bar, horizontal bar, pie, line, doughnut, radar, polarArea
-        data: {
-            labels: labels,
-            datasets: [{
-                // label: 'Insert Label Here',
-                data: data,
-                backgroundColor: colors,
-                borderWidth: 4,
-                borderColor: 'grey'
-            }]
-        },
-        options: {
-            title: {
-                display: true,
-                text: title
+    function createChart(location, type, labels, title, data, colors) {
+        console.log(data);
+        new Chart(location, {
+            type: type, // bar, horizontal bar, pie, line, doughnut, radar, polarArea
+            data: {
+                labels: labels,
+                datasets: [{
+                    // label: 'Insert Label Here',
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 4,
+                    borderColor: 'grey'
+                }]
             },
-            legend: {
-                position: 'right'
+            options: {
+                title: {
+                    display: true,
+                    text: title
+                },
+                legend: {
+                    position: 'right'
+                }
             }
-        }
-    });
-}
+        });
+    }
