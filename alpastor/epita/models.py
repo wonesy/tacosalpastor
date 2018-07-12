@@ -53,7 +53,7 @@ def save_user_student(sender, instance, **kwargs):
         instance.professor.save()
 
 def photo_file_path(instance, filename):
-    return "photos/{0}_{1}/{2}".format(instance.id, instance.user.get_full_name().replace(' ', '_'), filename)
+    return "photos/{0}_{1}_{2}".format(instance.id, instance.user.get_full_name().replace(' ', '_'), filename)
 
 class Student(models.Model):
     """
@@ -306,8 +306,7 @@ class Schedule(models.Model):
         return "{} {}".format(self.course_id, self.date)
 
 def excuse_file_path(instance, filename):
-    return "excuse_documents/student_id_{0}/{1}".format(instance.student_id.id, filename)
-
+    return "excuse_documents/student_id_{0}_{1}".format(instance.student_id.id, filename)
 
 class Attendance(models.Model):
     """
