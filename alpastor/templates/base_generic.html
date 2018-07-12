@@ -17,8 +17,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
+{#    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">#}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/base_generic.css' %}">
     <script src="{% static 'js/utils.js' %}"></script>
     <link rel="icon" type="image/png" href="{% static 'image/favicon.ico' %}" />
@@ -46,7 +47,7 @@
         <ul class="list-unstyled components">
             <li class="active hover-left-brdr">
                 <a href="/dashboard">
-                    <i class="fa fa-tachometer-alt"></i>
+                    <i class="fa fa-tachometer fa-fw"></i>
                     <span class="base-generic-lmargin">Dashboard</span>
                 </a>
             </li>
@@ -70,7 +71,7 @@
 {#            </li>#}
             <li class="active hover-left-brdr">
                 <a href="/attendance">
-                    <i class="fa fa-user-check"></i>
+                    <i class="fa fa-check fa-fw"></i>
                     <span class="base-generic-lmargin">Attendance</span>
                 </a>
             </li>
@@ -78,14 +79,14 @@
             {% if request.user.is_superuser %}
             <li class="active hover-left-brdr">
                 <a href="/manageusers">
-                    <i class="fa fa-users"></i>
+                    <i class="fa fa-users fa-fw"></i>
                     <span class="base-generic-lmargin">Manage Users</span>
                 </a>
             </li>
             {% endif %}
             <li class="active hover-left-brdr">
                 <a href="/graphs">
-                    <i class="fa fa-chart-line"></i>
+                    <i class="fa fa-line-chart"></i>
                     <span class="base-generic-lmargin">Graphs</span>
                 </a>
             </li>
