@@ -244,7 +244,7 @@ let studentStatusPresentTemplateCard =
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-success\">{1}</div>" +
             "<div class=\"card-body\">" +
-                "<img src='{3}'>" +
+                "<img class=\"student-img\" src='{3}'>" +
                 "<p class=\"card-text\">{2}</p>" +
             "</div>" +
             "<div class=\"card-footer\">" +
@@ -267,7 +267,7 @@ let studentStatusAbsentTemplateCard =
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-danger\">{1}</div>" +
             "<div class=\"card-body\">" +
-                "<img src='{3}'>" +
+                "<img class=\"student-img\" src='{3}'>" +
                 "<p class=\"card-text\">{2}</p>" +
             "</div>" +
             "<div class=\"card-footer\">" +
@@ -290,7 +290,7 @@ let studentStatusExcusedTemplateCard =
         "<div class=\"card text-white mb-3\" >" +
             "<div class=\"card-header bg-warning\">{1}</div>" +
             "<div class=\"card-body\">" +
-                "<img src='{3}'>" +
+                "<img class=\"student-img\" src='{3}'>" +
                 "<p class=\"card-text\">{2}</p>" +
             "</div>" +
             "<div class=\"card-footer\">" +
