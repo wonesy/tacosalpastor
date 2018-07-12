@@ -1,11 +1,20 @@
 from django.db import models
+from alpastor import settings
 from accounts.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django_countries.fields import CountryField
 import re
 import datetime
 from django.utils.timezone import now
 
+def choice_to_string(choices, index):
+    return [x[1] for x in choices][index]
+
+def string_to_choice(choices, val):
+    for x in choices:
+        if x[1] == val:
+            return x[0]
 
 @receiver(post_save, sender=User)
 def create_user_student_or_prof(sender, instance, created, **kwargs):
@@ -43,6 +52,8 @@ def save_user_student(sender, instance, **kwargs):
     elif not instance.is_superuser:
         instance.professor.save()
 
+def photo_file_path(instance, filename):
+    return "photos/{0}_{1}/{2}".format(instance.id, instance.user.get_full_name().replace(' ', '_'), filename)
 
 class Student(models.Model):
     """
@@ -136,42 +147,38 @@ class Student(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=31)
+    phone = models.CharField(max_length=31, blank=True, null=True)
     program = models.IntegerField(choices=PROGRAM_CHOICES, default=NONE, blank=False)
     specialization = models.IntegerField(choices=SPECIALIZATION_CHOICES, default=NONE, blank=False)
     intake_season = models.IntegerField(choices=SEASON_CHOICES, default=FALL, blank=False)
     intake_year = models.IntegerField(blank=False, default=now().year)
-    country = models.CharField(max_length=127)
-    country_code = models.CharField(max_length=2, blank=True)
+    country = CountryField(help_text="country", blank_label="Select a country", countries_flag_url="flags/{code}.jpg")
     city = models.CharField(max_length=127, blank=True, help_text="City of origin")
     languages = models.CharField(max_length=127, blank=True)
-    photo_location = models.CharField(max_length=511, null=True, blank=True)
-    address_street = models.CharField(max_length=255, null=True, blank=True, help_text="Street")
-    address_city = models.CharField(max_length=255, null=True, blank=True, help_text="City")
-    address_misc = models.CharField(max_length=255, null=True, blank=True, help_text="Building, mailbox, etc.")
-    postal_code = models.IntegerField(blank=True, null=True, help_text="Department postal code")
-    dob = models.DateField(null=True, blank=True, help_text="Date of birth")
-    enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False, help_text="Enrollment status")
-    flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False, help_text="Student flags")
+    photo = models.ImageField(null=True, blank=True, upload_to=photo_file_path)
+    address_street = models.CharField(max_length=255, null=True, blank=True)
+    address_city = models.CharField(max_length=255, null=True, blank=True)
+    address_misc = models.CharField(max_length=255, null=True, blank=True)
+    postal_code = models.IntegerField(blank=True, null=True)
+    dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
+    enrollment_status = models.IntegerField(choices=ENROLLMENT_CHOICES, default=ENROLLED, blank=False)
+    flags = models.IntegerField(choices=ADDITIONAL_FLAGS, default=OK, blank=False)
 
     def __repr__(self):
         return "Student(first_name={}, last_name={}, external_email={}, epita_email={}, phone={}, program={}, " \
-               "specialization={}, intake_season={}, intake_year={}, country={}, country_code={}, city={}, languages={}, photo_location={}" \
+               "specialization={}, intake_season={}, intake_year={}, country={}, city={}, languages={}, photo_location={}" \
                ")".format(self.user.first_name, self.user.last_name, self.user.external_email, self.user.email, self.phone,
-                          self.program, self.specialization, self.intake_season, self.intake_year, self.country, self.country_code, self.city,
-                          self.languages, self.photo_location)
+                          self.program, self.specialization, self.intake_season, self.intake_year, self.country.name, self.city,
+                          self.languages, self.photo.name)
 
     def __str__(self):
         return self.user.get_full_name()
 
-    def program_to_string(self, program_int):
-        return [x[1] for x in Student.PROGRAM_CHOICES][program_int]
+    def student_email(self):
+        return self.user.email
 
-    def specialization_to_string(self, specialization_int) -> object:
-        return [x[1] for x in Student.SPECIALIZATION_CHOICES][specialization_int]
-
-    def season_to_string(self, season_int):
-        return [x[1] for x in Student.SEASON_CHOICES][season_int]
+    def country_name(self):
+        return self.country.name
 
 class Professor(models.Model):
     """
@@ -183,7 +190,7 @@ class Professor(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=31)
-    photo_location = models.CharField(max_length=511, blank=True)
+    photo = models.ImageField(blank=True, upload_to=photo_file_path)
 
     def __repr__(self):
         return "Professor(first_name={}, last_name={}, external_email={}, epita_email={}, phone={})".format(
@@ -191,6 +198,9 @@ class Professor(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
+
+    def professor_email(self):
+        return self.user.email
 
 
 class Course(models.Model):
@@ -231,7 +241,7 @@ class Course(models.Model):
         self.title = re.sub(' +', ' ', self.title)
 
         # Save slug field (e.g. fall-2019-advanced-c-programming
-        slug_season = self.season_to_string()
+        slug_season = choice_to_string(Student.SEASON_CHOICES, self.semester_season)
         self.slug = slug_season.lower() + '-' + str(self.semester_year) + '-' + self.title.lower().replace(' ', '-')
 
     def save(self, **kwargs):
@@ -249,10 +259,8 @@ class Course(models.Model):
         return "{} ({})".format(self.title, self.full_semester())
 
     def full_semester(self):
-        return "{} {}".format(self.season_to_string(), self.semester_year)
+        return "{} {}".format(choice_to_string(Student.SEASON_CHOICES, self.semester_season), self.semester_year)
 
-    def season_to_string(self):
-        return [x[1] for x in Student.SEASON_CHOICES][self.semester_season]
 
 class StudentCourse(models.Model):
     """
@@ -272,6 +280,7 @@ class StudentCourse(models.Model):
 
     def __str__(self):
         return "{}".format(self.course_id)
+
 
 class Schedule(models.Model):
     """
@@ -295,6 +304,9 @@ class Schedule(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.course_id, self.date)
+
+def excuse_file_path(instance, filename):
+    return "excuse_documents/student_id_{0}/{1}".format(instance.student_id.id, filename)
 
 
 class Attendance(models.Model):
@@ -321,7 +333,7 @@ class Attendance(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     schedule_id = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     status = models.IntegerField(choices=ATTENDANCE_CHOICES, default=ABSENT)
-    file_upload = models.FileField(null=True, blank=True)
+    file_upload = models.FileField(null=True, blank=True, upload_to=excuse_file_path)
     upload_time = models.DateTimeField(null=True, blank=True)
 
     def __repr__(self):

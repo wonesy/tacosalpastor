@@ -11,6 +11,9 @@ before_script:
 - export MYSQL_DATABASE=alpastor
 - export MYSQL_USERNAME=alpastoradmin
 - export MYSQL_USER_PASSWORD=alpastorpass
+- export DJANGO_SECRET_KEY=abcd
+- export ADMIN_EMAIL=fake@fake.com
+- export ADMIN_EMAIL_PASSWORD=123abc
 - sudo mysql -e 'CREATE DATABASE IF NOT EXISTS alpastor;'
 - sudo mysql -e "CREATE USER 'alpastoradmin'@'localhost' IDENTIFIED BY 'alpastorpass';"
 - sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'alpastoradmin'@'localhost';"

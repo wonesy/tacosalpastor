@@ -13,6 +13,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
         return obj.student_id.__str__()
 
     def get_image(self, obj):
-        return obj.student_id.photo_location
-
+        if obj.student_id.photo:
+            return obj.student_id.photo.url
+        else:
+            return ""
 

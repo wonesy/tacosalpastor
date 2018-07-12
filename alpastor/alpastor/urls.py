@@ -19,13 +19,20 @@ from django.urls import path
 from accounts import views as accounts_views
 from quiz import views as quiz_views
 from epita import views
-from epita.views import CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData, OverrideStudentAttendanceData, ToggleAttendanceLock
+from epita import csv_views
+from epita.views import (
+    CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData,
+    OverrideStudentAttendanceData, ToggleAttendanceLock, AttendanceGraphs, AccountUpdateView)
+
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 # add new URL to this structure in alpastor/urls.py
+
+
 urlpatterns = [
     path('', views.dashboard, name='home'),
 
@@ -37,8 +44,17 @@ urlpatterns = [
     path('attendance/course/<slug:slug>', login_required(ScheduleView.as_view()), name='schedule_list'),
     path('attendance/', login_required(CourseView.as_view()), name='course_list'),
 
+    # graphs
+    path('graphs/', login_required(AttendanceGraphs.as_view()), name='graphs'),
+
+    # Accounts, change
+    path('account_update/', AccountUpdateView.as_view(), name='account_update'),
+
     # People
     path('people/', views.people, name='people'),
+
+    # CSV
+    path('csv/student/', csrf_exempt(login_required(csv_views.StudentToCSVView.as_view())), name='studentcsv'),
 
     # Quiz paths
     path('quiz/quiz_builder/savenewquiz/', login_required(quiz_views.SaveNewQuiz.as_view()), name='savenewquiz'),
@@ -58,11 +74,10 @@ urlpatterns = [
     path('manageusers/addstudentcourse/', login_required(accounts_views.AddStudentCourse.as_view()), name='addstudentcourse'),
     path('manageusers/deletestudentcourse/', login_required(accounts_views.DeleteStudentCourse.as_view()), name='deletestudentcourse'),
     path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
-    path('dashboardex/', views.dashboard, name='dashboardex'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('admin/', admin.site.urls),
 
 ]
-
 
 urlpatterns = format_suffix_patterns(urlpatterns)
 

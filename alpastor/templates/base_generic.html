@@ -36,7 +36,8 @@
     <!-- Sidebar Holder -->
     <nav id="sidebar">
         <div class="active sidebar-header">
-            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" class="nav-avatar">
+            <img src="{% static 'image/portraits/logo-epita.png' %}" class="nav-avatar">
+            <p style="text-align: center;">{{ request.user.get_full_name }}</p>
             <a href="/login">
                 <button type="button" class="btn">Logout</button>
             </a>
@@ -44,9 +45,15 @@
 
         <ul class="list-unstyled components">
             <li class="active hover-left-brdr">
-                <a href="/dashboardex">
+                <a href="/dashboard">
                     <i class="fa fa-tachometer-alt"></i>
                     <span class="base-generic-lmargin">Dashboard</span>
+                </a>
+            </li>
+            <li class="active hover-left-brdr">
+                <a href="/account_update">
+                    <i class="fa fa-address-card fa-fw"></i>
+                    <span class="base-generic-lmargin">Account</span>
                 </a>
             </li>
             <li class="active hover-left-brdr">
@@ -55,12 +62,12 @@
                     <span class="base-generic-lmargin">People</span>
                 </a>
             </li>
-            <li class="active hover-left-brdr">
-                <a href="/quiz">
-                    <i class="fa fa-pencil-alt fa-fw"></i>
-                    <span class="base-generic-lmargin">Quiz</span>
-                </a>
-            </li>
+{#            <li class="active hover-left-brdr">#}
+{#                <a href="/quiz">#}
+{#                    <i class="fa fa-pencil-alt fa-fw"></i>#}
+{#                    <span class="base-generic-lmargin">Quiz</span>#}
+{#                </a>#}
+{#            </li>#}
             <li class="active hover-left-brdr">
                 <a href="/attendance">
                     <i class="fa fa-user-check"></i>
@@ -76,6 +83,12 @@
                 </a>
             </li>
             {% endif %}
+            <li class="active hover-left-brdr">
+                <a href="/graphs">
+                    <i class="fa fa-chart-line"></i>
+                    <span class="base-generic-lmargin">Graphs</span>
+                </a>
+            </li>
         </ul>
     </nav>
 

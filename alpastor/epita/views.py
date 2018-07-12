@@ -1,17 +1,24 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.views.generic import ListView
 from rest_framework.exceptions import bad_request
-from .forms import AttendanceForm, ScheduleForm
+from .forms import AttendanceForm, ScheduleForm, AccountUpdateForm, ProfessorAccountUpdateForm, UserAccountUpdateForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
-from django.http import HttpResponse
-from .models import Student, StudentCourse, Course, Attendance, Schedule
+from django.http import HttpResponse, JsonResponse
+from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor, choice_to_string, string_to_choice
 from django.views.generic import View
 from rest_framework.response import Response
 from django.db.models import Count
+from alpastor import settings
+from django.template.loader import get_template, render_to_string
+from django.core.mail import EmailMultiAlternatives
+from accounts.models import User
+from django_countries import countries
+from django.utils import timezone
+
 
 import logging
 
@@ -20,6 +27,238 @@ logger = logging.getLogger(__name__)
 @login_required()
 def home(request):
     return render(request, 'base_generic.html')
+
+
+class AttendanceGraphs(ListView):
+    template_name = 'epita/graphs.html'
+    form_class = AttendanceForm
+
+    def get(self, request, *args):
+        student = 'Willy0'
+        course = 'Advanced C Programming'
+        intake_season = Student.FALL
+        intake_year = '2017'
+        semester_year = timezone.now().year - 1
+        semester_season = Student.FALL
+        email = 'me_student0@epita.fr'
+        professor = 'John'
+        specialization = Student.SE
+        # all_data = self.whole_semester_by_student_by_class(email, course)
+        # all_data = self.whole_semester_by_specialization(semester, specialization)
+        all_data = self.default_graph_by_program(semester_season, semester_year)
+        # all_data = self.whole_semester_by_class(course, semester)
+        # all_data = self.individual_student_allclass(student)
+        # all_data = self.individual_professor_allclass(professor)
+        # all_data = self.individual_professor_allclass_by_semester(professor, semester)
+        attendance_data = json.dumps(all_data)
+
+        return render(request, self.template_name, {'all_data': attendance_data})
+        # return JsonResponse(all_data)
+
+    def post(self, request):
+        # program = QueryDict(request.body)['program']
+        # specialization = QueryDict(request.body)['specialization']
+
+        names = QueryDict(request.body)['getNames']
+        chart_data = QueryDict(request.body)['chartData']
+        chart_dict = json.loads(chart_data)
+        year = chart_dict['year']
+        season = chart_dict['season']
+        student_list = StudentCourse.objects.filter(course_id__semester_season=season,
+                                                    course_id__semester_year=year).select_related('student_id')
+
+        names = []
+        for student in student_list:
+            name = student.student_id.user.get_full_name()
+            if name not in names:
+                names.append(name)
+        student_data = json.dumps(names)
+
+        if names:
+            return JsonResponse({"names":student_data})
+
+        # data = self.whole_semester_by_specialization(semester_season=season, semester_year=year,
+                                              # specialization_val=string_to_choice(Student.SPECIALIZATION_CHOICES, specialization))
+        # return JsonResponse(data)
+
+
+    def build_attendance_results(self, attendance_list):
+        present = 0
+        absent = 0
+        excused = 0
+
+        for i in attendance_list:
+            if i['status'] == Attendance.PRESENT:
+                present += 1
+            elif i['status'] == Attendance.ABSENT:
+                absent += 1
+            elif i['status'] == Attendance.EXCUSED:
+                excused += 1
+        return {'present': present, 'absent': absent, 'excused': excused}
+
+    def default_graph_by_program(self, semester_season, semester_year):
+        programs = Student.PROGRAM_CHOICES
+        program_list = []
+        specialization_list = []
+        course_list = []
+
+        for program in programs:
+            attendances = list(Attendance.objects.filter(student_id__program=program[0],
+                                                         schedule_id__course_id__semester_year=semester_year,
+                                                         schedule_id__course_id__semester_season=semester_season).values('status'))
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['program'] = program[1]
+            program_list.append(attendance_results)
+        for specialization in Student.SPECIALIZATION_CHOICES:
+            specialization_list.append(specialization[1])
+        for course in Course.objects.filter(semester_season=semester_season, semester_year=semester_year):
+            course_list.append(course.title)
+
+
+        attendance_data = {
+            "season": semester_season,
+            "year": semester_year,
+            "attendance": program_list,
+            "specialization": specialization_list,
+            "course": course_list
+        }
+
+        return attendance_data
+
+    def whole_semester_by_specialization(self, semester_season, semester_year, specialization_val):
+        specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
+        courses = Course.objects.values('title').distinct()
+        course_list = []
+
+        for course in courses:
+            attendances = list(Attendance.objects.filter(schedule_id__course_id__title=course['title'],
+                                                         schedule_id__course_id__semester_season=semester_season,
+                                                         schedule_id__course_id__semester_year=semester_year).values('status'))
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['title'] = course['title']
+            course_list.append(attendance_results)
+
+        attendance_data = {'specialization': specialization_name, 'courses': course_list}
+
+        return attendance_data
+
+    def whole_semester_by_class(self, course, semester):
+        schedule = Schedule.objects.filter(course_id__title=course, course_id__semester=semester)
+        attendance_list = []
+
+        for i in schedule:
+            attendances = Attendance.objects.filter(schedule_id__date=i.date).values('status')
+            attendance_results = self.build_attendance_results(attendances)
+            attendance_results['date'] = i.date
+
+            attendance_list.append(attendance_results)
+        attendance_data = {'course': course, 'semester': semester, 'attendance': attendance_list}
+        return attendance_data
+
+    def whole_semester_by_student_by_class(self, email, course):
+        attendance = Attendance.objects.filter(student_id__user__email=email, schedule_id__course_id__title=course)
+        student_name = Student.objects.filter(user__email=email)[0].user.get_full_name()
+        attendance_data = {'name': student_name, 'course': course,'attendance': []}
+
+        for i in attendance:
+            attendance_data['attendance'].append({'date': i.schedule_id.date, 'status': i.status})
+
+        return attendance_data
+
+    def individual_student_allclass(self, name):
+        student = Student.objects.filter(user__first_name=name)[0]
+        allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
+        student_name = student.user.get_full_name()
+        attendance_data = {'name': student_name, 'student': []}
+        for course in range(len(allcourse)):
+            data = Attendance.objects.filter(student_id__user__first_name=name,
+                                             schedule_id__course_id__title=allcourse[course].course_id).values(
+                'status').annotate(status_count=Count('status'))
+            status_list = list(data)
+            attendance_data['student'].append({'course': allcourse[course].course_id.title, 'status': status_list})
+        return attendance_data
+
+    def individual_student_allclass(self, name):
+
+        student = Student.objects.filter(user__first_name=name)[0]
+        allcourse = StudentCourse.objects.filter(student_id__user__first_name=name)
+        # print(allcourse)
+        stdname = student.user.get_full_name()
+        status = Attendance.objects.filter(student_id__user__first_name=name,
+                                           schedule_id__course_id__title=allcourse[0].course_id).values('status')
+        # print(status)
+
+        attendance_data = {'name': stdname, 'student': []}
+
+        for y in range(len(allcourse)):
+            b = Attendance.objects.filter(student_id__user__first_name=name,
+                                          schedule_id__course_id__title=allcourse[y].course_id).values('status')
+
+            print(b)
+            attendance_data['student'].append({'course': allcourse[y].course_id.title, 'st': b})
+            # attendance_data['student'].append({'st': b})
+        # print(attendance_data)
+
+        # attendance_data['student'].append({'allcourse': allcourse})
+        # attendance_data['student'][0]['allcourse'] = []
+        #
+        # for x in allcourse:
+        #     attendance_data['student'].append({'course': x.course_id.title})
+        #
+        # print(x)
+        # print(attendance_data)
+        #
+        # for i in student:
+        #     attendance_data['student'][0]['allcourse'].append({'status': i.status})
+        #     print('attendace data')
+        #     print(attendance_data)
+        return attendance_data
+
+
+    def individual_professor_allclass_by_semester(self, name, semester):
+        professor = Professor.objects.filter(user__first_name=name)[0]
+        # print(professor)
+        courses = Course.objects.filter(professor_id__user__first_name=name).distinct()
+        print(courses)
+        # course_attendance1 = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+        #                                               schedule_id__course_id__title=courses[0]).values(
+        #     'status').annotate(status_count=Count('status'))
+        # print(course_attendance1)
+        # course_attendance = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+        #                                               schedule_id__course_id__title=courses[1]).values(
+        #     'status').annotate(status_count=Count('status'))
+        # print(course_attendance)
+        professor_name = professor.user.get_full_name()
+        p_attendance_data = {'name': professor_name, 'professor': []}
+        # print(p_attendance_data)
+        for x in range(len(courses)):
+            course_attendance = Attendance.objects.filter(schedule_id__course_id__professor_id__user__first_name=name,
+                                                          schedule_id__course_id__semester=semester,
+                                                          schedule_id__course_id__title=courses[x]).values(
+                'status')
+            s_list = list(course_attendance)
+            p_attendance_data['professor'].append({'course': courses[x].title, 'status': s_list})
+            return p_attendance_data
+
+    def individual_professor_allclass(self, name):
+        professor = Professor.objects.filter(user__first_name=name)[0]
+        course = 'Advanced C Programming'
+        courses = Course.objects.filter(professor_id__user__first_name=name, title=course)
+        print(courses)
+        semester_attendance = Attendance.objects.filter(schedule_id__course_id__semester=courses[1].semester).values(
+            'status').annotate(status_count=Count('status'))
+        print(semester_attendance)
+        professor_name = professor.user.get_full_name()
+        p_attendance_data = {'name': professor_name, 'course name': course, 'professor': []}
+        for x in range(len(courses)):
+            semester_attendance = Attendance.objects.filter(
+                schedule_id__course_id__semester=courses[x].semester).values(
+                'status').annotate(status_count=Count('status'))
+            s_list = list(semester_attendance)
+            print("printing s_list")
+            print(s_list)
+            p_attendance_data['professor'].append({'course semester': courses[1].semester, 'status': s_list})
+            return p_attendance_data
 
 
 class CourseView(ListView):
@@ -33,14 +272,14 @@ class CourseView(ListView):
         if user_instance.is_superuser:
             semesters = Course.objects.values_list('semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
             for semester in semesters:
-                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                courses_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(semester[1])] = Course.objects.filter(
                     semester_season=semester[0], semester_year=semester[1]).order_by('title')
 
         elif user_instance.is_staff:
             semesters = Course.objects.filter(professor_id__user_id=user_instance).values_list(
                 'semester_season', 'semester_year').distinct().order_by('-semester_year', '-semester_season')
             for semester in semesters:
-                courses_by_semester[self.season_to_string(semester[0]) + " " + str(semester[1])] = Course.objects.filter(
+                courses_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(semester[1])] = Course.objects.filter(
                     semester_season=semester[0], semester_year=semester[1], professor_id__user_id=user_instance).order_by('title')
 
         else:
@@ -48,7 +287,7 @@ class CourseView(ListView):
                 '-course_id__semester_year', '-course_id__semester_season'
             )
             for course in enrolled_in:
-                key = self.season_to_string(course.course_id.semester_season) + " " + str(course.course_id.semester_year)
+                key = choice_to_string(Student.SEASON_CHOICES, course.course_id.semester_season) + " " + str(course.course_id.semester_year)
                 if not key in courses_by_semester:
                     courses_by_semester[key] = Course.objects.filter(semester_season=course.course_id.semester_season,
                             semester_year=course.course_id.semester_year,
@@ -57,10 +296,6 @@ class CourseView(ListView):
 
         return render(request, self.template_name, {'semester_list': courses_by_semester})
 
-    def season_to_string(self, season_int):
-        return [x[1] for x in Student.SEASON_CHOICES][season_int]
-
-
 class ScheduleView(ListView):
     template_name = 'epita/schedule_prof.html'
     form_class = ScheduleForm
@@ -68,7 +303,7 @@ class ScheduleView(ListView):
     def get(self, request, slug):
         logged_in_user = request.user
         course = get_object_or_404(Course, slug=slug)
-        schedule_list = Schedule.objects.filter(course_id=course).order_by('date', 'start_time')
+        schedule_list = Schedule.objects.filter(course_id__slug=slug).order_by('date', 'start_time')
 
         # Student view
         if not logged_in_user.is_staff and not logged_in_user.is_superuser:
@@ -115,8 +350,6 @@ class ScheduleView(ListView):
         return render(request, self.template_name, args)
 
 
-
-
 class AttendanceView(ListView):
     template_name = 'epita/attendance_list.html'
     form_class = AttendanceForm
@@ -151,30 +384,58 @@ class AttendanceView(ListView):
         return render(request, self.template_name, data)
 
     def post(self, request, slug, **kwargs):
+
         schedule_id = request.GET.get('schedule_id')
 
         instance = get_object_or_404(Attendance, schedule_id=schedule_id,
                                      student_id__user=request.user)
 
-        if instance.schedule_id.attendance_closed:
-            return redirect('schedule_list', slug=slug)
-
         status = request.POST.get('status')
-        file_upload = request.POST.get('file_upload')
         user = request.user
 
+        try:
+            file_upload = request.FILES['file_upload']
+        except:
+            file_upload = None
 
+        # Only changes to EXCUSED state are accepted after the attendance is closed
+        if (instance.schedule_id.attendance_closed) and (status != str(Attendance.EXCUSED)):
+            return redirect('schedule_list', slug=slug)
 
+        # There must be a status to change for there to be anything saved
         if not status:
             return redirect('schedule_list', slug=slug)
 
+        # If the change is to EXCUSED, there must be an accompanying document
         if (status == str(Attendance.EXCUSED)) and not file_upload:
             return redirect('schedule_list', slug=slug)
 
-        Attendance.objects.filter(schedule_id_id=schedule_id, student_id__user=user).update(
-            status=status,
-            file_upload=file_upload
-        )
+        form = AttendanceForm(instance=instance, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            logger.info("Updating attendance information: {} now marked as {}".format(user.get_full_name(), status))
+            saved_instance = form.save()
+
+            if file_upload and status == str(Attendance.EXCUSED):
+                template_name = 'attendance/excuse_doc_email.html'
+                admin = User.objects.filter(is_superuser=True)
+                admin_emails = [x.email for x in admin]
+
+                # Send email here
+                subject = "EPITA attendance excuse document uploaded"
+                from_email = settings.EMAIL_HOST_USER
+                d = {
+                    "doc_url": saved_instance.file_upload.url,
+                    "domain": request.get_host(),
+                    "protocol": "http",
+                    "attendance": instance
+                }
+                html_template = get_template(template_name)
+                html_content = html_template.render(d)
+                msg = EmailMultiAlternatives(subject, render_to_string(template_name, d), from_email, admin_emails)
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+        else:
+            logger.info("Failed up update attendance information")
 
         return redirect('schedule_list', slug=slug)
 
@@ -284,7 +545,7 @@ class ToggleAttendanceLock(View):
 
         return HttpResponse(200)
 
-
+@login_required()
 def dashboard(request):
     people_dict = {}
 
@@ -294,16 +555,39 @@ def dashboard(request):
 
     # bar graph by country
 
+    sem = '2018'
+    # bar graph by country
+
     country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    new = Student.objects.filter(intake_year=sem).values('country').annotate(the_count=Count('country')).order_by(
+        'country')
+    # print(new)
+
+    semesters = Student.objects.values_list('intake_season', 'intake_year').distinct().order_by('-intake_season',
+                                                                                                '-intake_year')
+    # print(semesters)
+
+    country_by_semester = {}
+
+    for semester in semesters:
+        country_by_semester[choice_to_string(Student.SEASON_CHOICES, semester[0]) + " " + str(
+            semester[1])] = Student.objects.filter(intake_season=semester[0], intake_year=semester[1]).values(
+            'country').annotate(the_count=Count('country')).order_by('country')
+
+    country = Student.objects.values('country').annotate(the_count=Count('country')).order_by('country')
+
+    country_dict = dict(countries)
+    for c in country:
+        c['country_name'] = country_dict[c['country']]
 
     program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
     for p in program:
         program_strings = {}
-        program_strings['program'] = Student.program_to_string(None, p['program'])
+        program_strings['program'] = choice_to_string(Student.PROGRAM_CHOICES, p['program'])
         program_strings['count_program'] = p['count_program']
         program_list.append(program_strings)
-
 
     # bar graph by specialization
 
@@ -312,18 +596,65 @@ def dashboard(request):
         count_specialization=Count('specialization')).order_by('specialization')
     for s in specialization:
         specialization_strings = {}
-        specialization_strings['specialization'] = Student.specialization_to_string(None, s['specialization'])
+        specialization_strings['specialization'] = choice_to_string(Student.SPECIALIZATION_CHOICES, s['specialization'])
         specialization_strings['count_specialization'] = s['count_specialization']
         specialization_list.append(specialization_strings)
 
 
-    # bar graph by intake semester
-
     semesters = Student.objects.values('intake_season', 'intake_year').order_by('intake_year', 'intake_season').distinct()
     for s in semesters:
         s['count'] = Student.objects.filter(intake_season=s['intake_season'], intake_year=s['intake_year']).count()
-        s['intake_season'] = Student.season_to_string(None, s['intake_season'])
+        s['intake_season'] = choice_to_string(Student.SEASON_CHOICES, s['intake_season'])
 
-    return render(request, 'dashboardex.html',
+    return render(request, 'dashboard.html',
                   {'country': country, 'program': program_list, 'splgraph': specialization_list, 'active_students': active_students,
-                   'intakeSemester': semesters})
+                    'intakeSemester': semesters, 'countrysemester': country_by_semester})
+
+
+class AccountUpdateView(ListView):
+    template_name = 'epita/accounts.html'
+
+    def get(self, request, *args, **kwargs):
+        logged_in_user = request.user
+        data = {}
+        if logged_in_user.is_staff and not logged_in_user.is_superuser:
+            professor_instance = Professor.objects.get(user_id=logged_in_user.id)
+            data['professor'] = professor_instance
+            data['form'] = ProfessorAccountUpdateForm(instance=professor_instance)
+        elif logged_in_user.is_superuser:
+            superuser_instance = User.objects.get(id=logged_in_user.id)
+            data['professor'] = superuser_instance
+            data['form'] = UserAccountUpdateForm(instance=superuser_instance)
+        else:
+            student_instance = Student.objects.get(user_id=logged_in_user.id)
+            data['student'] = student_instance
+            data['form'] = AccountUpdateForm(instance=student_instance)
+
+        return render(request, self.template_name, data)
+
+    def post(self, request, **kwargs):
+        logged_in_user = request.user
+        data = {}
+        if logged_in_user.is_staff and not logged_in_user.is_superuser:
+            instance = get_object_or_404(Professor, user=logged_in_user)
+            form = ProfessorAccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
+            if form.is_valid():
+                form.save()
+            data['professor'] = instance
+            data['form'] = form
+        elif logged_in_user.is_superuser:
+            instance = get_object_or_404(User, pk=logged_in_user.id)
+            form = UserAccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
+            if form.is_valid():
+                form.save()
+            data['professor'] = instance
+            data['form'] = form
+        else:
+            instance = get_object_or_404(Student, user=logged_in_user)
+            form = AccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
+            if form.is_valid():
+                form.save()
+            data['student'] = instance
+            data['form'] = form
+        return render(request, self.template_name, data)
+

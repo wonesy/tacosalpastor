@@ -1,0 +1,27 @@
+{% autoescape off %}
+    <h1>
+        An attendance excuse document has been uploaded by {{ attendance.student_id }}
+    </h1>
+
+    <div>
+        <h4>Details:</h4>
+        Student: {{ attendance.student_id }}
+        Course: {{ attendance.schedule_id.course_id.title }} ({{ attendance.schedule_id.course_id.get_semester_season_display }} {{ attendance.schedule_id.course_id.semester_year }})
+        Schedule: {{ attendance.schedule_id.date }} from {{ attendance.schedule_id.start_time }} to {{ attendance.schedule_id.end_time }}
+    </div>
+    <a href="{{ protocol }}://{{ domain }}{{ doc_url }}">
+        {{ protocol }}://{{ domain }}{{ doc_url }}
+    </a>
+
+    <p>
+        If clicking the link above doesn't work, please copy and paste the URL in a new browser
+        window instead.
+    </p>
+
+    <p>
+        Sincerely,
+    </p>
+    <p>
+        The Tacos Al Pastor dev squad @ EPITA
+    </p>
+{% endautoescape %}

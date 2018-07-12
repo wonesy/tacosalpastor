@@ -10,11 +10,11 @@ class CustomUserAdmin(UserAdmin):
 
     list_display = ('email', 'password', 'first_name', 'last_name', 'external_email', 'is_staff', 'is_superuser',)
     fieldsets = ((None, {'fields':
-                             ('email', 'password', 'last_name', 'first_name', 'is_staff', 'is_superuser')
+                             ('email', 'external_email', 'password', 'last_name', 'first_name', 'is_staff', 'is_superuser')
                          }
                   ),
                  )
-    readonly_fields = ('date_joined',)
+    readonly_fields = ('date_joined', 'password')
     ordering = ('email',)
     exclude = ('username',)
     add_fieldsets = (

@@ -20,7 +20,7 @@ find */migrations -type f \( -iname "*.py" ! -iname "__init__.py" \) -exec rm -f
 read_secrets
 
 mysql -u${mysql_username} -p${mysql_user_pw} -e  "DROP DATABASE alpastor;"
-mysql -u${mysql_username} -p${mysql_user_pw} -e  "CREATE DATABASE alpastor;"
+mysql -u${mysql_username} -p${mysql_user_pw} -e  "CREATE DATABASE alpastor CHARACTER SET utf8;"
 
 ./manage.py makemigrations
 ./manage.py migrate

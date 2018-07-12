@@ -1,0 +1,83 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+    <head>
+        <link rel="stylesheet" href="../../static/css/graphs.css">
+        <script src="{% static 'js/graphs.js' %}"></script>
+    </head>
+    <div class="container">
+        <div class="row text-center">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Season
+                </button>
+                <div class="dropdown-menu" id="seasonBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Year
+                </button>
+                <div class="dropdown-menu" id="yearBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Program
+                </button>
+                <div class="dropdown-menu" id="programBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Specialization
+                </button>
+                <div class="dropdown-menu" id="specializationBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Course
+                </button>
+                <div class="dropdown-menu" id="courseBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Students
+                </button>
+                <div class="dropdown-menu" id="studentBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
+            <div class="drop-downs col">
+                <button class="btn btn-info">CSV</button>
+            </div>
+        </div>
+
+        <div id="dataDiv" hidden>{{ all_data }}</div>
+        <div id="studentDataDiv" hidden>{{ students }}</div>
+        <div class="row" id="allChartsDiv">
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="chartDiv">
+                <canvas id="mscChart"></canvas>
+            </div>
+            <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="middleChart">
+                <canvas id="meChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script>
+        const raw_data = document.getElementById('dataDiv').innerText
+        console.log(raw_data);
+        const chart_data = JSON.parse(raw_data);
+        let student_data = "{{ students }}";
+
+        console.log(student_data['names']);
+
+        {#console.log(student_data['names']);#}
+        {#for (let i = 0; i < student_data['names'].length; i++) {#}
+        {#    console.log(student_data[i]);#}
+
+    </script>
+{% endblock %}

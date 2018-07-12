@@ -7,6 +7,10 @@
     width: 100%;
 }
 
+#studentName {
+    margin-bottom: 0;
+}
+
 .button-thumbnail {
     max-width: 10rem;
     min-width: 10rem;
