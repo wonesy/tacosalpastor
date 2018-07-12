@@ -637,21 +637,21 @@ class AccountUpdateView(ListView):
         data = {}
         if logged_in_user.is_staff and not logged_in_user.is_superuser:
             instance = get_object_or_404(Professor, user=logged_in_user)
-            form = ProfessorAccountUpdateForm(request.POST, instance=instance)
+            form = ProfessorAccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
             if form.is_valid():
                 form.save()
             data['professor'] = instance
             data['form'] = form
         elif logged_in_user.is_superuser:
             instance = get_object_or_404(User, pk=logged_in_user.id)
-            form = UserAccountUpdateForm(request.POST, instance=instance)
+            form = UserAccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
             if form.is_valid():
                 form.save()
             data['professor'] = instance
             data['form'] = form
         else:
             instance = get_object_or_404(Student, user=logged_in_user)
-            form = AccountUpdateForm(request.POST, instance=instance)
+            form = AccountUpdateForm(data=request.POST, files=request.FILES, instance=instance)
             if form.is_valid():
                 form.save()
             data['student'] = instance

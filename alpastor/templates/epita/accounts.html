@@ -9,10 +9,12 @@
 {% block content %}
     <div class="card-body container-fluid">
         <div class="row">
-            {#            add fields#}
-            {#            program specialization intake_season intake_year country#}
             <div class="add-single-user-form col-8">
                 {% if request.user.is_staff == False %}
+                    {% if student.photo %}
+                        <img class="user-photo" src="{{ student.photo.url }}">
+                        <br>
+                    {% endif %}
                     <label for="first_name">First names:</label>
                     <input class="input-group" type="text" id="first_name" name="first_name" disabled="True" placeholder="{{ student.user.first_name }}" value="{{ student.user.first_name }}">
 
@@ -55,17 +57,17 @@
 
     </div>
     {% comment %}
-    <div class="row">
-        <div class="col-6">
-            <label>Professor</label><br> onclick="updateStudentInfo();" enctype="multipart/form-data"
-            <input type="radio" name="staff" value="professor" onchange="toggleStudentForm(this)" checked="checked">
+        <div class="row">
+            <div class="col-6">
+                <label>Professor</label><br> onclick="updateStudentInfo();" enctype="multipart/form-data"
+                <input type="radio" name="staff" value="professor" onchange="toggleStudentForm(this)" checked="checked">
+            </div>
+            <div class="col-6">
+                <label>Student</label><br>
+                <input type="radio" name="staff" value="student" onchange="toggleStudentForm(this);">
+            </div>
         </div>
-        <div class="col-6">
-            <label>Student</label><br>
-            <input type="radio" name="staff" value="student" onchange="toggleStudentForm(this);">
-        </div>
-    </div>
-{% endcomment %}
+    {% endcomment %}
     {% comment %}    <script type="application/javascript">
         function updateStudentInfo() {
             let data = new FormData();

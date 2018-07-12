@@ -102,7 +102,7 @@ class AccountUpdateForm(forms.ModelForm):
         model = UpdateStudent
         fields = ['phone', 'city',
                   'address_street', 'address_city',
-                  'address_misc', 'postal_code']
+                  'address_misc', 'postal_code', 'photo']
         widgets = {
             'city': forms.TextInput(attrs={
                 'readonly': True
@@ -117,15 +117,8 @@ class AccountUpdateForm(forms.ModelForm):
         self.fields['external_email'].initial = self.instance.user.external_email
         order_list = ['email', 'external_email', 'phone', 'city',
                       'address_street', 'address_city',
-                      'address_misc', 'postal_code']
-        # order_list = ['user', 'email', 'phone', 'program', 'specialization', 'intake_season',
-        #               'intake_year', 'country',
-        #               'city', 'address_street', 'address_city', 'address_misc', 'postal_code',
-        #               'dob']
-        print(order_list)
+                      'address_misc', 'postal_code', 'photo']
         self.order_fields(order_list)
-        print(self.instance.user.email)
-        # print(self.instance.user.external_email)
 
     def save(self, commit=True):
         instance = super(AccountUpdateForm, self).save()
@@ -141,7 +134,7 @@ class ProfessorAccountUpdateForm(forms.ModelForm):
 
     class Meta:
         model = UpdateProfessor
-        fields = ['phone']
+        fields = ['phone', 'photo']
 
     def __init__(self, *args, **kwargs):
         super(ProfessorAccountUpdateForm, self).__init__(*args, **kwargs)
@@ -149,7 +142,7 @@ class ProfessorAccountUpdateForm(forms.ModelForm):
             visible.field.widget.attrs['class'] = 'input-group'
         self.fields['email'].initial = self.instance.user.email
         self.fields['external_email'].initial = self.instance.user.external_email
-        order_list = ['email', 'external_email', 'phone']
+        order_list = ['email', 'external_email', 'phone', 'photo']
         # print(order_list)
         self.order_fields(order_list)
 

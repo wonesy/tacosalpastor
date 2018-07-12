@@ -59,3 +59,7 @@ label {
 form {
     width: 100%;
 }
+
+.user-photo {
+    max-width: 150px;
+}
