@@ -4,6 +4,7 @@ from accounts.models import User
 from django_countries import countries
 from django.utils import timezone
 from datetime import date
+import datetime
 import random
 
 
@@ -132,8 +133,8 @@ class Command(BaseCommand):
         # Every month has at least 28 days
         for i in range(1, 8):
                 # Creates courses with date of Fall 2017
-                Schedule.objects.create(course_id=advc_f17, date=date(2017, 10, i), start_time=timezone.now(),
-                                        end_time=timezone.now())
+                Schedule.objects.create(course_id=advc_f17, date=date(2017, 10, (i * 2)), start_time=timezone.now(),
+                                        end_time=timezone.now() + datetime.timedelta(hours=2))
 
         ####################################################################################################################
         #                                         CHECK IN SOME STUDENTS                                                   #

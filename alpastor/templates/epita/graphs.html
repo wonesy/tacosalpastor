@@ -44,12 +44,20 @@
                 </button>
                 <div class="dropdown-menu" id="courseBtn" aria-labelledby="dropdownMenuButton"></div>
             </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Students
+                </button>
+                <div class="dropdown-menu" id="studentBtn" aria-labelledby="dropdownMenuButton"></div>
+            </div>
             <div class="drop-downs col">
-                <input type="text" placeholder="Student Search">
+                <button class="btn btn-info">CSV</button>
             </div>
         </div>
 
         <div id="dataDiv" hidden>{{ all_data }}</div>
+        <div id="studentDataDiv" hidden>{{ students }}</div>
         <div class="row" id="allChartsDiv">
             <div class="charts col-lg-6 col-md-6 col-sm-6 col-xs-6" id="chartDiv">
                 <canvas id="mscChart"></canvas>
@@ -60,7 +68,16 @@
         </div>
     </div>
     <script>
-        let raw_data = document.getElementById('dataDiv').innerText;
-        let chart_data = JSON.parse(raw_data);
+        const raw_data = document.getElementById('dataDiv').innerText
+        console.log(raw_data);
+        const chart_data = JSON.parse(raw_data);
+        let student_data = "{{ students }}";
+
+        console.log(student_data['names']);
+
+        {#console.log(student_data['names']);#}
+        {#for (let i = 0; i < student_data['names'].length; i++) {#}
+        {#    console.log(student_data[i]);#}
+
     </script>
 {% endblock %}

@@ -50,20 +50,47 @@ class AttendanceGraphs(ListView):
         # all_data = self.individual_student_allclass(student)
         # all_data = self.individual_professor_allclass(professor)
         # all_data = self.individual_professor_allclass_by_semester(professor, semester)
-        all_data_json = json.dumps(all_data)
-        return render(request, self.template_name, {'all_data': all_data_json})
+        student_list = StudentCourse.objects.filter(course_id__semester_season=semester_season,
+                                                    course_id__semester_year=semester_year).select_related('student_id')
+
+
+        names = []
+        for student in student_list:
+            name = student.student_id.user.get_full_name()
+            if name not in names:
+                names.append(name)
+        attendance_data = json.dumps(all_data)
+        student_data = json.dumps({"names": names})
+        # print(student_data)
+
+        return render(request, self.template_name, {'all_data': attendance_data, 'students': student_data})
         # return JsonResponse(all_data)
 
     def post(self, request):
-        season = QueryDict(request.body)['season']
-        year = QueryDict(request.body)['year']
-        program = QueryDict(request.body)['program']
-        specialization = QueryDict(request.body)['specialization']
-        print(specialization)
+        # program = QueryDict(request.body)['program']
+        # specialization = QueryDict(request.body)['specialization']
 
-        data = self.whole_semester_by_specialization(semester_season=season, semester_year=year,
-                                              specialization_val=string_to_choice(Student.SPECIALIZATION_CHOICES, specialization))
-        return JsonResponse(data)
+        names = QueryDict(request.body)['getNames']
+        chart_data = QueryDict(request.body)['chartData']
+        chart_dict = json.loads(chart_data)
+        year = chart_dict['year']
+        season = chart_dict['season']
+        student_list = StudentCourse.objects.filter(course_id__semester_season=season,
+                                                    course_id__semester_year=year).select_related('student_id')
+
+        names = []
+        for student in student_list:
+            name = student.student_id.user.get_full_name()
+            if name not in names:
+                names.append(name)
+        student_data = json.dumps(names)
+
+        if names:
+            return JsonResponse({"names":student_data})
+
+        # data = self.whole_semester_by_specialization(semester_season=season, semester_year=year,
+                                              # specialization_val=string_to_choice(Student.SPECIALIZATION_CHOICES, specialization))
+        # return JsonResponse(data)
 
 
     def build_attendance_results(self, attendance_list):

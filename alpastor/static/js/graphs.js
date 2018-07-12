@@ -1,6 +1,6 @@
 let date = new Date();
 const year = date.getFullYear();
-const season = 1;
+const season = 3;
 
 let globalChartData = {
     'year': year,
@@ -65,13 +65,13 @@ function populateDropdowns() {
     const courseBtn = document.getElementById('courseBtn');
     const seasonBtn = document.getElementById('seasonBtn');
     const yearBtn = document.getElementById('yearBtn');
+    const studentBtn = document.getElementById('studentBtn');
     let d = new Date();
     const year = d.getFullYear();
     for (let i = year - 5; i < year; i++) {
         yearBtn.innerHTML += '<a class="dropdown-item" onclick="setYearQuery(i)" href="#">' + i + '</a>';
     }
     seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Spring</a>';
-
     seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Fall</a>';
 
 
@@ -82,29 +82,15 @@ function populateDropdowns() {
             || (chart_data['attendance'][i]['excused'] !== 0)) {
             program_name = chart_data['attendance'][i]['program'];
             programBtn.innerHTML += '<a class="dropdown-item" href="#">' + program_name + '</a>';
-            // programBtn.addEventListener('click', function () {
-            //     setProgramQuery(program_name);
-            // });
         }
     }
 
     for (let i = 0; i < programBtn.children.length; i++) {
         aTag = programBtn.children[i].addEventListener('click', function (e) {
-            console.log(e);
-            console.log(e.srcElement.innerHTML);
             setProgramQuery(e.srcElement.innerHTML);
             feedMeData();
         });
     }
-
-    // for (let i = 0; i < specializationBtn.children.length; i++) {
-    //     aTag = specializationBtn.children[i].addEventListener('click', function (e) {
-    //         console.log(e);
-    //         console.log(e.srcElement.innerHTML);
-    //         setProgramQuery(e.srcElement.innerHTML);
-    //         feedMeData();
-    //     });
-    // }
 
     for (let i = 1; i < chart_data['specialization'].length; i++) {
         specialization_name = chart_data['specialization'][i];
@@ -113,12 +99,11 @@ function populateDropdowns() {
 
     for (let i = 0; i < specializationBtn.children.length; i++) {
         aTag = specializationBtn.children[i].addEventListener('click', function (e) {
-            console.log(e);
-            console.log(e.srcElement.innerHTML);
             setSpecializationQuery(e.srcElement.innerHTML);
             feedMeData();
         });
     }
+
     for (let i = 0; i < chart_data['course'].length; i++) {
         course_name = chart_data['course'][i];
         courseBtn.innerHTML += '<a class="dropdown-item" onclick="setCourseQuery(course_name)" href="#">' + course_name + '</a>';
@@ -127,23 +112,53 @@ function populateDropdowns() {
             feedMeData();
         });
     }
+
+    for (let i = 0; i < student_data['names'].length; i++) {
+        studentName = student_data['names'][i];
+        studentBtn.innerHTML += '<a class="dropdown-item" href="#">' + studentName + '</a>';
+    }
+
+    for (let i = 0; i < studentBtn.children.length; i++) {
+        aTag = studentBtn.children[i].addEventListener('click', function (e) {
+            setStudentQuery(e.srcElement.innerHTML);
+            feedMeData();
+        });
+    }
 }
 
-function feedMeData() {
+function feedMeData(isTrue) {
     $.ajax({
         type: 'POST',
         url: window.href,
-        data: globalChartData,
+        data: {
+            'chartData': JSON.stringify(globalChartData),
+            'getNames': isTrue
+        },
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (data) {
-            console.log(data);
+            if (isTrue) {
+                console.log(data);
+                console.log(data["names"]);
+
+                let nameList = JSON.parse(data["names"]);
+
+                for (let i = 0; i < nameList.length; i++) {
+                    console.log(nameList[i]);
+                }
+            }
+
+            // here
+            // console.log(data);
         }
     });
 }
 
+
 window.onload = function () {
+    feedMeData(true);
     populateDropdowns();
+    console.log(student_data);
     console.log(chart_data);
     defaultChart();
 };
