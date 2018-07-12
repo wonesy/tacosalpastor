@@ -4,3 +4,6 @@ redgreenunittest
 pillow
 djangorestframework
 django_countries
+boto
+boto3
+django-storages
