@@ -103,11 +103,7 @@ class AccountUpdateForm(forms.ModelForm):
         fields = ['phone', 'city',
                   'address_street', 'address_city',
                   'address_misc', 'postal_code']
-        # user program specialization intake_season country
         widgets = {
-            # 'intake_year': forms.NumberInput(attrs={
-            #     'readonly': True
-            # }),
             'city': forms.TextInput(attrs={
                 'readonly': True
             })
@@ -146,12 +142,6 @@ class ProfessorAccountUpdateForm(forms.ModelForm):
     class Meta:
         model = UpdateProfessor
         fields = ['phone']
-        # user
-        widgets = {
-            # 'user': forms.Select(attrs={
-            #     'readonly': True
-            # })
-        }
 
     def __init__(self, *args, **kwargs):
         super(ProfessorAccountUpdateForm, self).__init__(*args, **kwargs)
@@ -163,3 +153,26 @@ class ProfessorAccountUpdateForm(forms.ModelForm):
         # print(order_list)
         self.order_fields(order_list)
 
+
+class UserAccountUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ['email', 'external_email', 'title']
+
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'readonly': True,
+            }),
+            'first_name': forms.TextInput(attrs={
+                'readonly': True,
+            }),
+            'last_name': forms.TextInput(attrs={
+                'readonly': True,
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UserAccountUpdateForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'input-group'
