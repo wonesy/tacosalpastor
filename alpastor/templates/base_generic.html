@@ -36,7 +36,8 @@
     <!-- Sidebar Holder -->
     <nav id="sidebar">
         <div class="active sidebar-header">
-            <img src="{% static 'image/portraits/generic_avatar.jpg' %}" class="nav-avatar">
+            <img src="{% static 'image/portraits/logo-epita.png' %}" class="nav-avatar">
+            <p style="text-align: center;">{{ request.user.get_full_name }}</p>
             <a href="/login">
                 <button type="button" class="btn">Logout</button>
             </a>
