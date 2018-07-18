@@ -12,13 +12,15 @@
         <div id="accordion" class="center-container">
             {% for semester, course_list in semester_list.items %}
                 <div class="card">
-                    <button class="header-btn btn" data-toggle="collapse" data-target="#{{ semester }}" aria-expanded="false" aria-controls="{{ semester }}">
-                        <div class="card-header" id="headingOne">
+
+                    <div class="card-header" id="headingOne">
+                        <button class="header-btn btn btn-block" data-toggle="collapse" data-target="#{{ semester }}" aria-expanded="false" aria-controls="{{ semester }}">
                             <h5 class="mb-0">
                                 {{ semester }}
                             </h5>
-                        </div>
-                    </button>
+                        </button>
+                    </div>
+
                     <div id="{{ semester }}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
 
                         {%  for course in course_list %}
