@@ -293,7 +293,7 @@ class SaveNewUsers(View):
 
     def post(self, request, *args, **kwargs):
         length = int(request.POST.get('length'))
-        #users = json.loads(users_json)
+        file = None
 
         response_code = 200
         response_messages = []
@@ -302,7 +302,10 @@ class SaveNewUsers(View):
             # the key will be just the integer offset
             user = json.loads(request.POST.get(str(i)))
             file_key = "photo{0}".format(i)
-            file = request.FILES[file_key]
+
+            if file_key in request.FILES:
+                file = request.FILES[file_key]
+
             if user['isProfessor'] == True:
                 (rc, msg) = self.processNewProfessor(user, file)
             else:
@@ -356,7 +359,7 @@ class SaveNewUsers(View):
 
             prof.phone = phone
 
-            if file != "":
+            if file != None:
                 prof.photo.save(file.name, file)
 
             prof.save()
