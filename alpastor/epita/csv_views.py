@@ -1,13 +1,14 @@
 from django.http import HttpResponse, QueryDict, JsonResponse
-from django.shortcuts import redirect
 from django.utils import timezone
 from django.views import View
 from epita.models import Student, string_to_choice
 from alpastor.settings import MEDIA_ROOT
+from django.core.files.storage import FileSystemStorage
 import csv
 import json
 import logging
 import os
+from io import StringIO
 from django.db.models import Q
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,8 @@ class StudentToCSVView(View):
     def post(self, request, *args, **kwargs):
         csv_mkdir()
 
+        #fs = FileSystemStorage(location='csv/')
+
         students = self.get_queryset(request)
 
         field_names = [f.name for f in Student._meta.fields]
@@ -40,11 +43,14 @@ class StudentToCSVView(View):
 
         name = MEDIA_ROOT + ajax_download_url
 
+
         with open(name, "w") as csv_file:
             wr = csv.writer(csv_file, delimiter=",")
             wr.writerow(field_names)
             for student in students:
                 wr.writerow([str(getattr(student, f)) for f in field_names])
+
+        #fs.save(name)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(name)
