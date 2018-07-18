@@ -82,7 +82,9 @@
                                 <th>Semester Season</th>
                                 <th>Semester Year</th>
                                 <th>Email</th>
+                                {% if request.user.is_superuser == True %}
                                 <th>More Info</th>
+                                {% endif %}
                             </tr>
                             </thead>
                             <tbody class="list">
@@ -116,19 +118,23 @@
                                     <td class="intake_semester"
                                         data-column="Semester Year"> {{ student.intake_year }} </td>
                                     <td class="email" data-column="Email"> {{ student.user.email }} </td>
-                                    <td>
-                                        <a href="#myModal" style="background-color: #28a8e0;" class="btn btn-sm"
-                                           data-toggle="modal" data-phone="{{ student.phone }}"
-                                           data-address="{{ student.address_street }}"
-                                           data-addressmore="{{ student.address_city }}, {{ student.address_misc }}"
-                                           data-pc="{{ student.postal_code }}" data-city="{{ student.city }}"
-                                           data-lng="{{ student.languages }}" data-dob="{{ student.dob }}"
-                                           data-warning="{{ student.get_flags_display }}"
-                                           data-enrollment="{{ student.get_enrollment_status_display }}"
-                                           data-eemail="{{ student.user.external_email }}">
-                                            More info
-                                        </a>
-                                    </td>
+                                    {% if request.user.is_superuser == True %}
+                                        <td>
+
+                                            <a href="#myModal" style="background-color: #28a8e0;" class="btn btn-sm"
+                                               data-toggle="modal" data-phone="{{ student.phone }}"
+                                               data-address="{{ student.address_street }}"
+                                               data-addressmore="{{ student.address_city }}, {{ student.address_misc }}"
+                                               data-pc="{{ student.postal_code }}" data-city="{{ student.city }}"
+                                               data-lng="{{ student.languages }}" data-dob="{{ student.dob }}"
+                                               data-warning="{{ student.get_flags_display }}"
+                                               data-enrollment="{{ student.get_enrollment_status_display }}"
+                                               data-eemail="{{ student.user.external_email }}">
+                                                More info
+                                            </a>
+
+                                        </td>
+                                    {% endif %}
                                 </tr>
 
 
