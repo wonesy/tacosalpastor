@@ -1,14 +1,9 @@
-from django.http import HttpResponse, QueryDict, JsonResponse
+from django.http import QueryDict, JsonResponse
 from django.utils import timezone
 from django.views import View
-from epita.models import Student, string_to_choice
-from alpastor.settings import MEDIA_URL
-from django.core.files.storage import FileSystemStorage
-from django.core.files.base import ContentFile
-import csv
+from epita.models import Student, string_to_choice, choice_to_string
 import json
 import logging
-import os
 from io import StringIO
 from django.db.models import Q
 
@@ -85,8 +80,18 @@ class StudentToCSVView(View):
         for y in intake_year_list:
             year_q_object.add(Q(intake_year=y), season_q_object.connector)
 
-        return Student.objects.filter(q_object,
+        qs = Student.objects.filter(q_object,
                                       program_q_object,
                                       specialization_q_object,
                                       season_q_object,
                                       year_q_object)
+
+        for student in qs:
+            student.program = student.get_program_display()
+            student.specialization = student.get_specialization_display()
+            student.intake_season = student.get_intake_season_display()
+            student.flags = student.get_flags_display()
+            student.enrollment_status = student.get_enrollment_status_display()
+            student.country = student.country_name()
+
+        return qs
