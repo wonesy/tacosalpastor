@@ -2,8 +2,9 @@ from django.http import HttpResponse, QueryDict, JsonResponse
 from django.utils import timezone
 from django.views import View
 from epita.models import Student, string_to_choice
-from alpastor.settings import MEDIA_ROOT
+from alpastor.settings import MEDIA_URL
 from django.core.files.storage import FileSystemStorage
+from django.core.files.base import ContentFile
 import csv
 import json
 import logging
@@ -13,49 +14,53 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
-def csv_mkdir():
-    dir = MEDIA_ROOT + "/csv"
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-
 def set_if_not_none(mapping, key, value):
     if value is not None:
         mapping[key] = value
 
-# def dict_to_csv_filename(dictionary):
-#     name = "_".join([key + str(dictionary[key]) for key in dictionary.keys()])
-#     return name + ".csv"
+def list_to_csv(delimiter, values):
+    return delimiter.join(values) + "\n"
 
 class StudentToCSVView(View):
     def post(self, request, *args, **kwargs):
-        csv_mkdir()
+        csv_delimiter = ','
+        location = MEDIA_URL + "csv/"
 
-        #fs = FileSystemStorage(location='csv/')
+        if MEDIA_URL.startswith('/'):
+            location = MEDIA_URL[1:] + "csv/"
+
+        fs = FileSystemStorage(location=location)
 
         students = self.get_queryset(request)
 
+        # Get the list of all field names for the CSV column line
         field_names = [f.name for f in Student._meta.fields]
 
+        # Create the CSV file name
         now = timezone.now()
-        ajax_download_url = "/csv/students-{}-{}-{}_{}-{}-{}.csv".format(
+        file_name = "students-{}-{}-{}_{}-{}-{}.csv".format(
             now.year, now.month, now.day, now.hour, now.minute, now.second
         )
 
-        name = MEDIA_ROOT + ajax_download_url
+        # Start a CSV in memory (we're not writing to a file yet)
+        csv_out = StringIO()
+        csv_out.write(list_to_csv(csv_delimiter, field_names))
 
+        for student in students:
+            csv_out.write(list_to_csv(csv_delimiter, [str(getattr(student, f)) for f in field_names]))
 
-        with open(name, "w") as csv_file:
-            wr = csv.writer(csv_file, delimiter=",")
-            wr.writerow(field_names)
-            for student in students:
-                wr.writerow([str(getattr(student, f)) for f in field_names])
-
-        #fs.save(name)
+        fs.save(file_name, ContentFile(csv_out.getvalue()))
 
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(name)
 
-        return JsonResponse({"location": "/media" + ajax_download_url})
+        # Construct the return URL to download the CSV
+        download_location = location + file_name
+        if not download_location.startswith('/'):
+            download_location = "/" + download_location
+
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(download_location)
+
+        return JsonResponse({"location": download_location})
 
     def get_queryset(self, request):
         data = json.loads(QueryDict(request.body).get('students'))

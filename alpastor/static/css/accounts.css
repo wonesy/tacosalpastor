@@ -63,3 +63,7 @@ form {
 .user-photo {
     max-width: 150px;
 }
+
+#id_email {
+    color: gray;
+}
