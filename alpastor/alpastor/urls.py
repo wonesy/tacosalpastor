@@ -22,8 +22,8 @@ from epita import views
 from epita import csv_views
 from epita.views import (
     CourseView, ScheduleView, AttendanceView, GetStudentAttendanceData,
-    OverrideStudentAttendanceData, ToggleAttendanceLock, AttendanceGraphs, AccountUpdateView)
-
+    OverrideStudentAttendanceData, ToggleAttendanceLock, AccountUpdateView)
+from graphs import views as graphs_views
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -45,7 +45,7 @@ urlpatterns = [
     path('attendance/', login_required(CourseView.as_view()), name='course_list'),
 
     # graphs
-    path('graphs/', login_required(AttendanceGraphs.as_view()), name='graphs'),
+    path('graphs/', login_required(graphs_views.AttendanceGraphs.as_view()), name='graphs'),
 
     # Accounts, change
     path('account_update/', AccountUpdateView.as_view(), name='account_update'),

@@ -135,116 +135,110 @@ function populateDropdowns() {
             feedMeData();
         });
     }
-    }
+}
 
-    function feedMeData(isTrue) {
-        $.ajax({
-            type: 'POST',
-            url: window.href,
-            data: {
-                'chartData': JSON.stringify(globalChartData),
-                'getNames': isTrue
-            },
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (data) {
-                if (isTrue) {
-                    console.log(data);
-                    console.log(data["names"]);
+function feedMeData(isTrue) {
+    $.ajax({
+        type: 'POST',
+        url: window.href,
+        data: {
+            'chartData': JSON.stringify(globalChartData),
+            'getNames': isTrue
+        },
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (data) {
+            if (isTrue) {
+                console.log(data);
+                console.log(data["names"]);
 
-                    let nameList = JSON.parse(data["names"]);
+                let nameList = JSON.parse(data["names"]);
 
-                    for (let i = 0; i < nameList.length; i++) {
-                        console.log(nameList[i]);
-                    }
+                for (let i = 0; i < nameList.length; i++) {
+                    console.log(nameList[i]);
                 }
-
-                // here
-                // console.log(data);
             }
-        });
-    }
+
+            // here
+            // console.log(data);
+        }
+    });
+}
 
 
-    window.onload = function () {
-        feedMeData(true);
-        populateDropdowns();
-        defaultChart();
-    };
+window.onload = function () {
+    feedMeData(true);
+    populateDropdowns();
+    defaultChart();
+};
 
-    function defaultChart() {
-        let attendanceList = chart_data['attendance'];
-        let labels = ['present', 'absent', 'excused'];
-        let titles = [];
-        let noneAttendance = [];
-        let meAttendance = [];
-        let mscAttendance = [];
-        let fgitmAttendance = [];
-        let exchangeAttendance = [];
+function defaultChart() {
+    let allChartsDiv = document.getElementById('allChartsDiv');
+    let attendanceList = chart_data['attendance'];
+    let labels = ['present', 'absent', 'excused'];
 
-        attendanceList.forEach(function (i) {
-            titles.push(i['program']);
-            if (i['program'] === "None")
-                getAttendance(i['present'], i['absent'], i['excused'], noneAttendance);
+    let chartData = {};
+    let chartList = [];
 
-            if (i['program'] === "Master of Engineering")
-                getAttendance(i['present'], i['absent'], i['excused'], meAttendance);
+    attendanceList.forEach(function (i) {
+        chartData = {};
+        chartData['data'] = [];
 
-            if (i['program'] === "Master of Science")
-                getAttendance(i['present'], i['absent'], i['excused'], mscAttendance);
+        if (i['present'] + i['absent'] + i['excused'] === 0) {
+            return;
+        }
 
-            if (i['program'] === "Global IT Management (French)")
-                getAttendance(i['present'], i['absent'], i['excused'], fgitmAttendance);
+        getAttendance(i['present'], i['absent'], i['excused'], chartData['data']);
 
-            if (i['program'] === "Exchange")
-                getAttendance(i['present'], i['absent'], i['excused'], exchangeAttendance);
-        });
+        chartData['program'] = i['program'];
+        chartList.push(chartData);
+    });
 
-        colors = [];
-        mscAttendance.forEach(function () {
-            colors.push(getRandomColorHex());
-        });
+    let colors = [];
+    labels.forEach(function () {
+        colors.push(getRandomColorHex());
+    });
 
-        // MSC Chart
-        let mscChart = document.getElementById('mscChart').getContext('2d');
-        createChart(mscChart, 'pie', labels, titles[programs['MSc']], mscAttendance, colors);
+    chartList.forEach(function(elem) {
+        let newChartDiv = document.createElement('div');
+        newChartDiv.classList.add('col-6');
+        newChartDiv.classList.add('charts');
 
-        // ME Chart
-        let meChart = document.getElementById('meChart').getContext('2d');
-        createChart(meChart, 'pie', labels, titles[programs['ME']], meAttendance, colors);
+        let newChartCanvas = document.createElement('canvas');
+        newChartDiv.appendChild(newChartCanvas);
+        allChartsDiv.appendChild(newChartDiv);
 
-        // Exchange
-        let exchangeChart = document.getElementById('exchangeChart').getContext('2d');
-        createChart(exchangeChart, 'pie', labels, titles[programs['EXCHANGE']], exchangeAttendance, colors);
-    }
+        createChart(newChartCanvas, 'pie', labels, elem.program, elem.data, colors);
+    });
+}
 
 
 // function getChartData() {
 //
 // }
 
-    function createChart(location, type, labels, title, data, colors) {
-        console.log(data);
-        new Chart(location, {
-            type: type, // bar, horizontal bar, pie, line, doughnut, radar, polarArea
-            data: {
-                labels: labels,
-                datasets: [{
-                    // label: 'Insert Label Here',
-                    data: data,
-                    backgroundColor: colors,
-                    borderWidth: 4,
-                    borderColor: 'grey'
-                }]
+function createChart(location, type, labels, title, data, colors) {
+    console.log(data);
+    new Chart(location, {
+        type: type, // bar, horizontal bar, pie, line, doughnut, radar, polarArea
+        data: {
+            labels: labels,
+            datasets: [{
+                // label: 'Insert Label Here',
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 4,
+                borderColor: 'grey'
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: title
             },
-            options: {
-                title: {
-                    display: true,
-                    text: title
-                },
-                legend: {
-                    position: 'right'
-                }
+            legend: {
+                position: 'right'
             }
-        });
-    }
+        }
+    });
+}
