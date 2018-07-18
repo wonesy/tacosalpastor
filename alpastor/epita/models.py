@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django_countries.fields import CountryField
 import re
 import datetime
+from django.utils import timezone
 from django.utils.timezone import now
 
 def choice_to_string(choices, index):
@@ -341,6 +342,7 @@ class Attendance(models.Model):
 
     def __str__(self):
         return "{}, status: {}, {}, file: {}, time: {}".format(str(self.student_id), str(self.status), str(self.schedule_id), self.file_upload, self.upload_time)
+
 
 @receiver(post_save, sender=Schedule)
 def create_attendance_instances(sender, instance, created, **kwargs):

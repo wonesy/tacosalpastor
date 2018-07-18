@@ -24,12 +24,6 @@ def list_to_csv(delimiter, values):
 class StudentToCSVView(View):
     def post(self, request, *args, **kwargs):
         csv_delimiter = ','
-        location = MEDIA_URL + "csv/"
-
-        if MEDIA_URL.startswith('/'):
-            location = MEDIA_URL[1:] + "csv/"
-
-        fs = FileSystemStorage(location=location)
 
         students = self.get_queryset(request)
 
@@ -49,18 +43,7 @@ class StudentToCSVView(View):
         for student in students:
             csv_out.write(list_to_csv(csv_delimiter, [str(getattr(student, f)) for f in field_names]))
 
-        fs.save(file_name, ContentFile(csv_out.getvalue()))
-
-        response = HttpResponse(content_type='text/csv')
-
-        # Construct the return URL to download the CSV
-        download_location = location + file_name
-        if not download_location.startswith('/'):
-            download_location = "/" + download_location
-
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(download_location)
-
-        return JsonResponse({"location": download_location})
+        return JsonResponse({"name": file_name, "csv": csv_out.getvalue()})
 
     def get_queryset(self, request):
         data = json.loads(QueryDict(request.body).get('students'))
