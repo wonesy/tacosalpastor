@@ -2,11 +2,13 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.views.generic import ListView
+from django.views.defaults import page_not_found
 from rest_framework.exceptions import bad_request
 from .forms import AttendanceForm, ScheduleForm, AccountUpdateForm, ProfessorAccountUpdateForm, UserAccountUpdateForm
 from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
+import hashlib
 from django.http import HttpResponse
 from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor, choice_to_string
 from django.views.generic import View
@@ -424,3 +426,23 @@ class AccountUpdateView(ListView):
             data['form'] = form
         return render(request, self.template_name, data)
 
+@login_required()
+def CheckAttendanceByUser(request, slug, token):
+    schedule_id = request.GET.get('schedule_id', None)
+
+    if not schedule_id:
+        return page_not_found(request, "Bad Request")
+
+    lock = 0x616e616e6162
+    x = ""
+    while (lock):
+        x += chr(lock & 0xff)
+        lock = lock >> 8
+
+    y = x + request.user.email + slug
+    if (token == str(hashlib.sha256(y.encode('utf-8')).hexdigest())):
+        Attendance.objects.filter(student_id__user=request.user, schedule_id_id=schedule_id).update(status=Attendance.PRESENT)
+    else:
+        return page_not_found(request, "Bad Request")
+
+    return redirect('home')
