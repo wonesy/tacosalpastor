@@ -1,10 +1,17 @@
 let date = new Date();
-const year = date.getFullYear();
-const season = 3;
+const year = date.getFullYear()-1;
+const season = 'Fall';
+
+let SeasonEnum = {
+    'Winter': 0,
+    'Spring': 1,
+    'Summer': 2,
+    'Fall': 3
+};
 
 let globalChartData = {
     'year': year,
-    'season': season,
+    'season': 'Fall',
     'program': null,
     'specialization': null,
     'course': null,
@@ -13,35 +20,55 @@ let globalChartData = {
 
 function setYearQuery(year) {
     globalChartData['year'] = year;
+    updateCurrentQuery();
 }
 
 function setSeasonQuery(season) {
     globalChartData['season'] = season;
+    updateCurrentQuery();
 }
 
 function setProgramQuery(program) {
     globalChartData['program'] = program;
+    updateCurrentQuery();
 }
 
 function setSpecializationQuery(specialization) {
     globalChartData['specialization'] = specialization;
+    updateCurrentQuery();
 }
 
 function setCourseQuery(course) {
     globalChartData['course'] = course;
+    updateCurrentQuery();
 }
 
 function setStudentQuery(student) {
     globalChartData['student'] = student;
+    updateCurrentQuery();
 }
 
-const programs = {
-    NONE: 0,
-    ME: 1,
-    MSc: 2,
-    FGITM: 3,
-    EXCHANGE: 4
-};
+function updateCurrentQuery() {
+    let elem = document.getElementById('currentQuery');
+    let string =
+        "Season:<br><p>{0}</p>" +
+        "Year:<br><p>{1}</p>" +
+        "Program:<br><p>{2}</p>" +
+        "Specialization:<br><p>{3}</p>" +
+        "Course:<br><p>{4}</p>" +
+        "Student:<br><p>{5}</p>";
+
+    let x = string.format(
+        globalChartData.season,
+        globalChartData.year,
+        globalChartData.program,
+        globalChartData.specialization,
+        globalChartData.course,
+        globalChartData.student
+    );
+
+    elem.innerHTML = x;
+}
 
 function getRandomColorHex() {
     const hex = "0123456789ABCDEF";
@@ -59,50 +86,62 @@ function getAttendance(present, absent, excused, list, program) {
     title = program;
 }
 
-function populateDropdowns() {
+function populateDropdowns(chart_data) {
     const programBtn = document.getElementById('programBtn');
     const specializationBtn = document.getElementById('specializationBtn');
     const courseBtn = document.getElementById('courseBtn');
     const seasonBtn = document.getElementById('seasonBtn');
     const yearBtn = document.getElementById('yearBtn');
-    const studentBtn = document.getElementById('studentBtn');
-    for (let i = year - 5; i < year; i++) {
-        yearBtn.innerHTML += '<a class="dropdown-item" onclick="setYearQuery(i)" href="#">' + i + '</a>';
+
+    //
+    // Year
+    //
+    for (let i = year - 5; i <= year+1; i++) {
+        yearBtn.innerHTML += '<a class="dropdown-item" href="#">' + i + '</a>';
     }
+
+    for (let i = 0; i < yearBtn.children.length; i++) {
+        aTag = yearBtn.children[i].addEventListener('click', function (e) {
+            setYearQuery(e.target.innerHTML);
+            feedMeData(false);
+        });
+    }
+
+    //
+    // Season
+    //
+    seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Winter</a>';
     seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Spring</a>';
+    seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Summer</a>';
     seasonBtn.innerHTML += '<a class="dropdown-item" href="#">Fall</a>';
 
+    for (let i = 0; i < seasonBtn.children.length; i++) {
+        aTag = seasonBtn.children[i].addEventListener('click', function (e) {
+            setSeasonQuery(e.target.innerHTML);
+            feedMeData(false);
+        });
+    }
 
+    //
+    // Program
+    //
+    programBtn.innerHTML += '<a class="dropdown-item" href="#">Any</a>';
     for (let i = 0; i < chart_data['attendance'].length; i++) {
-        // Only add programs that have a value for present/absent/excused
-        if ((chart_data['attendance'][i]['present'] !== 0)
-            || (chart_data['attendance'][i]['absent'] !== 0)
-            || (chart_data['attendance'][i]['excused'] !== 0)) {
-            program_name = chart_data['attendance'][i]['program'];
-            programBtn.innerHTML += '<a class="dropdown-item" href="#">' + program_name + '</a>';
-        }
+        program_name = chart_data['attendance'][i]['program'];
+        programBtn.innerHTML += '<a class="dropdown-item" href="#">' + program_name + '</a>';
     }
 
     for (let i = 0; i < programBtn.children.length; i++) {
         aTag = programBtn.children[i].addEventListener('click', function (e) {
-            setProgramQuery(e.srcElement.innerHTML);
-            feedMeData();
+            setProgramQuery(e.target.innerHTML);
+            feedMeData(false);
         });
     }
 
-
-    for (let i = 0; i < chart_data['season'].length; i++) {
-        season_name = chart_data['season'][i];
-        seasonBtn.innerHTML += '<a class="dropdown-item" href="#">' + season_name + '</a>';
-    }
-
-    for (let i = 0; i < seasonBtn.children.length; i++) {
-        aTag = seasonBtn.children[i].addEventListener('click', function (e) {
-            setSeasonQuery(e.srcElement.innerHTML);
-            feedMeData();
-        });
-    }
-
+    //
+    // Specialization
+    //
+    specializationBtn.innerHTML += '<a class="dropdown-item" href="#">Any</a>';
     for (let i = 1; i < chart_data['specialization'].length; i++) {
         specialization_name = chart_data['specialization'][i];
         specializationBtn.innerHTML += '<a class="dropdown-item" href="#">' + specialization_name + '</a>';
@@ -110,71 +149,96 @@ function populateDropdowns() {
 
     for (let i = 0; i < specializationBtn.children.length; i++) {
         aTag = specializationBtn.children[i].addEventListener('click', function (e) {
-            setSpecializationQuery(e.srcElement.innerHTML);
-            feedMeData();
+            setSpecializationQuery(e.target.innerHTML);
+            feedMeData(false);
         });
     }
 
+    //
+    // Course
+    //
+    courseBtn.innerHTML += '<a class="dropdown-item" href="#">Any</a>';
     for (let i = 0; i < chart_data['course'].length; i++) {
         course_name = chart_data['course'][i];
         courseBtn.innerHTML += '<a class="dropdown-item" onclick="setCourseQuery(course_name)" href="#">' + course_name + '</a>';
-        courseBtn.addEventListener('click', function () {
-            setProgramQuery(course_name);
-            feedMeData();
-        });
     }
 
+    for (let i = 0; i < courseBtn.children.length; i++) {
+        aTag = courseBtn.children[i].addEventListener('click', function (e) {
+            setCourseQuery(e.target.innerHTML);
+            feedMeData(false);
+        });
+    }
+}
+
+function populateNameDropdown(student_data) {
+    const studentBtn = document.getElementById('studentBtn');
+
+    studentBtn.innerHTML += '<a class="dropdown-item" href="#">Any</a>';
+
+    //
+    // Student
+    //
     for (let i = 0; i < student_data.length; i++) {
-        studentName = student_data['names'][i];
+        let studentName = student_data[i];
         studentBtn.innerHTML += '<a class="dropdown-item" href="#">' + studentName + '</a>';
     }
 
     for (let i = 0; i < studentBtn.children.length; i++) {
         aTag = studentBtn.children[i].addEventListener('click', function (e) {
-            setStudentQuery(e.srcElement.innerHTML);
-            feedMeData();
+            setStudentQuery(e.target.innerHTML);
+            feedMeData(false);
         });
     }
 }
 
-function feedMeData(isTrue) {
+function feedMeData(initStudentNames) {
     $.ajax({
         type: 'POST',
         url: window.href,
         data: {
             'chartData': JSON.stringify(globalChartData),
-            'getNames': isTrue
+            'initNames': initStudentNames
         },
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (data) {
-            if (isTrue) {
-                console.log(data);
-                console.log(data["names"]);
-
+            if (initStudentNames) {
                 let nameList = JSON.parse(data["names"]);
 
-                for (let i = 0; i < nameList.length; i++) {
-                    console.log(nameList[i]);
-                }
+                populateNameDropdown(nameList);
             }
-
-            // here
-            // console.log(data);
+            console.log(JSON.parse(data['data']));
+            chooseChart(JSON.parse(data['data']));
         }
     });
 }
 
+function isSelected(value) {
+    if ((value === null) || (value === 'Any')) {
+        return false;
+    }
 
-window.onload = function () {
-    feedMeData(true);
-    populateDropdowns();
-    defaultChart();
-};
+    return true;
+}
+function chooseChart(data) {
 
-function defaultChart() {
+    // Nothing was selected
+    if ((!isSelected(globalChartData.program)) ||
+        (!isSelected(globalChartData.specialization)) ||
+        (!isSelected(globalChartData.course)) ||
+        (!isSelected(globalChartData.student))) {
+        defaultChart(data);
+    }
+}
+
+function defaultChart(data) {
     let allChartsDiv = document.getElementById('allChartsDiv');
-    let attendanceList = chart_data['attendance'];
+
+    // Clear what's currently in there
+    allChartsDiv.innerHTML = "";
+
+    let attendanceList = data['attendance'];
     let labels = ['present', 'absent', 'excused'];
 
     let chartData = {};

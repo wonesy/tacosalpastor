@@ -1,57 +1,101 @@
 from django.views.generic import View
-from epita.models import Student, Professor, Course, StudentCourse, Attendance, Schedule
+from epita.models import Student, Professor, Course, StudentCourse, Attendance, Schedule, string_to_choice
 from django.utils import timezone
 from django.shortcuts import render
 from django.db.models import Count
 from django.http import QueryDict, JsonResponse
 import json
 
+def isSelected(value):
+    if value == None or value == 'Any':
+        return False
+    return True
+
 class AttendanceGraphs(View):
     template_name = 'epita/graphs.html'
 
     def get(self, request, *args):
-        student = 'Willy0'
-        course = 'Advanced C Programming'
-        intake_season = Student.FALL
-        intake_year = '2017'
+
         semester_year = timezone.now().year - 1
         semester_season = Student.FALL
-        email = 'me_student0@epita.fr'
-        professor = 'John'
-        specialization = Student.SE
-        # all_data = self.whole_semester_by_student_by_class(email, course)
-        # all_data = self.whole_semester_by_specialization(semester, specialization)
+
         all_data = self.default_graph_by_program(semester_season, semester_year)
-        # all_data = self.whole_semester_by_class(course, semester)
-        # all_data = self.individual_student_allclass(student)
-        # all_data = self.individual_professor_allclass(professor)
-        # all_data = self.individual_professor_allclass_by_semester(professor, semester)
         attendance_data = json.dumps(all_data)
 
         return render(request, self.template_name, {'all_data': attendance_data})
-        # return JsonResponse(all_data)
 
     def post(self, request):
-        # program = QueryDict(request.body)['program']
-        # specialization = QueryDict(request.body)['specialization']
 
-        names = QueryDict(request.body)['getNames']
+        initNames = json.loads(QueryDict(request.body)['initNames'])
         chart_data = QueryDict(request.body)['chartData']
         chart_dict = json.loads(chart_data)
+
+        # Get the query data
         year = chart_dict['year']
-        season = chart_dict['season']
-        student_list = StudentCourse.objects.filter(course_id__semester_season=season,
-                                                    course_id__semester_year=year).select_related('student_id')
+        season = string_to_choice(Student.SEASON_CHOICES, chart_dict['season'])
+        program = chart_dict['program']
+        specialization = chart_dict['specialization']
+        course = chart_dict['course']
+        student_name = chart_dict['student']
 
-        names = []
-        for student in student_list:
-            name = student.student_id.user.get_full_name()
-            if name not in names:
-                names.append(name)
-        student_data = json.dumps(names)
+        return_data = {
+            "data": None,
+            "names": None
+        }
 
-        if names:
-            return JsonResponse({"names":student_data})
+        student_data = None
+        if initNames:
+            student_list = StudentCourse.objects.filter(course_id__semester_season=season,
+                                                        course_id__semester_year=year).select_related('student_id')
+
+            names = []
+            for student in student_list:
+                name = student.student_id.user.get_full_name()
+                if name not in names:
+                    names.append(name)
+            student_data = json.dumps(names)
+
+            return_data['names'] = student_data
+
+        '''
+        Our models guarantee the SEASON and YEAR will always be selected, so we do not need
+        to switch based on these parameters
+
+        OPTIONS:
+
+            = SPECIALIZATION :: X
+            ====> whole_semester_by_specialization
+
+            = COURSE :: X
+            ====> whole_semester_by_class
+
+            = COURSE :: STUDENT :: X
+            ====> whole_semester_by_student_by_class
+        '''
+        attendance_data = []
+
+        # Nothing selected
+        if not isSelected(specialization)       \
+            and not isSelected(course)      \
+            and not isSelected(program)     \
+            and not isSelected(student_name):
+            all_data = self.default_graph_by_program(season, year)
+            attendance_data = json.dumps(all_data)
+
+        # Only semester is selected
+        elif isSelected(specialization)       \
+            and not isSelected(course)      \
+            and not isSelected(program)     \
+            and not isSelected(student_name):
+            all_data = self.whole_semester_by_specialization(season, year, specialization)
+            attendance_data = json.dumps(all_data)
+
+        return_data['data'] = attendance_data
+
+        return JsonResponse(return_data)
+
+
+        # Switch on the requested parameters
 
         # data = self.whole_semester_by_specialization(semester_season=season, semester_year=year,
                                               # specialization_val=string_to_choice(Student.SPECIALIZATION_CHOICES, specialization))
@@ -85,8 +129,10 @@ class AttendanceGraphs(View):
             attendance_results = self.build_attendance_results(attendances)
             attendance_results['program'] = program[1]
             program_list.append(attendance_results)
+
         for specialization in Student.SPECIALIZATION_CHOICES:
             specialization_list.append(specialization[1])
+
         for course in Course.objects.filter(semester_season=semester_season, semester_year=semester_year):
             course_list.append(course.title)
 
@@ -102,19 +148,24 @@ class AttendanceGraphs(View):
         return attendance_data
 
     def whole_semester_by_specialization(self, semester_season, semester_year, specialization_val):
-        specialization_name = Student.SPECIALIZATION_CHOICES[specialization_val][1]
-        courses = Course.objects.values('title').distinct()
-        course_list = []
+        course_data = []
+
+        specialization = string_to_choice(Student.SPECIALIZATION_CHOICES, specialization_val)
+
+        courses = StudentCourse.objects.filter(student_id__specialization=specialization,
+                                               course_id__semester_year=semester_year,
+                                               course_id__semester_season=semester_season).values('course_id').distinct()
 
         for course in courses:
-            attendances = list(Attendance.objects.filter(schedule_id__course_id__title=course['title'],
-                                                         schedule_id__course_id__semester_season=semester_season,
-                                                         schedule_id__course_id__semester_year=semester_year).values('status'))
+            course_obj = Course.objects.get(id=course['course_id'])
+            attendances = list(Attendance.objects.filter(schedule_id__course_id__id=course['course_id']).values('status'))
             attendance_results = self.build_attendance_results(attendances)
-            attendance_results['title'] = course['title']
-            course_list.append(attendance_results)
+            attendance_results['title'] = course_obj.title
+            course_data.append(attendance_results)
 
-        attendance_data = {'specialization': specialization_name, 'courses': course_list}
+            print(attendance_results)
+
+        attendance_data = {'specialization': specialization_val, 'course_data': course_data}
 
         return attendance_data
 

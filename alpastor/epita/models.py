@@ -105,7 +105,7 @@ class Student(models.Model):
         (DSA, 'Data Science and Analytics'),
         (CS, 'Computer Security'),
         (SDM, 'Software Development and Multimedia'),
-        (SDS, 'Systems Networks & Security'),
+        (SDS, 'Systems Networks and Security'),
         (IGITM, 'Global IT Management (International)'),
         (AI, "Artificial Intelligence"),
     ]
