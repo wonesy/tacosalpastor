@@ -208,28 +208,81 @@ function feedMeData(initStudentNames) {
 
                 populateNameDropdown(nameList);
             }
-            console.log(JSON.parse(data['data']));
             chooseChart(JSON.parse(data['data']));
         }
     });
 }
 
 function isSelected(value) {
-    if ((value === null) || (value === 'Any')) {
-        return false;
-    }
-
-    return true;
+    return !((value === null) || (value === 'Any'));
 }
 function chooseChart(data) {
 
     // Nothing was selected
-    if ((!isSelected(globalChartData.program)) ||
-        (!isSelected(globalChartData.specialization)) ||
-        (!isSelected(globalChartData.course)) ||
+    if ((!isSelected(globalChartData.program)) &&
+        (!isSelected(globalChartData.specialization)) &&
+        (!isSelected(globalChartData.course)) &&
         (!isSelected(globalChartData.student))) {
         defaultChart(data);
     }
+
+    // Specialization ONLY was selected
+    else if ((!isSelected(globalChartData.program)) &&
+        (isSelected(globalChartData.specialization)) &&
+        (!isSelected(globalChartData.course)) &&
+        (!isSelected(globalChartData.student))) {
+        wholeSemesterBySpecializationChart(data);
+    }
+}
+
+function wholeSemesterBySpecializationChart(data) {
+    let allChartsDiv = document.getElementById('allChartsDiv');
+
+    // Clear what's currently in there
+    allChartsDiv.innerHTML = "";
+
+    let labels = [];
+    let presentCounts = [];
+    let absentCounts = [];
+    let excusedCounts = [];
+    data['course_data'].forEach(function(e) {
+        labels.push(e.title);
+        presentCounts.push(e.attendance.present);
+        absentCounts.push(e.attendance.absent);
+        excusedCounts.push(e.attendance.excused);
+    });
+
+    console.log(data['course_data']);
+    console.log(labels);
+
+    let bar_datasets = [
+        {
+            label: 'Present',
+            data: presentCounts,
+            backgroundColor: getRandomColorHex()
+        },
+        {
+            label: 'Absent',
+            data: absentCounts,
+            backgroundColor: getRandomColorHex()
+        },
+        {
+            label: 'Excused',
+            data: excusedCounts,
+            backgroundColor: getRandomColorHex()
+        },
+    ];
+
+    let newChartDiv = document.createElement('div');
+    newChartDiv.classList.add('col-12');
+    newChartDiv.classList.add('charts');
+    newChartDiv.classList.add('single-chart');
+
+    let newChartCanvas = document.createElement('canvas');
+    newChartDiv.appendChild(newChartCanvas);
+    allChartsDiv.appendChild(newChartDiv);
+
+    createStackedBarChart(newChartCanvas, labels, bar_datasets);
 }
 
 function defaultChart(data) {
@@ -272,19 +325,39 @@ function defaultChart(data) {
         newChartDiv.appendChild(newChartCanvas);
         allChartsDiv.appendChild(newChartDiv);
 
-        createChart(newChartCanvas, 'pie', labels, elem.program, elem.data, colors);
+        createPieChart(newChartCanvas, labels, elem.program, elem.data, colors);
     });
 }
 
 
-// function getChartData() {
-//
-// }
+function createStackedBarChart(location, labels, datasets) {
+    new Chart(location, {
+        type: 'bar',
+        data: {
+            datasets: datasets,
+            labels: labels,
+        },
 
-function createChart(location, type, labels, title, data, colors) {
+        options: {
+            scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true,
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function createPieChart(location, labels, title, data, colors) {
     console.log(data);
     new Chart(location, {
-        type: type, // bar, horizontal bar, pie, line, doughnut, radar, polarArea
+        type: 'pie',
         data: {
             labels: labels,
             datasets: [{

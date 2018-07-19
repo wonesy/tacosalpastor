@@ -157,13 +157,19 @@ class AttendanceGraphs(View):
                                                course_id__semester_season=semester_season).values('course_id').distinct()
 
         for course in courses:
+            course_dict = {
+                'title': '',
+                'attendance': {}
+            }
+
             course_obj = Course.objects.get(id=course['course_id'])
             attendances = list(Attendance.objects.filter(schedule_id__course_id__id=course['course_id']).values('status'))
             attendance_results = self.build_attendance_results(attendances)
-            attendance_results['title'] = course_obj.title
-            course_data.append(attendance_results)
 
-            print(attendance_results)
+            course_dict['title'] = course_obj.title
+            course_dict['attendance'] = attendance_results
+
+            course_data.append(course_dict)
 
         attendance_data = {'specialization': specialization_val, 'course_data': course_data}
 
