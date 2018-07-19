@@ -9,6 +9,7 @@ from .serializers import AttendanceSerializer
 from rest_framework import generics
 import json
 import hashlib
+import os
 from django.http import HttpResponse
 from .models import Student, StudentCourse, Course, Attendance, Schedule, Professor, choice_to_string
 from django.views.generic import View
@@ -433,7 +434,7 @@ def CheckAttendanceByUser(request, slug, token):
     if not schedule_id:
         return page_not_found(request, "Bad Request")
 
-    lock = 0x616e616e6162
+    lock = int(os.getenv('LOCK'), 16)
     x = ""
     while (lock):
         x += chr(lock & 0xff)
