@@ -56,20 +56,14 @@
             </div>
         </div>
 
-        <div id="dataDiv" hidden>{{ all_data }}</div>
-        <div id="studentDataDiv" hidden>{{ students }}</div>
         <div class="row queries">
-            <div id="currentQuery" class="col-lg-2"></div>
-            <div class="row col-lg-10" id="allChartsDiv"></div>
+            <div id="currentQuery" class="col-2"></div>
+            <div class="row col-10" id="allChartsDiv"></div>
         </div>
     </div>
     <script>
         window.onload = function () {
-            const raw_data = document.getElementById('dataDiv').innerText;
-            const chart_data = JSON.parse(raw_data);
-
             feedMeData(true);
-            populateDropdowns(chart_data);
             updateCurrentQuery();
         };
     </script>
