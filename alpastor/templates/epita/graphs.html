@@ -2,11 +2,12 @@
 
 {% load static %}
 
+{% block additional_links %}
+    <link rel="stylesheet" href="../../static/css/graphs.css">
+    <script src="{% static 'js/graphs.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-    <head>
-        <link rel="stylesheet" href="../../static/css/graphs.css">
-        <script src="{% static 'js/graphs.js' %}"></script>
-    </head>
     <div class="container">
         <div class="row text-center">
             <div class="dropdown">
