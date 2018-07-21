@@ -34,9 +34,6 @@ def getJsonNames(user, queryset):
             names[id] = name
     return json.dumps(names)
 
-def getCourseTitles(user):
-    pass
-
 class AttendanceGraphs(View):
     template_name = 'epita/graphs.html'
 
@@ -82,6 +79,7 @@ class AttendanceGraphs(View):
 
             return_data['data'] = attendance_data
             return_data['names'] = names
+            return_data['courses'] = all_data[0]['course']
 
             return JsonResponse(return_data)
 
@@ -151,6 +149,7 @@ class AttendanceGraphs(View):
 
         # Just to get rid of warnings, these do nothing in this
         _ = title
+        _ = authorized
 
         for course in courses:
             course_dict = {
@@ -199,7 +198,8 @@ class AttendanceGraphs(View):
             if title == Title.STUDENT_NAME:
                 student_obj = Student.objects.get(id=student[0])
 
-                if authorized or (student_obj.id == requested_student.id):
+                # Don't show the names of other students unless user is admin/professor
+                if authorized:
                     student_dict['title'] = student_obj.user.get_full_name()
                 else:
                     student_dict['title'] = student_obj.id
