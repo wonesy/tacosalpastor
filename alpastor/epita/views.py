@@ -55,13 +55,12 @@ class CourseView(ListView):
             enrolled_in = StudentCourse.objects.filter(student_id__user_id=user_instance).select_related('course_id').order_by(
                 '-course_id__semester_year', '-course_id__semester_season'
             )
+
             for course in enrolled_in:
                 key = choice_to_string(Student.SEASON_CHOICES, course.course_id.semester_season) + " " + str(course.course_id.semester_year)
-                if not key in courses_by_semester:
+                if not (key in courses_by_semester):
                     courses_by_semester[key] = Course.objects.filter(semester_season=course.course_id.semester_season,
-                            semester_year=course.course_id.semester_year,
-                            title=course.course_id.title
-                    )
+                            semester_year=course.course_id.semester_year)
 
         return render(request, self.template_name, {'semester_list': courses_by_semester})
 

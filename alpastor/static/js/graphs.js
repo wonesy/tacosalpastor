@@ -7,7 +7,7 @@ let globalChartData = {
     'program': null,
     'specialization': null,
     'course': null,
-    'student': null,
+    'student': -1,
     'student_name': null
 };
 
@@ -193,6 +193,29 @@ function populateNameDropdown(student_data) {
     }
 }
 
+function populateCourseDropdown(course_titles) {
+    const courseBtn = document.getElementById('courseBtn');
+
+    // Clear what's already there
+    courseBtn.innerHTML = "";
+
+    courseBtn.innerHTML += '<a class="dropdown-item" href="#">Any</a>';
+
+    //
+    // Student
+    //
+    course_titles.forEach(function(e) {
+        courseBtn.innerHTML += "<a class='dropdown-item' href='#'>{0}</a>".format(e);
+    });
+
+    for (let i = 0; i < courseBtn.children.length; i++) {
+        aTag = courseBtn.children[i].addEventListener('click', function (e) {
+            setCourseQuery(e.target.innerHTML);
+            feedMeData(false);
+        });
+    }
+}
+
 function feedMeData(initDropdown) {
     $.ajax({
         type: 'POST',
@@ -203,15 +226,23 @@ function feedMeData(initDropdown) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (data) {
+            console.log(data);
             if (initDropdown) {
                 // Populate the initial dropdown menus
                 let attendance = JSON.parse(data['data'])[0];
                 populateDropdowns(attendance);
+            } else {
+
             }
 
             // Every time, we have to update the possible list of names
             let nameList = JSON.parse(data["names"]);
             populateNameDropdown(nameList);
+
+            if (data['courses']) {
+                let courseList = data['courses'];
+                populateCourseDropdown(courseList);
+            }
 
             chooseChart(JSON.parse(data['data']));
         }
