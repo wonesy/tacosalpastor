@@ -73,6 +73,7 @@ urlpatterns = [
     path('manageusers/processusercsv/', login_required(accounts_views.ProcessUserCSVData.as_view()), name='processusercsv'),
     path('manageusers/savenewusers/', login_required(accounts_views.SaveNewUsers.as_view()), name='savenewusers'),
     path('manageusers/addstudentcourse/', login_required(accounts_views.AddStudentCourse.as_view()), name='addstudentcourse'),
+    path('manageusers/savenewcourse/', login_required(accounts_views.SaveNewCourse.as_view()), name='addstudentcourse'),
     path('manageusers/deletestudentcourse/', login_required(accounts_views.DeleteStudentCourse.as_view()), name='deletestudentcourse'),
     path('manageusers/', login_required(accounts_views.manageusers), name='manageusers'),
     path('dashboard/', views.dashboard, name='dashboard'),
