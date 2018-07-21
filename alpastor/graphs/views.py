@@ -15,8 +15,15 @@ def isSelected(value):
         return False
     return True
 
-def getJsonNames(queryset):
+def getJsonNames(user, queryset):
     names = {}
+
+    # If a student is accessing the graphs, only allow their own name as a possible option
+    if not user.is_superuser and not user.is_staff:
+        logged_in_student = Student.objects.get(user=user)
+        names[logged_in_student.id] = user.get_full_name()
+        return json.dumps(names)
+
     for student in queryset:
         id = student.student_id.id
         name = student.student_id.user.get_full_name()
@@ -58,7 +65,7 @@ class AttendanceGraphs(View):
             and not isSelected(specialization)  \
             and not isSelected(student)         \
             and not isSelected(course):
-            all_data, names = self.default_graph_by_season_year(season, year)
+            all_data, names = self.default_graph_by_season_year(request.user, season, year)
             attendance_data = json.dumps(all_data)
 
             return_data['data'] = attendance_data
@@ -69,9 +76,6 @@ class AttendanceGraphs(View):
         # Otherwise, run the specific query
         organization = self.organize_by_course
         title = Title.STUDENT_NAME
-
-        attendance_data = []
-        names = []
 
         # Construct the query
         q_query = Q(course_id__semester_season=season) & Q(course_id__semester_year=year)
@@ -89,16 +93,17 @@ class AttendanceGraphs(View):
             organization = self.organize_by_student
 
         if isSelected(student):
-            q_query.add(Q(student_id__id=student), q_query.connector)
+            requested_student_obj = Student.objects.get(id=student)
 
-            if isSelected(course):
-                title = Title.COURSE_TITLE
+            if request.user.is_staff or request.user.is_superuser or requested_student_obj.id == student:
+                q_query.add(Q(student_id__id=student), q_query.connector)
+
+                if isSelected(course):
+                    title = Title.COURSE_TITLE
 
         queryset = StudentCourse.objects.filter(q_query).select_related('student_id')
-        attendance_data = json.dumps(organization(queryset, title))
-        print(attendance_data)
-        names = getJsonNames(queryset)
-        print(names)
+        attendance_data = json.dumps(organization(queryset, title, request.user))
+        names = getJsonNames(request.user, queryset)
 
         return_data['data'] = attendance_data
         return_data['names'] = names
@@ -119,7 +124,7 @@ class AttendanceGraphs(View):
                 excused += 1
         return {'present': present, 'absent': absent, 'excused': excused}
 
-    def organize_by_course(self, queryset, title):
+    def organize_by_course(self, queryset, title, user):
         '''
         This will return data that is intended to be organized with 'course title' as the xAxis
 
@@ -127,6 +132,10 @@ class AttendanceGraphs(View):
         '''
         course_data = []
         courses = queryset.values('course_id').distinct()
+
+        # Just to get rid of warnings, these do nothing in this
+        _ = title
+        _ = user
 
         for course in courses:
             course_dict = {
@@ -146,7 +155,7 @@ class AttendanceGraphs(View):
 
         return course_data
 
-    def organize_by_student(self, queryset, title):
+    def organize_by_student(self, queryset, title, user):
         '''
         This will return data that is intended to be organized with 'student name' as the xAxis
 
@@ -167,7 +176,11 @@ class AttendanceGraphs(View):
 
             if title == Title.STUDENT_NAME:
                 student_obj = Student.objects.get(id=student[0])
-                student_dict['title'] = student_obj.user.get_full_name()
+
+                if user.is_staff or user.is_superuser or student_obj.user.id == user.id:
+                    student_dict['title'] = student_obj.user.get_full_name()
+                else:
+                    student_dict['title'] = student_obj.id
             elif title == Title.COURSE_TITLE:
                 student_dict['title'] = queryset[0].course_id.title
             else:
@@ -178,7 +191,7 @@ class AttendanceGraphs(View):
 
         return student_data
 
-    def default_graph_by_season_year(self, semester_season, semester_year):
+    def default_graph_by_season_year(self, user, semester_season, semester_year):
         programs = Student.PROGRAM_CHOICES
         program_list = []
         specialization_list = []
@@ -213,6 +226,6 @@ class AttendanceGraphs(View):
 
         attendance_data.append(_tmp)
 
-        names = getJsonNames(student_list)
+        names = getJsonNames(user, student_list)
 
         return attendance_data, names
