@@ -226,7 +226,6 @@ function feedMeData(initDropdown) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (data) {
-            console.log(data);
             if (initDropdown) {
                 // Populate the initial dropdown menus
                 let attendance = JSON.parse(data['data'])[0];
