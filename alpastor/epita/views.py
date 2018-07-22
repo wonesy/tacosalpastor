@@ -347,7 +347,8 @@ def dashboard(request):
 
     country_dict = dict(countries)
     for c in country:
-        c['country_name'] = country_dict[c['country']]
+        if c['country']:
+            c['country_name'] = country_dict[c['country']]
 
     program_list = []
     program = Student.objects.values('program').annotate(count_program=Count('program')).order_by('program')
